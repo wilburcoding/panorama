@@ -1,11 +1,18 @@
 # Panorama
-Goal: Performance monitoring, error catching, general logging, and statistics collecting across projects, self-hosted
+Goal: Performance monitoring, error catching, general logging, and statistics collecting across projects
 
 
 
 # TODO
+ - [ ] express for the api / site
+   - [ ] do database stuff using better-sqlite
+     - [ ] tables for errors, logs, metrics
  - [ ] javascript sdk -> going to start with a js sdk first
- - [ ]
+   - [ ] track errors
+   - [ ] track logs
+   - [ ] track metrics
+   - [ ] track performance
+ - [ ] python sdk
 
 
 
@@ -21,3 +28,6 @@ How users would use this
  - Users can launch dashboard from the monitoring service to view data
  - ....
 
+# NOTES
+
+Used a tiny bit of Claude to work out the database stuff but I think I figured it out
