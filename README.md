@@ -13,7 +13,8 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] CRUD operations for projects
      - [x] CRUD operations for deployments
      - [x] CRUD operations for error_events (paginated) (with filtering options)
-     - [ ] 
+     - [ ] Operations to get singular projects/deployments/error_events
+     - [ ] Input sanitazation (i think i spelled it wrong)
  - [ ] javascript sdk -> going to start with a js sdk first
    - [ ] track errors
    - [ ] track logs

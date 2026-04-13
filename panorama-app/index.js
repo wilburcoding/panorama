@@ -3,7 +3,7 @@ import express from "express";
 const app = express();
 const port = 3000;
 
-import { migrate } from "./db/schema.js";
+import { migrate, reset } from "./db/schema.js";
 import { db } from "./db/client.js";
 
 reset();
@@ -43,6 +43,52 @@ app.get("/api/projects", (req, res) => {
   const projects = db.prepare(query).all();
   res.json(projects);
 });
+
+app.get("/api/deployments", (req, res) => {
+  //filtering options: project_id, environment, status
+  const { project_id, environment, status} = req.query;
+  let query = "SELECT * FROM deployments";
+  const conditions = [];
+  if (project_id) {
+    conditions.push(`project_id = ${project_id}`);
+  }
+  if (environment) {
+    conditions.push(`environment = '${environment}'`);
+  }
+  if (status) {
+    conditions.push(`status = '${status}'`);
+  }
+
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+
+  const deployments = db.prepare(query).all();
+  res.json(deployments);
+});
+
+app.get("/api/error-events", (req, res) => {
+  //filtering options: deployment_id, environment, status
+  const { deployment_id, environment, status} = req.query;
+  let query = "SELECT * FROM error_events";
+  const conditions = [];
+  if (deployment_id) {
+    conditions.push(`deployment_id = ${deployment_id}`);
+  }
+
+  if (environment) {
+    conditions.push(`environment = '${environment}'`); // error environment != deployment environment
+  }
+  if (status) {
+    conditions.push(`status = '${status}'`);
+  }
+
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+  const error_events = db.prepare(query).all();
+  res.json(error_events);
+})
 
 app.post("/api/projects", express.json(), (req, res) => {
   const { name, environment, description } = req.body;
