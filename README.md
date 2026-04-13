@@ -7,6 +7,13 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
  - [ ] express for the api / site
    - [ ] do database stuff using better-sqlite
      - [ ] tables for errors, logs, metrics
+     - [x] Setup schema
+     - [x] Database reset function
+   - [ ] Setup API endpoints
+     - [x] CRUD operations for projects
+     - [x] CRUD operations for deployments
+     - [x] CRUD operations for error_events (paginated) (with filtering options)
+     - [ ] 
  - [ ] javascript sdk -> going to start with a js sdk first
    - [ ] track errors
    - [ ] track logs

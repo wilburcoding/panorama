@@ -1,12 +1,12 @@
-const db = require("./client");
- 
+import { db } from "./client.js";
 export function migrate() {
     db.exec(`
         CREATE TABLE IF NOT EXISTS projects (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             environment TEXT NOT NULL,
-            create_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            description TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     `);
     db.exec(`
@@ -16,8 +16,8 @@ export function migrate() {
             version TEXT NOT NULL,
             environment TEXT NOT NULL,
             status TEXT NOT NULL,
-            last_deployed DATETIME DEFAULT CURRENT_TIMESTAMP
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            last_deployed DATETIME DEFAULT CURRENT_TIMESTAMP,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             meta TEXT DEFAULT '{}'
         )`)
     db.exec(`
@@ -25,9 +25,18 @@ export function migrate() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             deployment_id INTEGER NOT NULL,
             title TEXT NOT NULL,
+            status TEXT NOT NULL,
             stack_trace TEXT NOT NULL,
             environment TEXT NOT NULL,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         ) `)
     console.log("Database migrated");
+}
+
+
+export function reset() {
+    db.exec("DROP TABLE IF EXISTS error_events");
+    db.exec("DROP TABLE IF EXISTS deployments");
+    db.exec("DROP TABLE IF EXISTS projects");
+    console.log("Database reset");
 }
