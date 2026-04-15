@@ -1,4 +1,7 @@
 import express from "express";
+import bcrypt from "bcrypt";
+
+const saltRounds = 10;
 
 const app = express();
 const port = 3000;
@@ -9,6 +12,21 @@ import { db } from "./db/client.js";
 reset();
 migrate();
 
+function generateApiKey() {
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
+}
+
+async function hashPassword(password) {
+  return await bcrypt.hashSync(password, saltRounds);
+}
+
+async function checkPassword(password, hash) {
+  return await bcrypt.compare(password, hash);
+}
+
 app.use(express.static("public"));
 
 app.listen(port, () => {
@@ -18,7 +36,7 @@ app.listen(port, () => {
 app.get("/api/projects", (req, res) => {
   // filtering options: name, environment
   // sorting options: created_at, name
-  const { name, environment, sort_by, sort_order } = req.query;
+  const { name, environment, sort_by, sort_order, user_id } = req.query;
   let query = "SELECT * FROM projects";
   const conditions = [];
   if (name) {
@@ -40,13 +58,54 @@ app.get("/api/projects", (req, res) => {
     query += ` ${sort_order}`; // ASC or DESC;
   }
 
+  if (user_id) {
+    query += ` WHERE user_id = ${user_id}`;
+  }
+
   const projects = db.prepare(query).all();
   res.json(projects);
 });
 
+app.post("/api/users", express.json(), async (req, res) => {
+  const { email, password } = req.body;
+  const password_hash = await hashPassword(password);
+  const result = db
+    .prepare("INSERT INTO users (email, password_hash) VALUES (?, ?)")
+    .run(email, password_hash);
+  const user = db
+    .prepare("SELECT first_name, last_name, email, id, created_at FROM users WHERE id = ?")
+    .get(result.lastInsertRowid);
+  res.json({ success: true, user: user });
+});
+
+app.get("/api/users/:id", (req, res) => {
+  const { id } = req.params;
+  const user = db.prepare("SELECT first_name, last_name, email, id, created_at FROM users WHERE id = ?").get(id);
+  res.json(user);
+});
+
+app.get("/api/users/check-credentials", express.json(), async (req, res) => {
+  const { email, password } = req.body;
+  const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  if (!user) {
+    res.status(404).json({ success: false, message: "User not found" });
+  } else {
+    res.json({
+      success: true,
+      valid: await checkPassword(password, user.password_hash),
+    });
+  }
+});
+
+app.get("/api/projects/:id", (req, res) => {
+  const { id } = req.params;
+  const project = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
+  res.json(project);
+});
+
 app.get("/api/deployments", (req, res) => {
   //filtering options: project_id, environment, status
-  const { project_id, environment, status} = req.query;
+  const { project_id, environment, status } = req.query;
   let query = "SELECT * FROM deployments";
   const conditions = [];
   if (project_id) {
@@ -67,9 +126,17 @@ app.get("/api/deployments", (req, res) => {
   res.json(deployments);
 });
 
+app.get("/api/deployments/:id", (req, res) => {
+  const { id } = req.params;
+  const deployment = db
+    .prepare("SELECT * FROM deployments WHERE id = ?")
+    .get(id);
+  res.json(deployment);
+});
+
 app.get("/api/error-events", (req, res) => {
   //filtering options: deployment_id, environment, status
-  const { deployment_id, environment, status} = req.query;
+  const { deployment_id, environment, status } = req.query;
   let query = "SELECT * FROM error_events";
   const conditions = [];
   if (deployment_id) {
@@ -88,7 +155,15 @@ app.get("/api/error-events", (req, res) => {
   }
   const error_events = db.prepare(query).all();
   res.json(error_events);
-})
+});
+
+app.get("/api/error-events/:id", (req, res) => {
+  const { id } = req.params;
+  const error_event = db
+    .prepare("SELECT * FROM error_events WHERE id = ?")
+    .get(id);
+  res.json(error_event);
+});
 
 app.post("/api/projects", express.json(), (req, res) => {
   const { name, environment, description } = req.body;
@@ -105,15 +180,40 @@ app.post("/api/projects", express.json(), (req, res) => {
 });
 
 app.post("/api/deployments", express.json(), (req, res) => {
-  const { project_id, version, environment, status } = req.body;
+  const { project_id, version, environment } = req.body;
   const result = db
     .prepare(
-      "INSERT INTO deployments (project_id, version, environment, status) VALUES (?, ?, ?, ?)",
+      "INSERT INTO deployments (project_id, version, environment, status, api_key) VALUES (?, ?, ?, ?, ?)",
     )
-    .run(project_id, version, environment, status);
+    .run(project_id, version, environment, "enabled", generateApiKey());
   const deployment = db
     .prepare("SELECT * FROM deployments WHERE id = ?")
     .get(result.lastInsertRowid);
+  res.json({ success: true, deployment: deployment });
+});
+
+app.post("/api/deployments/:id/connect", express.json(), (req, res) => {
+  // initializing connection from comment
+  const { id, api_key } = req.body;
+  const deployment = db
+    .prepare("SELECT * FROM deployments WHERE id = ?")
+    .get(id);
+  if (!deployment) {
+    res.status(404).json({ success: false, message: "Deployment not found" });
+    return;
+  }
+
+  if (deployment.api_key !== api_key) {
+    res.status(403).json({ success: false, message: "Invalid API key" });
+  }
+
+  if (deployment.status !== "enabled") {
+    res
+      .status(403)
+      .json({ success: false, message: "Deployment is not active" });
+  }
+  // don't send api_key back in response
+  deployment.api_key = "";
   res.json({ success: true, deployment: deployment });
 });
 

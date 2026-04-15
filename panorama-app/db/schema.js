@@ -1,9 +1,20 @@
 import { db } from "./client.js";
 export function migrate() {
     db.exec(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL UNIQUE,
+            first_name TEXT,
+            last_name TEXT,
+            password_hash TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+    db.exec(`
         CREATE TABLE IF NOT EXISTS projects (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
             environment TEXT NOT NULL,
             description TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -18,7 +29,8 @@ export function migrate() {
             status TEXT NOT NULL,
             last_deployed DATETIME DEFAULT CURRENT_TIMESTAMP,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            meta TEXT DEFAULT '{}'
+            meta TEXT DEFAULT '{}',
+            api_key TEXT NOT NULL
         )`)
     db.exec(`
         CREATE TABLE IF NOT EXISTS error_events (

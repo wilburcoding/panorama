@@ -1,0 +1,9 @@
+{
+  "name": "panorama-sdk",
+  "version": "1.0.0",
+  "main": "main.js",
+  "type": "module",
+  "files": [
+    "main.js"
+  ]
+}

@@ -6,21 +6,32 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
 # TODO
  - [ ] express for the api / site
    - [ ] do database stuff using better-sqlite
-     - [ ] tables for errors, logs, metrics
+     - [x] tables for errors, logs, metrics
      - [x] Setup schema
      - [x] Database reset function
+     - [x] Handle users
+       - [x] Handle user account creation
+       - [x] Handle user credentials check
+       - [x] Figure out how to securely store passwords using bcryptjs
    - [ ] Setup API endpoints
      - [x] CRUD operations for projects
      - [x] CRUD operations for deployments
      - [x] CRUD operations for error_events (paginated) (with filtering options)
-     - [ ] Operations to get singular projects/deployments/error_events
+     - [x] Operations to get singular projects/deployments/error_events
      - [ ] Input sanitazation (i think i spelled it wrong)
  - [ ] javascript sdk -> going to start with a js sdk first
+   - [x] initiate
    - [ ] track errors
+     - [ ] incorporate data straight from node.js error catching
+     - [ ] track breadcrumbs 
    - [ ] track logs
    - [ ] track metrics
    - [ ] track performance
  - [ ] python sdk
+ - [ ] dashboard
+   - [ ] project list page
+   - [ ] project detail page
+   - [ ] user account management
 
 
 
@@ -35,6 +46,7 @@ How users would use this
  - Users use the API url to send data to other service
  - Users can launch dashboard from the monitoring service to view data
  - ....
+
 
 # NOTES
 
