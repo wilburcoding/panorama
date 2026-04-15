@@ -10,8 +10,6 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] Setup schema
      - [x] Database reset function
      - [x] Handle users
-       - [x] Handle user account creation
-       - [x] Handle user credentials check
        - [x] Figure out how to securely store passwords using bcryptjs
    - [ ] Setup API endpoints
      - [x] CRUD operations for projects
@@ -19,6 +17,8 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] CRUD operations for error_events (paginated) (with filtering options)
      - [x] Operations to get singular projects/deployments/error_events
      - [ ] Input sanitazation (i think i spelled it wrong)
+     - [x] Handle user account creation
+     - [x] Handle user credentials check
  - [ ] javascript sdk -> going to start with a js sdk first
    - [x] initiate
    - [ ] track errors
@@ -47,7 +47,44 @@ How users would use this
  - Users can launch dashboard from the monitoring service to view data
  - ....
 
+Website planning:
+ - Minimalistic theme? 
+ - Colors 
+   - White
+   - MIdish blue #195FF9
+   - Gray: #9B9B9B
+   - Light blue #96C5FF
+ - Keep it simple probably
+ - Pages
+   - Home page
+     - Show heading + options to create an account or login
+   - Log in / sign up page
+     - Dialog + input areas + buttons to create an account or login
+   - Dashboard
+     - Sidebar menu with options for
+       - Home page (summary of projects, deployments, recent events);
+       - List of projects
+         - Card list of projects with basic overview
+         - Open project page
+           - Show statics regarding project
+           - List of deployments 
+           - Settings
+       - Deployment information
+         - Show some basic information and statistics
+         - list of error events
+       - Error information
+         - Basically show everything that is available about the event
+         - Options to delete, tag
+       - Settings
+         - With user account options
 
 # NOTES
 
 Used a tiny bit of Claude to work out the database stuff but I think I figured it out
+
+Timeline:
+- [ ] API
+- [ ] dashboard
+- [ ] SDK
+- [ ] dashboard functionality
+- [ ] testing

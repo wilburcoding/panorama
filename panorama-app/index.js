@@ -97,6 +97,12 @@ app.get("/api/users/check-credentials", express.json(), async (req, res) => {
   }
 });
 
+app.delete("/api/users/:id", (req, res) => {
+  const { id } = req.params;
+  db.prepare("DELETE FROM users WHERE id = ?").run(id);
+  res.json({ success: true });
+});
+
 app.get("/api/projects/:id", (req, res) => {
   const { id } = req.params;
   const project = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
