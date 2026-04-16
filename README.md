@@ -48,6 +48,7 @@ How users would use this
  - ....
 
 Website planning:
+ - Make a website logo (eventually)
  - Minimalistic theme?  Scrap that I'm taking on neobrutalism
  - Colors 
    - White

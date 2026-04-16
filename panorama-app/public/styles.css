@@ -39,14 +39,12 @@ h1 {
 }
 
 #home-bar {
-    margin-top:15px;
-    margin-bottom:4px;
-
-
+  margin-top: 15px;
+  margin-bottom: 4px;
 }
 
 #home-bar button {
-    font-size:25px;
+  font-size: 25px;
 }
 
 p {
@@ -61,6 +59,7 @@ button {
   box-shadow: 4px 4px 0px #000;
   font-size: 20px;
   padding: 10px 12px;
+  transition-duration: 0.1s;
   margin: 5px;
 }
 
@@ -96,8 +95,8 @@ button:hover {
 #m-subbox1 {
   width: 24vw;
   height: 24vw;
-  margin-top: 4vw;
-  margin-left: 4vw;
+  margin-top: 4.5vw;
+  margin-left: 4.5vw;
   background-color: #31a047;
   display: flex;
   align-items: center;
@@ -110,8 +109,8 @@ button:hover {
 
 #m-subbox2 {
   position: absolute;
-  top: -4vw;
-  left: -4vw;
+  top: -4.5vw;
+  left: -4.5vw;
   background-color: #e0e757;
   width: 24vw;
   transform: rotate(-25deg);
@@ -123,4 +122,74 @@ button:hover {
   justify-content: center;
   border-radius: 2px;
   border: solid 3px black;
+}
+
+/* SIGN IN PAGE STYLES */
+#signin-container, #signup-container {
+  background-color: white;
+  border: solid 3px black;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width:400px;
+  justify-content: center;
+  color: black;
+}
+
+#signin-container h1, #signup-container h1{
+  font-size: 55px;
+  line-height:55px;
+  margin-top:30px;
+  margin-bottom:5px;
+}
+
+#signin-container button, #signup-container button {
+    margin-top:10px !important;
+    width: 50%;
+}
+
+.form-label {
+  font-size: 18px !important;
+  width: 80%;
+  text-align: left;
+  /* margin-left: 10px !important; */
+  margin-bottom: 0px;
+  box-sizing: border-box;
+
+  margin-top: 3px;
+}
+input[type="text"],
+input[type="password"] {
+  border: solid 2px black;
+  border-radius: 2px;
+  padding: 10px 12px;
+  font-size: 20px;
+  box-sizing: border-box;
+  margin: 10px;
+  width: 80%;
+  margin-top: 0px;
+  outline: none;
+}
+
+#signin-subtext, #signup-subtext {
+    font-size:15px !important;
+    margin-bottom:5px;
+}
+
+#name-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width:80%;
+    gap: 10px;
+}
+
+#name-container input {
+    margin: 0px;
+}
+
+a {
+    text-decoration: underline !important;
 }
