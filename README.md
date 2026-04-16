@@ -48,12 +48,15 @@ How users would use this
  - ....
 
 Website planning:
- - Minimalistic theme? 
+ - Minimalistic theme?  Scrap that I'm taking on neobrutalism
  - Colors 
    - White
-   - MIdish blue #195FF9
+   - MIdish blue #2c69ed
+   - Green #31a047
+   - Dark yellow? #cbd23e
    - Gray: #9B9B9B
    - Light blue #96C5FF
+   - Light green: #47a558
  - Keep it simple probably
  - Pages
    - Home page
