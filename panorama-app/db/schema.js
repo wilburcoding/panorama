@@ -7,7 +7,8 @@ export function migrate() {
             first_name TEXT,
             last_name TEXT,
             password_hash TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            session_id TEXT
         )
     `);
     db.exec(`
@@ -47,6 +48,7 @@ export function migrate() {
 
 
 export function reset() {
+    db.exec("DROP TABLE IF EXISTS users");
     db.exec("DROP TABLE IF EXISTS error_events");
     db.exec("DROP TABLE IF EXISTS deployments");
     db.exec("DROP TABLE IF EXISTS projects");

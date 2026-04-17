@@ -28,10 +28,18 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
    - [ ] track metrics
    - [ ] track performance
  - [ ] python sdk
- - [ ] dashboard
-   - [ ] project list page
-   - [ ] project detail page
-   - [ ] user account management
+ - [ ] web app
+   - [ ] UI
+     - [ ] Home page
+     - [ ] Dashboard
+     - [ ] user signin/create account
+   - [x] User signup + sign in base functionality
+     - [ ] Check if user is logged in already
+     - [ ] Handle sessions
+   - [ ] Dashboard
+     - [ ] project list page
+     - [ ] project detail page
+     - [ ] user account management
 
 
 

@@ -20,36 +20,172 @@
       type="text/css"
       href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
     />
+
     <title>Panorama App</title>
   </head>
   <body>
-    <div id="main-content">
-      <div id="signin-container">
-        <h1>SIGN IN</h1>
-        <p class="form-label">Email</p>
-        <input type="text" placeholder="Email" />
-        <p class="form-label">Password</p>
-        <input type="password" placeholder="Password" />
-        <button>Sign In</button>
-        <p id="signin-subtext">Already have an account? <a>Sign Up</a></p>
+    <div
+      id="main-content"
+      style="
+        overflow-y: hidden;
+        overflow-x: hidden;
+        width: 100vw;
+        height: 100vh;
+      "
+    >
+      <div class="menu-container">
+        <div id="signin-container">
+          <h1>SIGN IN</h1>
+          <p class="form-label">Email</p>
+          <input type="text" placeholder="Email" id="signin-email" />
+          <p class="form-label">Password</p>
+          <input type="password" placeholder="Password" id="signin-password" />
+          <p id="signin-error">
+            <!-- Please put a valid email and password -->
+          </p>
+          <button id="signin">Sign In</button>
+          <p id="signin-subtext">
+            Already have an account? <a class="s-flip">Sign Up</a>
+          </p>
+        </div>
       </div>
       <div id="signup-container">
         <h1>SIGN UP</h1>
         <p class="form-label">Full Name</p>
         <div id="name-container">
-          <input type="text" placeholder="First Name"/>
-          <input type="text" placeholder="Last Name"/>
+          <input type="text" placeholder="First Name" id="signup-firstname" />
+          <input type="text" placeholder="Last Name" id="signup-lastname" />
         </div>
         <p class="form-label">Email</p>
-        <input type="text" placeholder="Email" />
+        <input type="text" placeholder="Email" id="signup-email" />
         <p class="form-label">Password</p>
-        <input type="password" placeholder="Password" />
-        <button>Sign Up</button>
-        <p id="signup-subtext">Already have an account? <a>Sign In</a></p>
+        <input type="password" placeholder="Password" id="signup-password" />
+        <p id="signup-error">
+          <!-- Please put a valid email and password -->
+        </p>
+        <button id="signup">Sign Up</button>
+        <p id="signup-subtext">
+          Already have an account? <a class="s-flip">Sign In</a>
+        </p>
       </div>
     </div>
   </body>
+  <script
+    src="https://code.jquery.com/jquery-4.0.0.min.js"
+    integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao="
+    crossorigin="anonymous"
+  ></script>
   <script>
-    
+    let signin = true;
+    let params = new URLSearchParams(window.location.search);
+    $(document).ready(function () {
+      let name = params.get("signup");
+      if (name != null) {
+        $("#signin-container").css("transform", "translateX(-60vw)");
+        $("#signup-container").css("transform", "translateX(0)");
+      } else {
+        $("#signin-container").css("transform", "translateX(0)");
+        $("#signup-container").css("transform", "translateX(60vw)");
+      }
+      $(".s-flip").click(function () {
+        signin = !signin;
+        if (signin) {
+          $("#signin-container").css("transform", "translateX(0)");
+          $("#signup-container").css("transform", "translateX(60vw)");
+        } else {
+          $("#signin-container").css("transform", "translateX(-60vw)");
+          $("#signup-container").css("transform", "translateX(0)");
+        }
+      });
+
+      // handle sign in
+      $("#signin").on("click", function () {
+        // check inputs
+        if ($("#signin-password").val().length < 4) {
+          $("#signin-error").text("Please enter a valid password");
+          return;
+        }
+        if (
+          $("#signin-email").val().length < 3 ||
+          !$("#signin-email").val().includes("@")
+        ) {
+          $("#signin-error").text("Please enter a valid email");
+          return;
+        }
+
+        fetch("/api/users/check-credentials", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: $("#signin-email").val(),
+            password: $("#signin-password").val(),
+          }),
+        })
+          .then((data) => data.json())
+          .then((json) => {
+            if (!json.success) {
+              $("#signin-error").text(json.message);
+            } else {
+              // redirect to dashboard
+            }
+          })
+          .catch((e) => {
+            $("#signin-error").text(
+              "An error occurred while signing in. Please try again later.",
+            );
+          });
+      });
+
+      // handle sign up
+      $("#signup").on("click", function () {
+        // check inputs -> first name, last name, email, and password
+        if ($("#signup-password").val().length < 8) {
+          $("#signup-error").text(
+            "Your password must be at least 8 characters long",
+          );
+          return;
+        }
+        if ($("#signup-firstname").val().length == 0) {
+          $("#signup-error").text("Please enter your first name");
+          return;
+        }
+        if ($("#signup-lastname").val().length == 0) {
+          $("#signup-error").text("Please enter your last name");
+          return;
+        }
+
+        if (
+          $("#signup-email").val().length < 3 ||
+          !$("#signup-email").val().includes("@")
+        ) {
+          $("#signup-error").text("Please enter a valid email");
+          return;
+        }
+
+        fetch("/api/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            first_name: $("#signup-firstname").val(),
+            last_name: $("#signup-lastname").val(),
+            email: $("#signup-email").val(),
+            password: $("#signup-password").val(),
+          }),
+        }).then((data) => data.json())
+        .then((json) => {
+            if (json.success) {
+                //return to dashboard
+            } else {
+                $("#signup-error").text(json.message);
+            }
+        })
+      });
+
+      // check if user is already signed in
+    });
   </script>
 </html>

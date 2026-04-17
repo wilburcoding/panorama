@@ -67,32 +67,54 @@ app.get("/api/projects", (req, res) => {
 });
 
 app.post("/api/users", express.json(), async (req, res) => {
-  const { email, password } = req.body;
+  const { first_name, last_name, email, password } = req.body;
   const password_hash = await hashPassword(password);
+  // check if user already exists with that email
+  const existing = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
+  if (existing) {
+    res.json({ success: false, message: "A user with that email already exists. Try signing in." })
+    return;
+  }
   const result = db
-    .prepare("INSERT INTO users (email, password_hash) VALUES (?, ?)")
-    .run(email, password_hash);
+    .prepare("INSERT INTO users (first_name, last_name, email, password_hash) VALUES (?, ?, ?, ?)")
+    .run(first_name, last_name, email, password_hash);
   const user = db
     .prepare("SELECT first_name, last_name, email, id, created_at FROM users WHERE id = ?")
     .get(result.lastInsertRowid);
   res.json({ success: true, user: user });
 });
 
-app.get("/api/users/:id", (req, res) => {
+app.get("/api/users/find/:id", (req, res) => {
   const { id } = req.params;
   const user = db.prepare("SELECT first_name, last_name, email, id, created_at FROM users WHERE id = ?").get(id);
   res.json(user);
 });
 
-app.get("/api/users/check-credentials", express.json(), async (req, res) => {
+app.get("/api/users/:id/session", (req, res) => {
+  const { id } = req.params;
+
+  const session_id = db.prepare("SELECT session_id FROM users WHERE id = ?").get(id);
+  if (!session_id) {
+    res.status(404).json({ success: false, message: "We couldn't find anyone with that email..."}); 
+  }
+  res.json({ session_id: session_id})
+})
+
+// user log in
+app.post("/api/users/check-credentials", express.json(), async (req, res) => {
   const { email, password } = req.body;
   const user = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
   if (!user) {
     res.status(404).json({ success: false, message: "User not found" });
   } else {
+    // create new session id
+    const session_id = generateApiKey();
+    db.prepare("UPDATE users SET session_id = ? WHERE id = ?").run(session_id, user.id);
+
     res.json({
       success: true,
       valid: await checkPassword(password, user.password_hash),
+      session_id: session_id,
     });
   }
 });

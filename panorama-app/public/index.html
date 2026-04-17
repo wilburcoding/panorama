@@ -29,8 +29,8 @@
           <h1>PANORAMA</h1>
           <p>Easy error tracking for your projects</p>
           <div id="home-bar">
-            <button>Get Started</button>
-            <button>Login</button>
+            <button id="m-signup">Get Started</button>
+            <button id="m-login">Login</button>
           </div>
         </div>
         <div id="main-sidecontent">
@@ -44,6 +44,15 @@
       </div>
     </div>
   </body>
+  <script src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
   <script>
+    $(document).ready(function() {
+      $("#m-login").click(function() {
+        window.location.href = "/signin.html";
+      })
+      $("#m-signup").click(function() {
+        window.location.href = "/signin.html";
+      })
+    })
   </script>
 </html>
