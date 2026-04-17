@@ -34,8 +34,8 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] Dashboard
      - [ ] user signin/create account
    - [x] User signup + sign in base functionality
-     - [ ] Check if user is logged in already
-     - [ ] Handle sessions
+     - [x] Check if user is logged in already
+     - [x] Handle sessions 
    - [ ] Dashboard
      - [ ] project list page
      - [ ] project detail page

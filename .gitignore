@@ -1,2 +1,4 @@
 package_lock.json
 node_modules/
+panorama-app/panorama.db-shm
+panorama-app/panorama.db-wal

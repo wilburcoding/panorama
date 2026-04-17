@@ -75,11 +75,12 @@ app.post("/api/users", express.json(), async (req, res) => {
     res.json({ success: false, message: "A user with that email already exists. Try signing in." })
     return;
   }
+  const session_id = generateApiKey();
   const result = db
-    .prepare("INSERT INTO users (first_name, last_name, email, password_hash) VALUES (?, ?, ?, ?)")
-    .run(first_name, last_name, email, password_hash);
+    .prepare("INSERT INTO users (first_name, last_name, email, password_hash, session_id) VALUES (?, ?, ?, ?, ?)")
+    .run(first_name, last_name, email, password_hash, session_id);
   const user = db
-    .prepare("SELECT first_name, last_name, email, id, created_at FROM users WHERE id = ?")
+    .prepare("SELECT first_name, last_name, email, id, created_at, session_id FROM users WHERE id = ?")
     .get(result.lastInsertRowid);
   res.json({ success: true, user: user });
 });
@@ -90,14 +91,15 @@ app.get("/api/users/find/:id", (req, res) => {
   res.json(user);
 });
 
-app.get("/api/users/:id/session", (req, res) => {
+app.get("/api/users/check-session", (req, res) => {
   const { id } = req.params;
 
-  const session_id = db.prepare("SELECT session_id FROM users WHERE id = ?").get(id);
-  if (!session_id) {
-    res.status(404).json({ success: false, message: "We couldn't find anyone with that email..."}); 
+  const user = db.prepare("SELECT * FROM users WHERE session_id = ?").get(id);
+  if (!user) {
+    res.status(404).json({ success: false})
+  } else {
+    res.status(200).json({ success: true});
   }
-  res.json({ session_id: session_id})
 })
 
 // user log in

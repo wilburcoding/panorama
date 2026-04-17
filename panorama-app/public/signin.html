@@ -125,10 +125,17 @@
         })
           .then((data) => data.json())
           .then((json) => {
+            console.log(json);
             if (!json.success) {
               $("#signin-error").text(json.message);
             } else {
               // redirect to dashboard
+              if (json.valid) {
+                localStorage.setItem("session_id", json.user.session_id);
+                //   window.location.href = "/dashboard.html";
+              } else {
+                $("#signin-error").text("Invalid email or password");
+              }
             }
           })
           .catch((e) => {
@@ -175,17 +182,39 @@
             email: $("#signup-email").val(),
             password: $("#signup-password").val(),
           }),
-        }).then((data) => data.json())
-        .then((json) => {
-            if (json.success) {
-                //return to dashboard
-            } else {
-                $("#signup-error").text(json.message);
-            }
         })
+          .then((data) => data.json())
+          .then((json) => {
+            if (json.success) {
+              //return to dashboard
+              localStorage.setItem("session_id", json.user.session_id);
+            //   window.location.href = "/dashboard.html";
+            } else {
+              $("#signup-error").text(json.message);
+            }
+          });
       });
 
       // check if user is already signed in
+      if (localStorage.getItem("session_id")) {
+        // check if session id is valid
+        fetch("/api/users/check-session", {
+          method: "GET",
+          params: {
+            session_id: localStorage.getItem("session_id"),
+          },
+        })
+          .then((data) => data.json())
+          .then((json) => {
+            console.log(json);
+            if (json.success) {
+                // continue to dashbaord
+            } else {
+                //invalid session
+                localStorage.removeItem("session_id");
+            }
+          });
+      }
     });
   </script>
 </html>
