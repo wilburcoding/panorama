@@ -131,7 +131,7 @@
             } else {
               // redirect to dashboard
               if (json.valid) {
-                localStorage.setItem("session_id", json.user.session_id);
+                localStorage.setItem("session_id", json.session_id);
                 //   window.location.href = "/dashboard.html";
               } else {
                 $("#signin-error").text("Invalid email or password");
@@ -142,6 +142,7 @@
             $("#signin-error").text(
               "An error occurred while signing in. Please try again later.",
             );
+            console.error(e);
           });
       });
 
@@ -188,7 +189,7 @@
             if (json.success) {
               //return to dashboard
               localStorage.setItem("session_id", json.user.session_id);
-            //   window.location.href = "/dashboard.html";
+              window.location.href = "/dashboard.html";
             } else {
               $("#signup-error").text(json.message);
             }
@@ -198,17 +199,15 @@
       // check if user is already signed in
       if (localStorage.getItem("session_id")) {
         // check if session id is valid
-        fetch("/api/users/check-session", {
+        fetch("/api/users/check-session?session_id=" + localStorage.getItem("session_id") , {
           method: "GET",
-          params: {
-            session_id: localStorage.getItem("session_id"),
-          },
         })
           .then((data) => data.json())
           .then((json) => {
             console.log(json);
             if (json.success) {
                 // continue to dashbaord
+                window.location.href = "/dashboard.html";
             } else {
                 //invalid session
                 localStorage.removeItem("session_id");

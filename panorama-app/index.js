@@ -9,7 +9,7 @@ const port = 3000;
 import { migrate, reset } from "./db/schema.js";
 import { db } from "./db/client.js";
 
-reset();
+// reset();
 migrate();
 
 function generateApiKey() {
@@ -92,9 +92,10 @@ app.get("/api/users/find/:id", (req, res) => {
 });
 
 app.get("/api/users/check-session", (req, res) => {
-  const { id } = req.params;
+  console.log(req.query);
+  const { session_id } = req.query;
 
-  const user = db.prepare("SELECT * FROM users WHERE session_id = ?").get(id);
+  const user = db.prepare("SELECT * FROM users WHERE session_id = ?").get(session_id);
   if (!user) {
     res.status(404).json({ success: false})
   } else {

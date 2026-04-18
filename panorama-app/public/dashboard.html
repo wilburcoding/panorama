@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
+
+    <title>Panorama App</title>
+  </head>
+  <body>
+    <div id="main-content" style="flex-direction:row">
+        <div id="sidebar">
+            <h1 style="margin-top:20px;" id="stitle">PANORAMA</h1>
+            <p class="section-label">Navigation</p>
+            <button class="active"><i class="ph ph-chart-pie-slice"></i>Dashboard</button>
+            <button><i class="ph ph-list-checks"></i>Projects</button>
+            <div id="project-list">
+
+            </div>
+            <button><i class="ph ph-gear"></i>Settings</button>
+
+        </div>
+        <div id="dashboard-content">
+
+        </div>
+    </div>
+  </body>
+  <script
+    src="https://code.jquery.com/jquery-4.0.0.min.js"
+    integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao="
+    crossorigin="anonymous"
+  ></script>
+  <script>
+    $(document).ready(function () {
+      // check if user is signed in
+      if (localStorage.getItem("session_id")) {
+        // check if session id is valid
+        fetch(
+          "/api/users/check-session?session_id=" +
+            localStorage.getItem("session_id"),
+          {
+            method: "GET",
+          },
+        )
+          .then((data) => data.json())
+          .then((json) => {
+            console.log(json);
+            if (!json.success){
+              //invalid session
+              localStorage.removeItem("session_id");
+              window.location.href="/signin.html";
+            } else {
+                //load user data + populate dashboard
+            }
+          });
+      }
+    });
+  </script>
+</html>
