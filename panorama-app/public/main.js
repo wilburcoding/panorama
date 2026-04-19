@@ -3,11 +3,11 @@ $(document).ready(function () {
 
   function loadData() {
     fetch("/api/projects?session_id=" + localStorage.getItem("session_id"), {
-        method: "GET",
-    }).then((data) => data.json())
-    .then((json) => {
+      method: "GET",
+    })
+      .then((data) => data.json())
+      .then((json) => {
         projects = json;
-
 
         // create sample timeline chart for now
         const config = {
@@ -18,9 +18,11 @@ $(document).ready(function () {
               {
                 label: "Error Events",
                 data: [0, 4, 10, 2, 5],
-                backgroundColor: "#A3E635",
+                backgroundColor: "#31a047",
                 borderColor: "#000000",
-                borderWidth: 3
+                borderWidth: 3,
+                borderSkipped: false,
+                borderRadius: 3,
               },
             ],
           },
@@ -28,15 +30,44 @@ $(document).ready(function () {
             scales: {
               y: {
                 beginAtZero: true,
+                grid: {
+                  display: false,
+                },
+              },
+              x: {
+                grid: { display: false },
+                ticks: {
+                  color: "#000000",
+                  font: { size: 13, weight: "500" },
+                  autoSkip: false,
+                  maxRotation: 0,
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+              },
+              tooltip: {
+                backgroundColor: "#FFFFFF",
+                borderColor: "#000000",
+                borderWidth: 1.5,
+                cornerRadius: 0,
+                titleColor: "#000000",
+                bodyColor: "#000000",
+                padding: 10,
+                boxPadding: 5,
+                titleFont: { size: 15, weight: "600" },
               },
             },
           },
         };
         const ctx = document.getElementById("timeline-chart");
         const timelineChart = new Chart(ctx, config);
-    }).catch((error) => {
-        // TODO: error messages for user 
-    })
+      })
+      .catch((error) => {
+        // TODO: error messages for user
+      });
   }
   // check if user is signed in
   if (localStorage.getItem("session_id")) {

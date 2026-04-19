@@ -49,7 +49,7 @@
               font-size: 35px;
               color: black;
               margin-top: 5px;
-              margin-bottom: 0px;
+              margin-bottom: 10px;
               line-height: 35px;
             "
           >
@@ -73,16 +73,135 @@
           </div>
         </div>
         <div class="dashboard-row">
-          <div class="dashboard-card" style="flex: 2">
+          <div class="dashboard-card" style="flex: 1.6">
             <h2>Event Timeline</h2>
             <div style="flex: 1; height: auto; width: 100%">
               <canvas id="timeline-chart"> </canvas>
             </div>
           </div>
-          <div class="dashboard-card" style="flex: 1">
-            <h2></h2>
-            <!-- placeholder for now as I can't find think of anything better -->
-            <h1>5</h1>
+          <div
+            class="dashboard-card"
+            style="
+              flex: 1;
+              padding-left: 0;
+              padding-right: 0;
+              padding-bottom: 0;
+            "
+          >
+            <h2 style="margin-left: 20px">Problematic Deployments</h2>
+            <div
+              id="wdeployment-container"
+              style="flex: 1; border-top: solid 2px black"
+            >
+              <!-- max number is 5 -->
+              <div class="wdeployment-card">
+                <h1>Deployment 1</h1>
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <p>4 errors</p>
+                  <div class="change">
+                    <p>+1</p>
+                  </div>
+                </div>
+              </div>
+              <hr />
+              <div class="wdeployment-card">
+                <h1>Deployment 2</h1>
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <p>4 errors</p>
+                  <div class="change">
+                    <p>+1</p>
+                  </div>
+                </div>
+              </div>
+              <hr />
+              <div class="wdeployment-card">
+                <h1>Deployment 3</h1>
+                <div
+                  style="
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+                  "
+                >
+                  <p>4 errors</p>
+                  <div class="change">
+                    <p>+1</p>
+                  </div>
+                </div>
+              </div>
+              <hr />
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div
+            class="dashboard-card"
+            style="
+              flex: 1;
+              padding-left: 0;
+              padding-right: 0;
+              padding-bottom: 0;
+            "
+          >
+            <h2 style="margin-left: 20px">Project List</h2>
+            <div id="dashboard-plist">
+              <!-- list of projets on dashboard -->
+              <div class="dproject-card">
+                <div class="dproject-info-item">
+                  <h1>Project 1</h1>
+                  <div class="dproject-status active">
+                    <p>Active</p>
+                  </div>
+                </div>
+                <div class="dproject-info">
+                  <div class="dproject-info-item">
+                    <i class="ph ph-warning"></i>
+                    <p>5 Unresolved Errors</p>
+                  </div>
+                  <p>/</p>
+                  <div class="dproject-info-item">
+                    <i class="ph ph-clock"></i>
+                    <p>Last error 2 hours ago</p>
+                  </div>
+                </div>
+              </div>
+              <hr />
+              <div class="dproject-card">
+                <div class="dproject-info-item">
+                  <h1>Project 1</h1>
+                  <div class="dproject-status inactive">
+                    <p>Inactive</p>
+                  </div>
+                </div>
+                <div class="dproject-info">
+                  <div class="dproject-info-item">
+                    <i class="ph ph-warning"></i>
+                    <p>5 Unresolved Errors</p>
+                  </div>
+                  <p>/</p>
+                  <div class="dproject-info-item">
+                    <i class="ph ph-clock"></i>
+                    <p>Last error 2 hours ago</p>
+                  </div>
+                </div>
+              </div>
+              <hr />
+            </div>
           </div>
         </div>
       </div>

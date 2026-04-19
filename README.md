@@ -69,7 +69,9 @@ Website planning:
    - Dark yellow? #cbd23e
    - Gray: #9B9B9B
    - Light blue #96C5FF
-   - Light green: #47a558
+   - Light green: #7fd58f
+   - Light gray: rgb(186, 186, 186);
+   - Light red: rgb(245, 140, 140);
  - Keep it simple probably
  - Pages
    - Home page
