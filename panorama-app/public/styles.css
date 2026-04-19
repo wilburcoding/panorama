@@ -256,6 +256,7 @@ a {
   height:100%;
   background-color: rgb(253, 250, 242);
   box-sizing: border-box;
+  overflow-y: scroll;
 
 }
 
@@ -264,7 +265,6 @@ a {
   border:none;
   background-color: transparent;
   box-shadow: none;
-  color:white;
   font-weight: 700;
   outline:none;
   display:flex;
@@ -275,11 +275,18 @@ a {
   width:80%;
   margin-top: 4px;
   margin-bottom:4px;
+  color: white;
+  opacity:0.7;
 }
 
 #project-list {
   padding:0;
   padding-left:15px;
+  width:100%;
+
+}
+#project-list button {
+  width:60%;
 }
 
 #sidebar button i {
@@ -287,6 +294,14 @@ a {
 
 }
 
+#sidebar button.active {
+  opacity:1;
+}
+
+#sidebar button.project {
+  margin-top:0px !important; 
+  margin-bottom:0px !important;
+}
 
 #sidebar button:hover {
   transform:none;
@@ -294,3 +309,48 @@ a {
   background-color: rgba(165, 165, 165, 0.152);
   
 }
+
+.project-color {
+  width:18px;
+  height:18px;
+  border-radius:3px;
+  background-color: blue;
+  border:solid 1px white;
+  margin-right: 10px;
+}
+
+.dashboard-row {
+  width:100%;
+  display:flex;
+  padding:10px 20px;
+  padding-left:5%;
+  box-sizing:border-box;
+  flex-direction: row;
+  gap: 20px;;
+}
+
+.dashboard-card {
+  background-color:white;
+  border:solid 2px black;
+  border-radius:2px;
+  padding:20px;
+  color: black;
+  /* margin-right:30px; */
+  width:15vw;
+  box-sizing: border-box;
+  min-width:0;
+
+
+}
+
+.dashboard-card h2 {
+  margin-top:10px;
+  font-weight:500;
+}
+
+.dashboard-card h1 {
+  font-size:80px !important;
+  line-height:80px !important;
+}
+
+

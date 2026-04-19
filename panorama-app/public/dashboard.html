@@ -24,21 +24,73 @@
     <title>Panorama App</title>
   </head>
   <body>
-    <div id="main-content" style="flex-direction:row">
-        <div id="sidebar">
-            <h1 style="margin-top:20px;" id="stitle">PANORAMA</h1>
-            <p class="section-label">Navigation</p>
-            <button class="active"><i class="ph ph-chart-pie-slice"></i>Dashboard</button>
-            <button><i class="ph ph-list-checks"></i>Projects</button>
-            <div id="project-list">
-
+    <div id="main-content" style="flex-direction: row">
+      <div id="sidebar">
+        <h1 style="margin-top: 20px" id="stitle">PANORAMA</h1>
+        <button class="active">
+          <i class="ph ph-chart-pie-slice"></i>Dashboard
+        </button>
+        <p class="section-label" style="margin-top: 15px">Projects</p>
+        <button class="project">
+          <i class="ph ph-list-checks"></i>Overview
+        </button>
+        <!-- <button class="project"><div class="project-color" ></div>Project 1</button> -->
+        <button style="margin-top: 19px">
+          <i class="ph ph-gear"></i>Settings
+        </button>
+      </div>
+      <div id="dashboard-content">
+        <div
+          class="dashboard-row"
+          style="padding-bottom: 0px; padding-top: 40px"
+        >
+          <h1
+            style="
+              font-size: 35px;
+              color: black;
+              margin-top: 5px;
+              margin-bottom: 0px;
+              line-height: 35px;
+            "
+          >
+            Welcome to your Dashboard
+          </h1>
+        </div>
+        <div class="dashboard-row">
+          <!-- statistics cards here -->
+          <div class="dashboard-card" style="flex: 1">
+            <h2>Active Deployments</h2>
+            <h1>5</h1>
+          </div>
+          <div class="dashboard-card" style="flex: 1">
+            <h2>New Errors</h2>
+            <h1>5</h1>
+          </div>
+          <div class="dashboard-card" style="flex: 1">
+            <h2>Unresolved Errors</h2>
+            <!-- placeholder for now as I can't find think of anything better -->
+            <h1>5</h1>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="flex: 2">
+            <h2>Event Timeline</h2>
+            <div style="flex: 1; height: auto; width: 100%">
+              <canvas id="timeline-chart"> </canvas>
             </div>
-            <button><i class="ph ph-gear"></i>Settings</button>
-
+          </div>
+          <div class="dashboard-card" style="flex: 1">
+            <h2></h2>
+            <!-- placeholder for now as I can't find think of anything better -->
+            <h1>5</h1>
+          </div>
         </div>
-        <div id="dashboard-content">
-
-        </div>
+      </div>
+      <div id="project-content"></div>
+      <div id="sproject-content">
+        <!-- individual project content view -->
+      </div>
+      <div id="settings-content"></div>
     </div>
   </body>
   <script
@@ -46,30 +98,6 @@
     integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao="
     crossorigin="anonymous"
   ></script>
-  <script>
-    $(document).ready(function () {
-      // check if user is signed in
-      if (localStorage.getItem("session_id")) {
-        // check if session id is valid
-        fetch(
-          "/api/users/check-session?session_id=" +
-            localStorage.getItem("session_id"),
-          {
-            method: "GET",
-          },
-        )
-          .then((data) => data.json())
-          .then((json) => {
-            console.log(json);
-            if (!json.success){
-              //invalid session
-              localStorage.removeItem("session_id");
-              window.location.href="/signin.html";
-            } else {
-                //load user data + populate dashboard
-            }
-          });
-      }
-    });
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="./main.js"></script>
 </html>

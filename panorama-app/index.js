@@ -36,7 +36,7 @@ app.listen(port, () => {
 app.get("/api/projects", (req, res) => {
   // filtering options: name, environment
   // sorting options: created_at, name
-  const { name, environment, sort_by, sort_order, user_id } = req.query;
+  const { name, environment, sort_by, sort_order, session_id } = req.query;
   let query = "SELECT * FROM projects";
   const conditions = [];
   if (name) {
@@ -58,8 +58,14 @@ app.get("/api/projects", (req, res) => {
     query += ` ${sort_order}`; // ASC or DESC;
   }
 
-  if (user_id) {
-    query += ` WHERE user_id = ${user_id}`;
+  if (session_id) {
+    const user = db.prepare("SELECT * FROM users WHERE session_id = ?").get(session_id);
+    if (user) {
+      query += ` WHERE user_id = ${user.id}`;
+    } else {
+      res.status(403).json({ success: false, message: "Invalid session ID"});
+      return;
+    }
   }
 
   const projects = db.prepare(query).all();

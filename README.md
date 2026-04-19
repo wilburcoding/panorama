@@ -37,6 +37,10 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] Check if user is logged in already
      - [x] Handle sessions 
    - [ ] Dashboard
+     - [ ] main dashboard page
+       - [ ] Dashboard layout
+       - [ ] dashboard populating
+       - [ ] interactive dashboard functions
      - [ ] project list page
      - [ ] project detail page
      - [ ] user account management
@@ -74,7 +78,10 @@ Website planning:
      - Dialog + input areas + buttons to create an account or login
    - Dashboard
      - Sidebar menu with options for
-       - Home page (summary of projects, deployments, recent events);
+       - Home page (summary of projects, deployments, recent events)
+         - Top card layer with active project count, new error count, 
+         - Second layer -> large past errors timeline 
+         - Third layer -> Condensed list of projects underneath 
        - List of projects
          - Card list of projects with basic overview
          - Open project page
