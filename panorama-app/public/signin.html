@@ -132,7 +132,7 @@
               // redirect to dashboard
               if (json.valid) {
                 localStorage.setItem("session_id", json.session_id);
-                //   window.location.href = "/dashboard.html";
+                window.location.href = "/dashboard.html";
               } else {
                 $("#signin-error").text("Invalid email or password");
               }

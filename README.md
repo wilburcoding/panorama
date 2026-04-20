@@ -11,6 +11,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] Database reset function
      - [x] Handle users
        - [x] Figure out how to securely store passwords using bcryptjs
+     - [ ] Sample data
    - [ ] Setup API endpoints
      - [x] CRUD operations for projects
      - [x] CRUD operations for deployments
@@ -37,12 +38,19 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] Check if user is logged in already
      - [x] Handle sessions 
    - [ ] Dashboard
-     - [ ] main dashboard page
-       - [ ] Dashboard layout
+     - [ ] Sidebar 
+       - [x] Sidebar layout
+       - [x] Populate sidebar project list
+       - [ ] Sidebar project list functionality
+     - [x] main dashboard page
+       - [x] Dashboard layout
        - [ ] dashboard populating
        - [ ] interactive dashboard functions
-     - [ ] project list page
+     - [ ] project overview 
+       - [ ] Cards for each project
+       - [ ] Dynamically populate
      - [ ] project detail page
+       - [ ] 
      - [ ] user account management
 
 
@@ -59,6 +67,7 @@ How users would use this
  - Users can launch dashboard from the monitoring service to view data
  - ....
 
+Deployment version should be (eventually) based on Github repo commits but for now, defaults to v1
 Website planning:
  - Make a website logo (eventually)
  - Minimalistic theme?  Scrap that I'm taking on neobrutalism
@@ -109,3 +118,5 @@ Timeline:
 - [ ] SDK
 - [ ] dashboard functionality
 - [ ] testing
+
+Color for database schema should be in HEX

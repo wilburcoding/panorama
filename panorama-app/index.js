@@ -6,11 +6,12 @@ const saltRounds = 10;
 const app = express();
 const port = 3000;
 
-import { migrate, reset } from "./db/schema.js";
+import { migrate, reset, sample_data } from "./db/schema.js";
 import { db } from "./db/client.js";
 
-// reset();
+reset();
 migrate();
+sample_data();
 
 function generateApiKey() {
   return (

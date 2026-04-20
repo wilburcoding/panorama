@@ -64,6 +64,18 @@ $(document).ready(function () {
         };
         const ctx = document.getElementById("timeline-chart");
         const timelineChart = new Chart(ctx, config);
+
+
+        // populate sidebar project list
+        for (let i =0; i < projects.length; i++) {
+            const project = projects[i];
+            console.log(project);
+            $("#sidebar-plist").append(`
+            <button class="sidebar-project">
+                <div class="project-color" style="background-color: ${project.color}"></div>${project.name}
+            </button>`);
+        }
+
       })
       .catch((error) => {
         // TODO: error messages for user
