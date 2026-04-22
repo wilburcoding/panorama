@@ -147,13 +147,13 @@ app.get("/api/deployments", (req, res) => {
   let query = "SELECT * FROM deployments";
   const conditions = [];
   if (project_id) {
-    conditions.push(`project_id = ${project_id}`);
+    conditions.push(`project_id IN (${project_id})`);
   }
   if (environment) {
-    conditions.push(`environment = '${environment}'`);
+    conditions.push(`environment IN ('${environment}')`);
   }
   if (status) {
-    conditions.push(`status = '${status}'`);
+    conditions.push(`status IN ('${status}')`);
   }
 
   if (conditions.length > 0) {
@@ -172,20 +172,20 @@ app.get("/api/deployments/:id", (req, res) => {
   res.json(deployment);
 });
 
-app.get("/api/error-events", (req, res) => {
+app.get("/api/error_events", (req, res) => {
   //filtering options: deployment_id, environment, status
   const { deployment_id, environment, status } = req.query;
   let query = "SELECT * FROM error_events";
   const conditions = [];
   if (deployment_id) {
-    conditions.push(`deployment_id = ${deployment_id}`);
+    conditions.push(`deployment_id IN (${deployment_id})`);
   }
 
   if (environment) {
-    conditions.push(`environment = '${environment}'`); // error environment != deployment environment
+    conditions.push(`environment IN ('${environment}')`); // error environment != deployment environment
   }
   if (status) {
-    conditions.push(`status = '${status}'`);
+    conditions.push(`status IN ('${status}')`);
   }
 
   if (conditions.length > 0) {
@@ -195,7 +195,7 @@ app.get("/api/error-events", (req, res) => {
   res.json(error_events);
 });
 
-app.get("/api/error-events/:id", (req, res) => {
+app.get("/api/error_events/:id", (req, res) => {
   const { id } = req.params;
   const error_event = db
     .prepare("SELECT * FROM error_events WHERE id = ?")

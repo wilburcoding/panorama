@@ -11,7 +11,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] Database reset function
      - [x] Handle users
        - [x] Figure out how to securely store passwords using bcryptjs
-     - [ ] Sample data
+     - [x] Sample data
    - [ ] Setup API endpoints
      - [x] CRUD operations for projects
      - [x] CRUD operations for deployments
@@ -52,6 +52,9 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] project detail page
        - [ ] 
      - [ ] user account management
+     - [x] Functionality to switch between pages
+       - [ ] Loading animation to prevent weird UI glitches from being seen
+     - [ ] Switch to async/await instead of promises
 
 
 

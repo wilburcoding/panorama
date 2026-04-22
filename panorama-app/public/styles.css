@@ -252,7 +252,7 @@ a {
 }
 
 
-#dashboard-content {
+#dashboard-content, #settings-content, #project-content, #sproject-content {
   width:80%;
   height:100%;
   background-color: rgb(253, 250, 242);
@@ -279,6 +279,7 @@ a {
   margin-bottom:4px;
   color: white;
   opacity:0.5;
+  text-align: left;
 }
 
 #project-list {
@@ -395,6 +396,10 @@ a {
   margin-bottom:0;
   background-color: transparent;
   margin-top:0;
+}
+
+#wdeployment-container {
+  height: 20vh;
 }
 
 #dashboard-plist {
