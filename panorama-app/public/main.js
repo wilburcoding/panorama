@@ -2,6 +2,70 @@ $(document).ready(function () {
   let projects = [];
   let dashboardTimeline = null;
 
+  // base chart config
+  const config = {
+    type: "bar",
+    data: {
+      labels: ["1 am", "2 am", "3 am", "4 am", "5 am", "6 am"],
+      datasets: [
+        {
+          label: "Error Events",
+          data: [0, 0, 0, 0, 0, 0],
+          backgroundColor: "#31a047",
+          borderColor: "#000000",
+          borderWidth: 3,
+          borderSkipped: false,
+          borderRadius: 3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            display: false,
+          },
+          ticks: {
+            color: "#000000",
+            stepSize: 1,
+            font: { size: 13, color: "#000000", weight: "500" },
+          },
+          stacked: true,
+          display: false,
+        },
+        x: {
+          grid: { display: false },
+          ticks: {
+            color: "#000000",
+            font: { size: 13, weight: "500" },
+            autoSkip: false,
+            maxRotation: 0,
+          },
+          stacked: true,
+        },
+      },
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          backgroundColor: "#FFFFFF",
+          borderColor: "#000000",
+          borderWidth: 1.5,
+          cornerRadius: 0,
+          titleColor: "#000000",
+          bodyColor: "#000000",
+          padding: 10,
+          boxPadding: 5,
+          titleFont: { size: 15, weight: "600" },
+        },
+      },
+    },
+  };
+
   async function loadData() {
     const resp1 = await fetch(
       "/api/projects?session_id=" + localStorage.getItem("session_id"),
@@ -17,67 +81,6 @@ $(document).ready(function () {
     }
 
     // create sample timeline chart for now
-    const config = {
-      type: "bar",
-      data: {
-        labels: ["1 am", "2 am", "3 am", "4 am", "5 am", "6 am"],
-        datasets: [
-          {
-            label: "Error Events",
-            data: [0, 0, 0, 0, 0, 0],
-            backgroundColor: "#31a047",
-            borderColor: "#000000",
-            borderWidth: 3,
-            borderSkipped: false,
-            borderRadius: 3,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              display: false,
-            },
-            ticks: {
-              color: "#000000",
-              stepSize: 1,
-              font: { size: 13, color: "#000000", weight: "500" },
-            },
-            stacked: true,
-          },
-          x: {
-            grid: { display: false },
-            ticks: {
-              color: "#000000",
-              font: { size: 13, weight: "500" },
-              autoSkip: false,
-              maxRotation: 0,
-            },
-            stacked: true,
-          },
-        },
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            backgroundColor: "#FFFFFF",
-            borderColor: "#000000",
-            borderWidth: 1.5,
-            cornerRadius: 0,
-            titleColor: "#000000",
-            bodyColor: "#000000",
-            padding: 10,
-            boxPadding: 5,
-            titleFont: { size: 15, weight: "600" },
-          },
-        },
-      },
-    };
     const ctx = document.getElementById("timeline-chart");
     const timelineChart = new Chart(ctx, config);
     dashboardTimeline = timelineChart;
@@ -195,10 +198,14 @@ $(document).ready(function () {
         return Math.floor(diff_ms / (24 * 60 * 60 * 1000)) + " day(s) ago";
       } else if (diff_ms < 365 * 24 * 60 * 60 * 1000) {
         // less than a year
-        return Math.floor(diff_ms / (30 * 24 * 60 * 60 * 1000)) + " month(s) ago";
+        return (
+          Math.floor(diff_ms / (30 * 24 * 60 * 60 * 1000)) + " month(s) ago"
+        );
       } else {
         // years
-        return Math.floor(diff_ms / (365 * 24 * 60 * 60 * 1000)) + " year(s) ago";
+        return (
+          Math.floor(diff_ms / (365 * 24 * 60 * 60 * 1000)) + " year(s) ago"
+        );
       }
     }
     const params = new URLSearchParams(window.location.search);
@@ -215,18 +222,34 @@ $(document).ready(function () {
         let unresolved_errors = 0;
         let latest_time = null;
         for (let j = 0; j < project.deployments.length; j++) {
-            for (let k =0; k < project.deployments[j].error_events.length; k++) {
-                if (project.deployments[j].error_events[k].status !== "resolved") {
-                    unresolved_errors += 1;
-                }
-                if (latest_time == null) {
-                    latest_time = project.deployments[j].error_events[k].timestamp;
-                } else if (parseSqlTimestamp(project.deployments[j].error_events[k].timestamp) > parseSqlTimestamp(latest_time)) {
-                    latest_time = project.deployments[j].error_events[k].timestamp;
-                }
+          for (let k = 0; k < project.deployments[j].error_events.length; k++) {
+            if (project.deployments[j].error_events[k].status !== "resolved") {
+              unresolved_errors += 1;
             }
+            if (latest_time == null) {
+              latest_time = project.deployments[j].error_events[k].timestamp;
+            } else if (
+              parseSqlTimestamp(
+                project.deployments[j].error_events[k].timestamp,
+              ) > parseSqlTimestamp(latest_time)
+            ) {
+              latest_time = project.deployments[j].error_events[k].timestamp;
+            }
+          }
         }
-
+        const p_id = project.id;
+        let timeline_data = [0, 0, 0, 0, 0, 0];
+        for (let j = 0; j < project.deployments.length; j++) {
+          const error_events = project.deployments[j].error_events;
+          for (let k = 0; k < error_events.length; k++) {
+            const event_time = parseSqlTimestamp(error_events[k].timestamp);
+            const now = new Date();
+            const hours_before = (now - event_time) / 1000 / 60 / 60;
+            if (hours_before < 24) {
+              timeline_data[5 - Math.floor(hours_before / 4)] += 1;
+            }
+          }
+        }
 
         $("#project-overview-content").append(`
             <div
@@ -265,12 +288,21 @@ $(document).ready(function () {
                   <p>${latest_time == null ? "No errors found" : formatTime(latest_time)}</p>
                 </div>
               </div>
-              <div class="project-error-chart" style="width:100%; height: 60px;">
-                <canvas id="project-chart1"></canvas>
+              <div class="project-error-chart" style="width:100%; height: 100px;position: relative">
+                ${timeline_data.filter((v) => v > 0).length === 0 ? "<div style='width:100%;height:100px;position: absolute;display:flex;align-items:center;justify-content:center;color:#4a4a4a'><p style='margin-bottom:40px;font-size:14px;'>No errors in the last 24 hours</p></div>" : ""}
+                <canvas id="project-chart${project.id}" style="width: 100%; height: 100%;"></canvas>
               </div>
             </div>
           </div>
         `);
+        const ctx = document.getElementById("project-chart" + p_id);
+        let new_config = JSON.parse(JSON.stringify(config));
+        const timelineChart = new Chart(ctx, new_config);
+        timelineChart.data.datasets[0].data = timeline_data;
+        timelineChart.data.datasets[0].backgroundColor = project.color;
+
+        console.log(timeline_data);
+        timelineChart.update();
       }
     } else if (params.has("projectInfo")) {
       console.log("proj");
@@ -353,7 +385,10 @@ $(document).ready(function () {
       $("#d-unresolvederrors").text(unresolved_error_count);
 
       // populate timeline chart
-      let timelineData = [0, 0, 0, 0, 0, 0]; // representing hours before now
+      let timelineData = []; // representing hours before now
+      for (let i = 0; i < 6; i++) {
+        timelineData.push(0); // four hour intervals
+      }
       let datasets = [];
       for (let i = 0; i < projects.length; i++) {
         datasets.push({
@@ -372,8 +407,8 @@ $(document).ready(function () {
             const now = new Date();
             const hours_before = (now - event_time) / 1000 / 60 / 60;
             console.log("Hours before: " + hours_before);
-            if (hours_before < 6) {
-              datasets[i].data[5 - Math.floor(hours_before)] += 1;
+            if (hours_before < 24) {
+              datasets[i].data[5 - Math.floor(hours_before / 4)] += 1;
             }
           }
         }
@@ -384,7 +419,7 @@ $(document).ready(function () {
       // labels
       let labels = [];
       for (let i = 5; i >= 0; i--) {
-        const time = new Date(Date.now() - i * 60 * 60 * 1000);
+        const time = new Date(Date.now() - i * 4 * 60 * 60 * 1000);
         const hours = time.getHours();
         const suffix = hours >= 12 ? "pm" : "am";
         labels.push(((hours + 11) % 12) + 1 + " " + suffix);

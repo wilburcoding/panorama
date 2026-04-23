@@ -489,8 +489,14 @@ a {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+  transition-duration: 0.05s;
+  box-shadow: 4px 4px 0px #000;
 }
 
+.project-overview-card:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000;
+}
 .project-overview-card h1 {
   font-size: 30px !important;
   line-height: 30px !important;
@@ -535,8 +541,8 @@ a {
 .project-status-env p {
   font-size: 17px;
   line-height: 17px;
-  margin-top:2px;
-  margin-bottom:2px;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 hr.hr-dotted {
@@ -556,22 +562,20 @@ hr.hr-dotted {
 }
 
 .project-card-sectionh {
-  font-size: 17px ;
-  line-height: 17px ;
+  font-size: 17px;
+  line-height: 17px;
   font-weight: 600 !important;
-  margin-top:15px;
-  margin-bottom:2px;
-
+  margin-top: 15px;
+  margin-bottom: 2px;
 }
 
-
 .main-p {
-  margin-top:2px;
-  margin-bottom:2px;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 .project-card-info-subitem {
-  display:flex;
+  display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
@@ -581,9 +585,8 @@ hr.hr-dotted {
 .project-card-info-subitem h3 {
   font-size: 17px !important;
   line-height: 17px !important;
-  margin-top:3px;
+  margin-top: 3px;
   margin-bottom: 4px;
-
 }
 
 .project-card-info-subitem p {
