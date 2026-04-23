@@ -44,11 +44,13 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [ ] Sidebar project list functionality
      - [x] main dashboard page
        - [x] Dashboard layout
-       - [ ] dashboard populating
+         - [x] Stacked bar graph
+       - [x] dashboard populating
        - [ ] interactive dashboard functions
-     - [ ] project overview 
-       - [ ] Cards for each project
-       - [ ] Dynamically populate
+     - [x] project overview 
+       - [x] Cards for each project
+       - [x] Dynamically populate
+       - [ ] Functionality -> mainly the timeline
      - [ ] project detail page
        - [ ] 
      - [ ] user account management
@@ -100,6 +102,10 @@ Website planning:
          - Card list of projects with basic overview
          - Open project page
            - Show statics regarding project
+             - project description + environment
+             - number of issues
+             - percent issues resolved
+             - most recent issues bar chart based on deployment
            - List of deployments 
            - Settings
        - Deployment information

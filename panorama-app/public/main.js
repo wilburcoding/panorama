@@ -34,6 +34,8 @@ $(document).ready(function () {
         ],
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         scales: {
           y: {
             beginAtZero: true,
@@ -45,6 +47,7 @@ $(document).ready(function () {
               stepSize: 1,
               font: { size: 13, color: "#000000", weight: "500" },
             },
+            stacked: true,
           },
           x: {
             grid: { display: false },
@@ -54,6 +57,7 @@ $(document).ready(function () {
               autoSkip: false,
               maxRotation: 0,
             },
+            stacked: true,
           },
         },
         plugins: {
@@ -158,7 +162,7 @@ $(document).ready(function () {
   }
 
   // check page state
-  function checkPage() {
+  async function checkPage() {
     function parseSqlTimestamp(timestamp) {
       if (!timestamp || typeof timestamp !== "string") {
         return new Date(timestamp);
@@ -179,40 +183,115 @@ $(document).ready(function () {
 
       if (diff_ms < 60 * 1000) {
         // less than a minute
-        return Math.floor(diff_ms / 1000) + " seconds ago";
+        return Math.floor(diff_ms / 1000) + " second(s) ago";
       } else if (diff_ms < 60 * 60 * 1000) {
         // less than an hour
-        return Math.floor(diff_ms / (60 * 1000)) + " minutes ago";
+        return Math.floor(diff_ms / (60 * 1000)) + " minute(s) ago";
       } else if (diff_ms < 24 * 60 * 60 * 1000) {
         // less than a day
-        return Math.floor(diff_ms / (60 * 60 * 1000)) + " hours ago";
+        return Math.floor(diff_ms / (60 * 60 * 1000)) + " hour(s) ago";
       } else if (diff_ms < 30 * 24 * 60 * 60 * 1000) {
         // less than a month (im lazy so assume 30 days in month)
-        return Math.floor(diff_ms / (24 * 60 * 60 * 1000)) + " days ago";
+        return Math.floor(diff_ms / (24 * 60 * 60 * 1000)) + " day(s) ago";
       } else if (diff_ms < 365 * 24 * 60 * 60 * 1000) {
         // less than a year
-        return Math.floor(diff_ms / (30 * 24 * 60 * 60 * 1000)) + " months ago";
+        return Math.floor(diff_ms / (30 * 24 * 60 * 60 * 1000)) + " month(s) ago";
       } else {
         // years
-        return Math.floor(diff_ms / (365 * 24 * 60 * 60 * 1000)) + " years ago";
+        return Math.floor(diff_ms / (365 * 24 * 60 * 60 * 1000)) + " year(s) ago";
       }
     }
     const params = new URLSearchParams(window.location.search);
     if (params.has("projectOverview")) {
-      console.log("overview");
+      // projects overview -> cards with each project
       $("#dashboard-content").hide();
       $("#settings-content").hide();
-      $("#project-content").hide();
-      $("#sproject-content").show();
+      $("#sproject-content").hide();
+      $("#project-content").show();
+      for (let i = 0; i < projects.length; i++) {
+        const project = projects[i];
+        const create_date = parseSqlTimestamp(project.created_at);
+
+        let unresolved_errors = 0;
+        let latest_time = null;
+        for (let j = 0; j < project.deployments.length; j++) {
+            for (let k =0; k < project.deployments[j].error_events.length; k++) {
+                if (project.deployments[j].error_events[k].status !== "resolved") {
+                    unresolved_errors += 1;
+                }
+                if (latest_time == null) {
+                    latest_time = project.deployments[j].error_events[k].timestamp;
+                } else if (parseSqlTimestamp(project.deployments[j].error_events[k].timestamp) > parseSqlTimestamp(latest_time)) {
+                    latest_time = project.deployments[j].error_events[k].timestamp;
+                }
+            }
+        }
+
+
+        $("#project-overview-content").append(`
+            <div
+            class="dashboard-card project-overview-card"
+            style="width: 45%; padding: 0"
+          >
+            <div
+              style="
+                width: 100%;
+                height: 50px;
+                background-color: ${project.color};
+                border-bottom: solid 2px black;
+              "
+            ></div>
+            <div style="padding: 20px;width:100%;box-sizing: border-box">
+              <div class="project-card-info" style="justify-content: space-between;">
+                <h1>${project.name}</h1>
+              </div>
+              <p class="project-card-create">Created on ${create_date.getMonth() + 1}/${create_date.getDate()}/${create_date.getFullYear()}</p>
+              <h2 class="project-card-sectionh" style="margin-top: 20px">
+                Description
+              </h2>
+
+              <p class="main-p">
+                ${project.description}
+              </p>
+
+              <hr class="hr-dotted" style="margin-top: 13px" />
+              <div class="project-card-info">
+                <div class="project-card-info-subitem">
+                  <h3>Unresolved Errors</h3>
+                  <p>${unresolved_errors}</p>
+                </div>
+                <div class="project-card-info-subitem">
+                  <h3>Last Error</h3>
+                  <p>${latest_time == null ? "No errors found" : formatTime(latest_time)}</p>
+                </div>
+              </div>
+              <div class="project-error-chart" style="width:100%; height: 60px;">
+                <canvas id="project-chart1"></canvas>
+              </div>
+            </div>
+          </div>
+        `);
+      }
     } else if (params.has("projectInfo")) {
       console.log("proj");
       const project_id = params.get("projectId");
       if (project_id) {
         // populate project info page
+        console.log("Project ID:  " + project_id);
         $("#dashboard-content").hide();
         $("#settings-content").hide();
-        $("#sproject-content").hide();
-        $("#project-content").show();
+        $("#project-content").hide();
+        $("#sproject-content").show();
+
+        // get project info
+        const project_res = await fetch(
+          "/api/projects/" +
+            project_id +
+            "?session_id=" +
+            localStorage.getItem("session_id"),
+        );
+        const project = await project_res.json();
+        console.log(project);
       } else {
         // redirect bcs no project id
         window.location.href = "/dashboard.html";
@@ -275,7 +354,17 @@ $(document).ready(function () {
 
       // populate timeline chart
       let timelineData = [0, 0, 0, 0, 0, 0]; // representing hours before now
+      let datasets = [];
       for (let i = 0; i < projects.length; i++) {
+        datasets.push({
+          label: projects[i].name,
+          data: [0, 0, 0, 0, 0, 0],
+          backgroundColor: projects[i].color,
+          borderColor: "#000000",
+          borderWidth: 2,
+          borderSkipped: false,
+          borderRadius: 3,
+        });
         for (let j = 0; j < projects[i].deployments.length; j++) {
           const error_events = projects[i].deployments[j].error_events;
           for (let k = 0; k < error_events.length; k++) {
@@ -284,13 +373,13 @@ $(document).ready(function () {
             const hours_before = (now - event_time) / 1000 / 60 / 60;
             console.log("Hours before: " + hours_before);
             if (hours_before < 6) {
-              timelineData[5 - Math.floor(hours_before)] += 1;
+              datasets[i].data[5 - Math.floor(hours_before)] += 1;
             }
           }
         }
-        dashboardTimeline.data.datasets[0].data = timelineData;
-        dashboardTimeline.update();
       }
+      dashboardTimeline.data.datasets = datasets;
+      dashboardTimeline.update();
 
       // labels
       let labels = [];
@@ -330,7 +419,16 @@ $(document).ready(function () {
         const unresolved_errors = deployment.error_events.filter(
           (e) => e.status !== "resolved",
         );
-        console.log(deployment);
+
+        const now = new Date();
+        const new_errors = deployment.error_events.filter((e) => {
+          const event_time = parseSqlTimestamp(e.timestamp);
+          return (
+            (now - event_time) / (1000 * 60 * 60) < 24 &&
+            e.status !== "resolved"
+          ); // 24 hours is the threshhold for now
+        });
+        console.log(new_errors);
         $("#wdeployment-container").append(`
             <div class="wdeployment-card">
                 <h1>${deployment.name}</h1>
@@ -344,7 +442,7 @@ $(document).ready(function () {
                 >
                     <p>${unresolved_errors.length} ${unresolved_errors.length == 1 ? "error" : "errors"}</p>
                     <div class="change">
-                        <p>+1</p>
+                        <p>+${new_errors.length}</p>
                     </div>
                 </div>
             </div>
@@ -390,7 +488,7 @@ $(document).ready(function () {
         }
 
         $("#dashboard-plist").append(`
-        <div class="dproject-card">
+        <div class="dproject-card" id="dproject-${projects[i].id}">
             <div class="dproject-info-item">
                 <h1>${projects[i].name}</h1>
                 <div class="dproject-status ${project_active ? "active" : "inactive"}">
@@ -411,6 +509,10 @@ $(document).ready(function () {
         </div>
         <hr />
             `);
+        $("#dproject-" + projects[i].id).click(function () {
+          window.location.href =
+            "/dashboard.html?projectId=" + projects[i].id + "&projectInfo";
+        });
       }
     }
   }

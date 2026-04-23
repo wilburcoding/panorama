@@ -60,11 +60,13 @@ app.get("/api/projects", (req, res) => {
   }
 
   if (session_id) {
-    const user = db.prepare("SELECT * FROM users WHERE session_id = ?").get(session_id);
+    const user = db
+      .prepare("SELECT * FROM users WHERE session_id = ?")
+      .get(session_id);
     if (user) {
       query += ` WHERE user_id = ${user.id}`;
     } else {
-      res.status(403).json({ success: false, message: "Invalid session ID"});
+      res.status(403).json({ success: false, message: "Invalid session ID" });
       return;
     }
   }
@@ -79,22 +81,33 @@ app.post("/api/users", express.json(), async (req, res) => {
   // check if user already exists with that email
   const existing = db.prepare("SELECT * FROM users WHERE email = ?").get(email);
   if (existing) {
-    res.json({ success: false, message: "A user with that email already exists. Try signing in." })
+    res.json({
+      success: false,
+      message: "A user with that email already exists. Try signing in.",
+    });
     return;
   }
   const session_id = generateApiKey();
   const result = db
-    .prepare("INSERT INTO users (first_name, last_name, email, password_hash, session_id) VALUES (?, ?, ?, ?, ?)")
+    .prepare(
+      "INSERT INTO users (first_name, last_name, email, password_hash, session_id) VALUES (?, ?, ?, ?, ?)",
+    )
     .run(first_name, last_name, email, password_hash, session_id);
   const user = db
-    .prepare("SELECT first_name, last_name, email, id, created_at, session_id FROM users WHERE id = ?")
+    .prepare(
+      "SELECT first_name, last_name, email, id, created_at, session_id FROM users WHERE id = ?",
+    )
     .get(result.lastInsertRowid);
   res.json({ success: true, user: user });
 });
 
 app.get("/api/users/find/:id", (req, res) => {
   const { id } = req.params;
-  const user = db.prepare("SELECT first_name, last_name, email, id, created_at FROM users WHERE id = ?").get(id);
+  const user = db
+    .prepare(
+      "SELECT first_name, last_name, email, id, created_at FROM users WHERE id = ?",
+    )
+    .get(id);
   res.json(user);
 });
 
@@ -102,13 +115,15 @@ app.get("/api/users/check-session", (req, res) => {
   console.log(req.query);
   const { session_id } = req.query;
 
-  const user = db.prepare("SELECT * FROM users WHERE session_id = ?").get(session_id);
+  const user = db
+    .prepare("SELECT * FROM users WHERE session_id = ?")
+    .get(session_id);
   if (!user) {
-    res.status(404).json({ success: false})
+    res.status(404).json({ success: false });
   } else {
-    res.status(200).json({ success: true});
+    res.status(200).json({ success: true });
   }
-})
+});
 
 // user log in
 app.post("/api/users/check-credentials", express.json(), async (req, res) => {
@@ -119,7 +134,10 @@ app.post("/api/users/check-credentials", express.json(), async (req, res) => {
   } else {
     // create new session id
     const session_id = generateApiKey();
-    db.prepare("UPDATE users SET session_id = ? WHERE id = ?").run(session_id, user.id);
+    db.prepare("UPDATE users SET session_id = ? WHERE id = ?").run(
+      session_id,
+      user.id,
+    );
 
     res.json({
       success: true,
@@ -137,8 +155,24 @@ app.delete("/api/users/:id", (req, res) => {
 
 app.get("/api/projects/:id", (req, res) => {
   const { id } = req.params;
-  const project = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
-  res.json(project);
+  const { session_id } = req.query;
+  if (session_id) {
+    const user = db
+      .prepare("SELECT * FROM users WHERE session_id = ?")
+      .get(session_id);
+    if (!user) {
+      res.status(403).json({ success: false, message: "Invalid session ID" });
+      return;
+    }
+    const project = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
+    if (project.user_id !== user.id) {
+      res.status(403).json({ success: false, message: "Unauthorized" });
+      return;
+    }
+    res.json(project);
+    return;
+  } 
+  res.status(403).json({ success: false, message: "Session ID required"})
 });
 
 app.get("/api/deployments", (req, res) => {

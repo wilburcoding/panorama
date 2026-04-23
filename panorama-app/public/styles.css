@@ -14,7 +14,7 @@ html {
 #main-content {
   background-color: 195FF9;
   color: white;
-  height:100%;
+  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -25,19 +25,19 @@ html {
 #main-content h1 {
   font-size: 110px;
   line-height: 110px;
-  margin-left: -5px;
+  /* margin-left: -5px; */
 }
 
 h1 {
   margin-top: 4px;
   margin-bottom: 4px;
 }
-
+/* 
 #main-content p {
   font-size: 30px;
   line-height: 36px;
   margin-left: 0px;
-}
+} */
 
 #home-bar {
   margin-top: 15px;
@@ -48,10 +48,10 @@ h1 {
   font-size: 25px;
 }
 
-p {
+/* p {
   margin-top: 4px;
   margin-bottom: 4px;
-}
+} */
 
 button {
   border: solid 2px black;
@@ -126,30 +126,33 @@ button:hover {
 }
 
 /* SIGN IN PAGE STYLES */
-#signin-container, #signup-container {
+#signin-container,
+#signup-container {
   background-color: white;
   border: solid 3px black;
   padding: 20px;
-  border-radius:2px;
+  border-radius: 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
   transition-duration: 0.2s;
-  width:400px;
+  width: 400px;
   justify-content: center;
   color: black;
 }
 
-#signin-container h1, #signup-container h1{
+#signin-container h1,
+#signup-container h1 {
   font-size: 55px;
-  line-height:55px;
-  margin-top:30px;
-  margin-bottom:5px;
+  line-height: 55px;
+  margin-top: 30px;
+  margin-bottom: 5px;
 }
 
-#signin-container button, #signup-container button {
-    margin-top:10px !important;
-    width: 50%;
+#signin-container button,
+#signup-container button {
+  margin-top: 10px !important;
+  width: 50%;
 }
 
 .form-label {
@@ -175,227 +178,223 @@ input[type="password"] {
   outline: none;
 }
 
-#signin-subtext, #signup-subtext {
-    font-size:15px !important;
-    margin-bottom:5px;
+#signin-subtext,
+#signup-subtext {
+  font-size: 15px !important;
+  margin-bottom: 5px;
 }
 
-#signin-error, #signup-error {
-    color: red;
-    font-size: 15px !important;
-    margin-bottom:0px !important;
-    line-height:18px !important;
-    font-weight: 600;
-    margin-top:0px !important;
+#signin-error,
+#signup-error {
+  color: red;
+  font-size: 15px !important;
+  margin-bottom: 0px !important;
+  line-height: 18px !important;
+  font-weight: 600;
+  margin-top: 0px !important;
 }
 
 #name-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    width:80%;
-    gap: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  gap: 10px;
 }
 
 #name-container input {
-    margin: 0px;
+  margin: 0px;
 }
 
 a {
-    text-decoration: underline !important;
+  text-decoration: underline !important;
 }
 
 .menu-container {
-    width:100%;
-    height:100%;
-    position: absolute;
-    top:0;
-    left:0;
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Dashboard page styles */
 
 #sidebar {
-  width:20%;
-  height:100%;
+  width: 20%;
+  height: 100%;
   background-color: #265ed8;
   box-sizing: border-box;
   border-right: solid 4px black;
   padding: 20px;
-  display:flex;
-  flex-direction:column;
+  display: flex;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-
 }
 
 #sidebar #stitle {
-  font-size:35px;
-  line-height:35px;
-  margin:0;
-  margin-left:10px;
-  margin-bottom:10%;
+  font-size: 35px;
+  line-height: 35px;
+  margin: 0;
+  margin-left: 10px;
+  margin-bottom: 10%;
 }
 
 #sidebar .section-label {
-  font-size:15px;
-  color:rgb(170, 170, 170);
-  margin-left:10px;
-  margin-top:0px;
-  margin-bottom:0px;
-
+  font-size: 15px;
+  color: rgb(170, 170, 170);
+  margin-left: 10px;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
-
-#dashboard-content, #settings-content, #project-content, #sproject-content {
-  width:80%;
-  height:100%;
+#dashboard-content,
+#settings-content,
+#project-content,
+#sproject-content {
+  width: 80%;
+  height: 100%;
   background-color: rgb(253, 250, 242);
   box-sizing: border-box;
   overflow-y: scroll;
-  padding-bottom:20vh;
-
+  padding-bottom: 20vh;
 }
 
 #sidebar button {
   margin-left: 0px !important;
-  border:none;
+  border: none;
   background-color: transparent;
   box-shadow: none;
   font-weight: 700;
-  outline:none;
-  display:flex;
-  align-items:center;
+  outline: none;
+  display: flex;
+  align-items: center;
   flex-direction: row;
   justify-content: flex-start;
-  padding-left:10px;
-  width:80%;
+  padding-left: 10px;
+  width: 80%;
   margin-top: 4px;
-  margin-bottom:4px;
+  margin-bottom: 4px;
   color: white;
-  opacity:0.5;
+  opacity: 0.5;
   text-align: left;
 }
 
 #project-list {
-  padding:0;
-  padding-left:15px;
-  width:100%;
-
+  padding: 0;
+  padding-left: 15px;
+  width: 100%;
 }
 #project-list button {
-  width:60%;
+  width: 60%;
 }
 
 #sidebar button i {
-  margin-right:10px;
-
+  margin-right: 10px;
 }
 
 #sidebar button.active {
-  opacity:1;
+  opacity: 1;
 }
 
 #sidebar button.sidebar-project {
-  margin-top:0px !important; 
-  margin-bottom:0px !important;
-  width:80%;
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+  width: 80%;
 }
 
 #sidebar-plist {
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: flex-start;
-  width:100%;
+  width: 100%;
 }
 
 #sidebar button:hover {
-  transform:none;
+  transform: none;
   box-shadow: none;
   opacity: 1;
   background-color: rgba(165, 165, 165, 0.152);
-  
 }
 
 .project-color {
-  width:18px;
-  height:18px;
-  border-radius:3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
   background-color: blue;
-  border:solid 1px white;
+  border: solid 1px white;
   margin-right: 10px;
 }
 
 .dashboard-row {
-  width:100%;
-  display:flex;
-  padding:10px 20px;
-  padding-left:5%;
-  box-sizing:border-box;
+  width: 100%;
+  display: flex;
+  padding: 10px 20px;
+  padding-left: 5%;
+  box-sizing: border-box;
   flex-direction: row;
-  gap: 20px;;
+  gap: 20px;
 }
 
 .dashboard-card {
-  background-color:white;
-  border:solid 2px black;
-  border-radius:2px;
-  padding:20px;
+  background-color: white;
+  border: solid 2px black;
+  border-radius: 2px;
+  padding: 20px;
   color: black;
   /* margin-right:30px; */
-  width:15vw;
+  width: 15vw;
   box-sizing: border-box;
-  min-width:0;
-  display:flex;
+  min-width: 0;
+  display: flex;
   flex-direction: column;
-
-
-
 }
 
 .dashboard-card h2 {
-  margin-top:10px;
-  font-weight:500;
+  margin-top: 10px;
+  font-weight: 500;
 }
 
 .dashboard-card h1 {
-  font-size:80px !important;
-  line-height:80px !important;
+  font-size: 80px !important;
+  line-height: 80px !important;
 }
 
-
-.wdeployment-card, .dproject-card{
-  width:100%;
-  border:none;
-  padding:20px;
+.wdeployment-card,
+.dproject-card {
+  width: 100%;
+  border: none;
+  padding: 20px;
   box-sizing: border-box;
-  display:flex;
-  flex-direction:row;
+  display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  
 }
 
-.wdeployment-card h1, .dproject-card h1 {
+.wdeployment-card h1,
+.dproject-card h1 {
   font-size: 20px !important;
   line-height: 20px !important;
-  font-weight:800;
-  margin:0;
+  font-weight: 800;
+  margin: 0;
 }
 
-#wdeployment-container hr, #dashboard-plist hr {
-  width:100%;
-  border:none;
+#wdeployment-container hr,
+#dashboard-plist hr {
+  width: 100%;
+  border: none;
   border-top: dotted 1.6px black;
-  margin-bottom:0;
+  margin-bottom: 0;
   background-color: transparent;
-  margin-top:0;
+  margin-top: 0;
 }
 
 #wdeployment-container {
@@ -403,7 +402,7 @@ a {
 }
 
 #dashboard-plist {
-  flex: 1; 
+  flex: 1;
   border-top: solid 2px black;
   overflow-y: scroll;
   scrollbar-width: 1px;
@@ -411,29 +410,28 @@ a {
 
 .wdeployment-card p {
   font-size: 18px !important;
-  margin:0;
+  margin: 0;
   line-height: 18px !important;
-  font-weight:500;
- 
+  font-weight: 500;
 }
 
 .wdeployment-card .change {
-  padding:4px 4px;
+  padding: 4px 4px;
   background-color: rgb(245, 140, 140);
-  display:flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  border-radius:2px;
-  margin-left:5px;
+  border-radius: 2px;
+  margin-left: 5px;
 }
 
 .wdeployment-card .change p {
-  font-size:16px !important;
+  font-size: 16px !important;
   font-weight: 600;
 }
 
 .dproject-card .dproject-info {
-  display:flex;
+  display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -442,24 +440,32 @@ a {
 
 .dproject-card .dproject-info p {
   font-size: 16px !important;
-  margin:0;
+  margin: 0;
   line-height: 16px !important;
+}
+
+.dproject-card:hover {
+  background-color: rgb(238, 238, 238);
+}
+
+.wdeployment-card:hover {
+  background-color: rgb(238, 238, 238);
 }
 
 .dproject-card .dproject-info i {
   font-size: 19px !important;
 }
 .dproject-info-item {
-  display:flex;
-  flex-direction:row;
+  display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 5px;
 }
 
 .dproject-info-item .dproject-status {
-  padding:3px;
-  border-radius:2px;
+  padding: 3px;
+  border-radius: 2px;
 }
 
 .dproject-info-item .dproject-status p {
@@ -476,3 +482,112 @@ a {
   background-color: rgb(186, 186, 186);
 }
 
+/*-- Project Overview page */
+
+.project-overview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.project-overview-card h1 {
+  font-size: 30px !important;
+  line-height: 30px !important;
+  margin: 0;
+}
+
+.project-overview-card hr {
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  border-top: solid 2px black;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 0;
+}
+
+/* .project-overview-card p {
+  font-size: 20px !important;
+  line-height: 20px !important;
+  margin:0;
+} */
+
+.project-card-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.project-status-env {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  background-color: #2c69ed;
+  color: white;
+  border-radius: 3px;
+}
+
+.project-status-env p {
+  font-size: 17px;
+  line-height: 17px;
+  margin-top:2px;
+  margin-bottom:2px;
+}
+
+hr.hr-dotted {
+  width: 100%;
+  border: none;
+  border-top: dotted 1.6px black;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.project-card-create {
+  font-size: 16px !important;
+  line-height: 16px !important;
+  margin-top: 3px;
+  margin-bottom: 10px;
+  color: rgb(84, 84, 84);
+}
+
+.project-card-sectionh {
+  font-size: 17px ;
+  line-height: 17px ;
+  font-weight: 600 !important;
+  margin-top:15px;
+  margin-bottom:2px;
+
+}
+
+
+.main-p {
+  margin-top:2px;
+  margin-bottom:2px;
+}
+
+.project-card-info-subitem {
+  display:flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.project-card-info-subitem h3 {
+  font-size: 17px !important;
+  line-height: 17px !important;
+  margin-top:3px;
+  margin-bottom: 4px;
+
+}
+
+.project-card-info-subitem p {
+  font-size: 17px !important;
+  line-height: 17px !important;
+  margin-top: 2px;
+}
