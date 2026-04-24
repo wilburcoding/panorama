@@ -50,13 +50,15 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] project overview 
        - [x] Cards for each project
        - [x] Dynamically populate
-       - [ ] Functionality -> mainly the timeline
+       - [x] Functionality -> mainly the timeline
      - [ ] project detail page
-       - [ ] 
+       - [ ] Project detail page layout
+       - [ ] Load project 
      - [ ] user account management
      - [x] Functionality to switch between pages
        - [ ] Loading animation to prevent weird UI glitches from being seen
      - [ ] Switch to async/await instead of promises
+   - [ ] Toast messages
 
 
 
@@ -100,14 +102,16 @@ Website planning:
          - Third layer -> Condensed list of projects underneath 
        - List of projects
          - Card list of projects with basic overview
-         - Open project page
+         - Project overview
            - Show statics regarding project
              - project description + environment
              - number of issues
              - percent issues resolved
              - most recent issues bar chart based on deployment
-           - List of deployments 
-           - Settings
+           - Single project page
+             - Big info box on top -> description, creation date, settings button, stuff like that
+             - General overview of errors (timeline + statistics)
+             - List of deployments 
        - Deployment information
          - Show some basic information and statistics
          - list of error events

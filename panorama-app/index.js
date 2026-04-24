@@ -165,14 +165,18 @@ app.get("/api/projects/:id", (req, res) => {
       return;
     }
     const project = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
+
+    if (!project) {
+      res.status(404).json({ success: false, message: "Project not found" });
+    }
     if (project.user_id !== user.id) {
       res.status(403).json({ success: false, message: "Unauthorized" });
       return;
     }
-    res.json(project);
+    res.json({ success: true, project: project});
     return;
-  } 
-  res.status(403).json({ success: false, message: "Session ID required"})
+  }
+  res.status(403).json({ success: false, message: "Session ID required" });
 });
 
 app.get("/api/deployments", (req, res) => {

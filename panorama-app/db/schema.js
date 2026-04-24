@@ -123,7 +123,7 @@ export function sample_data() {
           at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:12)
       `
       const environment = "Windows 10, Node.js v14.17.0";
-      const timestamp = new Date(Date.now() );
+      const timestamp = new Date(Date.now());
       timestamp.setHours(timestamp.getHours() - j * 2 - Math.floor(Math.random() * 5)); 
       db.prepare("INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp) values (?, ?, ?, ?, ?, ?)").run(deployment_id, title, status, stack_trace, environment, timestamp.toISOString());
     

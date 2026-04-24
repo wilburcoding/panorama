@@ -251,10 +251,18 @@ $(document).ready(function () {
           }
         }
 
+        let labels = [];
+        for (let i = 5; i >= 0; i--) {
+            const time = new Date(Date.now() - i * 4 * 60 * 60 * 1000);
+            const hours = time.getHours();
+            const suffix = hours >= 12 ? "pm" : "am";
+            labels.push(((hours + 11) % 12) + 1 + " " + suffix);
+        }
+
         $("#project-overview-content").append(`
             <div
             class="dashboard-card project-overview-card"
-            style="width: 45%; padding: 0"
+            style="width: 45%; padding: 0" id="project-overview-${project.id}"
           >
             <div
               style="
@@ -299,10 +307,13 @@ $(document).ready(function () {
         let new_config = JSON.parse(JSON.stringify(config));
         const timelineChart = new Chart(ctx, new_config);
         timelineChart.data.datasets[0].data = timeline_data;
+        timelineChart.data.labels = labels;
         timelineChart.data.datasets[0].backgroundColor = project.color;
-
-        console.log(timeline_data);
         timelineChart.update();
+
+        $("#project-overview-" + p_id).click(function( ) {
+            window.location.href="/dashboard.html?projectId=" + p_id + "&projectInfo";
+        })
       }
     } else if (params.has("projectInfo")) {
       console.log("proj");
@@ -323,6 +334,14 @@ $(document).ready(function () {
             localStorage.getItem("session_id"),
         );
         const project = await project_res.json();
+        if (project.success) {
+
+            // populate project info page
+
+        } else {
+            // redirect for now
+            window.location.href= "/dashboard.html?projectOverview";
+        }
         console.log(project);
       } else {
         // redirect bcs no project id
