@@ -363,8 +363,8 @@ a {
 }
 
 .dashboard-card h1 {
-  font-size: 80px !important;
-  line-height: 80px !important;
+  font-size: 80px;
+  line-height: 80px;
 }
 
 .wdeployment-card,
@@ -388,7 +388,7 @@ a {
 }
 
 #wdeployment-container hr,
-#dashboard-plist hr {
+#dashboard-plist hr, #dashboard-dlist hr {
   width: 100%;
   border: none;
   border-top: dotted 1.6px black;
@@ -401,7 +401,7 @@ a {
   height: 20vh;
 }
 
-#dashboard-plist {
+#dashboard-plist, #dashboard-dlist {
   flex: 1;
   border-top: solid 2px black;
   overflow-y: scroll;
@@ -435,7 +435,7 @@ a {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 30px;
+  gap: 10px;
 }
 
 .dproject-card .dproject-info p {
@@ -453,14 +453,19 @@ a {
 }
 
 .dproject-card .dproject-info i {
-  font-size: 19px !important;
+  font-size: 17px !important;
+  margin-right:2px;
 }
 .dproject-info-item {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
+}
+
+.dproject-divider {
+  color: rgb(56, 56, 56);
 }
 
 .dproject-info-item .dproject-status {
@@ -472,6 +477,10 @@ a {
   font-size: 14px !important;
   color: black;
   line-height: 14px !important;
+  margin-top:3px;
+  margin-bottom:3px;
+  margin-left: 0px; 
+  margin-right:0px;
 }
 
 .dproject-info-item .dproject-status.active {
@@ -593,4 +602,63 @@ hr.hr-dotted {
   font-size: 17px !important;
   line-height: 17px !important;
   margin-top: 2px;
+}
+
+select {
+  border: solid 2px black;
+  background-color: white;
+  border-radius: 2px;
+  box-shadow: 4px 4px 0px #000;
+  font-size: 20px;
+  padding: 10px 12px;
+  transition-duration: 0.1s;
+  margin: 5px;
+  outline: none;
+}
+
+#project-overview-settings h2 {
+  font-size: 18px !important;
+  line-height: 28px !important;
+  margin-top:15px;
+  margin-bottom:5px;
+}
+
+#project-overview-settings select {
+  margin:0;
+  font-size: 18px;
+}
+
+#project-overview-settings p {
+  margin-top:4px;
+  margin-bottom:4px;
+}
+
+#project-overview-settings h1 {
+  font-size:40px;
+  line-height:40px;
+}
+
+#project-stats-container h3 {
+  margin-top:0px;
+  margin-bottom:0px;
+  font-size:16px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+#project-stats-container p {
+  font-weight:700;
+  font-size:17px;
+  line-height: 17px;
+  margin-top:0px;
+  margin-bottom:0px;
+}
+
+#project-stats-container div {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content: space-between;
+  padding: 13px 8px;
+  padding-right: 15px;
 }

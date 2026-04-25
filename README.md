@@ -52,8 +52,11 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Dynamically populate
        - [x] Functionality -> mainly the timeline
      - [ ] project detail page
-       - [ ] Project detail page layout
+       - [x] Project detail page layout
        - [ ] Load project 
+       - [ ] Project detail page functionality
+         - [ ] Settings box options
+         - [ ] Project details editing
      - [ ] user account management
      - [x] Functionality to switch between pages
        - [ ] Loading animation to prevent weird UI glitches from being seen
@@ -109,7 +112,7 @@ Website planning:
              - percent issues resolved
              - most recent issues bar chart based on deployment
            - Single project page
-             - Big info box on top -> description, creation date, settings button, stuff like that
+             - Big info box on top -> description, creation date, settings options (another card to the right), stuff like that
              - General overview of errors (timeline + statistics)
              - List of deployments 
        - Deployment information

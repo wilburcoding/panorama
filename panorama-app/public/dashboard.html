@@ -62,16 +62,23 @@
           <!-- statistics cards here -->
           <div class="dashboard-card" style="flex: 1">
             <h2>Active Deployments</h2>
-            <h1 id="d-activedeployments">5</h1>
+            <h1
+              id="d-activedeployments"
+              style="font-size: 80px; line-height: 80px"
+            >
+              5
+            </h1>
           </div>
           <div class="dashboard-card" style="flex: 1">
             <h2>New Errors</h2>
-            <h1 id="d-newerrors">5</h1>
+            <h1 id="d-newerrors" style="font-size: 80px; line-height: 80px">
+              5
+            </h1>
           </div>
           <div class="dashboard-card" style="flex: 1">
             <h2>Unresolved Errors</h2>
             <!-- placeholder for now as I can't find think of anything better -->
-            <h1>5</h1>
+            <h1 style="font-size: 80px; line-height: 80px">5</h1>
           </div>
         </div>
         <div class="dashboard-row">
@@ -177,7 +184,11 @@
             Projects Overview
           </h1>
         </div>
-        <div class="dashboard-row" style="flex-wrap: wrap" id="project-overview-content">
+        <div
+          class="dashboard-row"
+          style="flex-wrap: wrap"
+          id="project-overview-content"
+        >
           <!-- project cards here probably -->
           <!-- <div
             class="dashboard-card project-overview-card"
@@ -227,7 +238,162 @@
       </div>
       <div id="sproject-content">
         <!-- project content view -->
-         
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="flex: 3; margin-top: 5vh">
+            <h1
+              style="
+                font-size: 35px !important;
+                color: black;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                line-height: 35px;
+              "
+            >
+              Sample Project 1
+            </h1>
+            <p style="margin-top: 4px; color: rgb(68, 68, 68)">
+              Created on 3/15/2025
+            </p>
+            <p
+              style="
+                margin-top: 10px;
+                margin-bottom: 2px;
+                font-weight: 700;
+                font-size: 18px;
+              "
+            >
+              Description
+            </p>
+            <p style="margin-top: 2px">
+              Description here for Sample Project 1 blah blah blah blah blah
+              blah blah blah
+            </p>
+          </div>
+          <div
+            class="dashboard-card"
+            style="flex: 1; margin-top: 5vh"
+            id="project-overview-settings"
+          >
+            <!-- settings stuff -->
+            <h1 style="margin-bottom: 0px">Settings</h1>
+            <h2 style="margin-bottom: 2px">Color</h2>
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+              "
+            >
+              <div
+                class="project-color"
+                style="width: 100px; height: 25px; border: solid 2px black"
+              ></div>
+              <p
+                style="margin-top: 2px; margin-bottom: 2px"
+                id="project-color-code"
+              >
+                #523522
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <!-- project statistics and charts -->
+          <div class="dashboard-card" style="flex: 1.6">
+            <h2>Event Timeline</h2>
+            <div style="flex: 1; height: auto; width: 100%">
+              <canvas id="timeline-chart"> </canvas>
+            </div>
+          </div>
+          <div
+            class="dashboard-card"
+            style="
+              flex: 1;
+              padding-left: 0;
+              padding-right: 0;
+              padding-bottom: 0;
+            "
+          >
+            <h2 style="margin-left: 20px">Project Stats</h2>
+            <div
+              id="project-stats-container"
+              style="
+                flex: 1;
+                border-top: solid 2px black;
+                overflow-y: scroll;
+                scrollbar-width: 1px;
+              "
+            >
+              <div>
+                <h3>Unresolved Issues:</h3>
+                <p>5</p>
+              </div>
+              <div>
+                <h3>New Issues (last 24 hours):</h3>
+                <p>3</p>
+              </div>
+              <div>
+                <h3>Last Error:</h3>
+                <p>3 hours ago</p>
+              </div>
+              <div>
+                <h3>Active Deployments:</h3>
+                <p>5</p>
+              </div>
+              <div>
+                <h3>Inactive Deployments:</h3>
+                <p>2</p>
+              </div>
+              <div>
+                <h3>Project Created:</h3>
+                <p>3/15/2026</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div
+            class="dashboard-card"
+            style="
+              flex: 1;
+              padding-left: 0;
+              padding-right: 0;
+              padding-bottom: 0;
+            "
+          >
+            <!-- list of deployments for project -->
+            <h2 style="margin-left: 20px">Deployment List</h2>
+            <div
+              id="dashboard-dlist"
+              style="padding-bottom: 80px; max-height: 30vh"
+            >
+              <div class="dproject-card">
+                <div class="dproject-info-item">
+                  <h1>Sample Deployment 1</h1>
+                  <div class="dproject-status active">
+                    <p>Active</p>
+                  </div>
+                  <div class="dproject-status active">
+                    <p>Production</p>
+                  </div>
+                </div>
+                <div class="dproject-info">
+                  <div class="dproject-info-item">
+                    <i class="ph ph-warning"></i>
+                    <p>5 Unresolved Errors</p>
+                  </div>
+                  <p class="dproject-divider">/</p>
+                  <div class="dproject-info-item">
+                    <i class="ph ph-clock"></i>
+                    <p>Active since 4/1/2025</p>
+                  </div>
+                </div>
+              </div>
+              <hr />
+            </div>
+          </div>
+        </div>
       </div>
       <div id="settings-content"></div>
     </div>
