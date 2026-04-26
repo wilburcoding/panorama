@@ -302,7 +302,7 @@
         </div>
         <div class="dashboard-row">
           <!-- project statistics and charts -->
-          <div class="dashboard-card" style="flex: 1.6;height:35vh;">
+          <div class="dashboard-card" style="flex: 1.6; height: 35vh">
             <h2>Event Timeline</h2>
             <div style="flex: 1; height: auto; width: 100%">
               <canvas id="sproject-timeline"> </canvas>
@@ -389,6 +389,125 @@
                 </div>
               </div>
               <hr /> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="sdeployment-content">
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="flex: 2; margin-top: 5vh">
+            <h1
+              style="
+                font-size: 35px !important;
+                color: black;
+                margin-top: 5px;
+                margin-bottom: 15px;
+                line-height: 35px;
+              "
+              id="sdeployment-name"
+            >
+              Sample Deployment 1
+            </h1>
+            <div class="sdeployment-info-row">
+              <div class="sdeployment-info-ritem">
+                <h3>Status</h3>
+                <div class="dproject-status active">
+                  <p>Active</p>
+                </div>
+              </div>
+              <div class="sdeployment-info-ritem">
+                <h3>Environment</h3>
+                <div class="dproject-status development">
+                  <p>Development</p>
+                </div>
+              </div>
+              <div class="sdeployment-info-ritem">
+                <h3>Version</h3>
+                <p>v0.1.1</p>
+              </div>
+            </div>
+            <div class="sdeployment-info-row">
+              <div class="sdeployment-info-ritem">
+                <h3>Last Deployed</h3>
+                <p>5/2/2025</p>
+              </div>
+              <div class="sdeployment-info-ritem">
+                <h3>Created On</h3>
+                <p>4/23/2025</p>
+              </div>
+              <div class="sdeployment-info-ritem">
+                <h3>Parent Project</h3>
+                <p>Sample Project 1</p>
+              </div>
+            </div>
+            <div class="sdeployment-info-row">
+              <div class="sdeployment-info-ritem">
+                <h3>API key</h3>
+                <p>92h489howaigniwyt98anyomo</p>
+              </div>
+            </div>
+          </div>
+          <div class="dashboard-card" style="flex: 2; margin-top: 5vh">
+            <h2 style="margin-bottom: 5px">Event Statistics + Timeline</h2>
+            <div class="sdeployment-info-row">
+              <div class="sdeployment-info-ritem">
+                <h3>Unresolved Errors</h3>
+                <p>5</p>
+              </div>
+              <div class="sdeployment-info-ritem">
+                <h3>Last Error</h3>
+                <p>5 hours ago</p>
+              </div>
+              <div class="sdeployment-info-ritem">
+                <h3>Total Errors</h3>
+                <p>15</p>
+              </div>
+            </div>
+            <div class="sdeployment-info-row">
+              <div style="flex: 1; height: auto; width: 100%">
+                <canvas id="sdeployment-timeline"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div
+            class="dashboard-card"
+            style="
+              flex: 1;
+              padding-left: 0;
+              padding-right: 0;
+              padding-bottom: 0;
+            "
+          >
+            <h2 style="margin-bottom: 5px; margin-left: 20px">
+              Error Events List
+            </h2>
+            <input
+              type="text"
+              id="error-search"
+              placeholder="Search errors..."
+              style="margin-left: 0px; margin-left: 20px; margin-bottom: 15px"
+            />
+            <div
+              id="sdeployment-dlist"
+              style="padding-bottom: 80px; max-height: 30vh"
+            >
+              <div class="sdeployment-card">
+                <div class="sdeployment-info-item">
+                  <h1>Assignment to constant variable</h1>
+                  <div class="dproject-status unresolved">
+                    <p>Unresolved</p>
+                  </div>
+                </div>
+                <div class="sdeployment-info">
+                  <div class="dproject-info-item">
+                    <i class="ph ph-clock"></i>
+                    <p>Created on 4/1/2025</p>
+                  </div>
+                </div>
+              </div>
+              <hr />
             </div>
           </div>
         </div>

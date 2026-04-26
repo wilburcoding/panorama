@@ -215,6 +215,8 @@ $(document).ready(function () {
       $("#settings-content").hide();
       $("#sproject-content").hide();
       $("#project-content").show();
+      $("#sdeployment-content").hide();
+
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i];
         const create_date = parseSqlTimestamp(project.created_at);
@@ -326,6 +328,7 @@ $(document).ready(function () {
         $("#settings-content").hide();
         $("#project-content").hide();
         $("#sproject-content").show();
+        $("#sdeployment-content").hide();
 
         // get project info
         const project_res = await fetch(
@@ -353,14 +356,17 @@ $(document).ready(function () {
           let inactive_deployments = 0;
           let timeline = [0, 0, 0, 0, 0, 0];
           let labels = [];
-          for (let i =5; i >=0;i--) {
-            const time = new Date(Date.now() - i * 4 * 60 * 60 *1000);
+          for (let i = 5; i >= 0; i--) {
+            const time = new Date(Date.now() - i * 4 * 60 * 60 * 1000);
             const hours = time.getHours();
             const suffix = hours >= 12 ? "pm" : "am";
-            labels.push(((hours + 11) % 12) + 1 + " " + suffix); 
+            labels.push(((hours + 11) % 12) + 1 + " " + suffix);
           }
           const ctx = document.getElementById("sproject-timeline");
-          const timelineChart = new Chart(ctx, JSON.parse(JSON.stringify(config)));
+          const timelineChart = new Chart(
+            ctx,
+            JSON.parse(JSON.stringify(config)),
+          );
 
           for (let j = 0; j < project.deployments.length; j++) {
             if (project.deployments[j].status == "active") {
@@ -369,7 +375,7 @@ $(document).ready(function () {
               inactive_deployments += 1;
             }
             const deployment = project.deployments[j];
-            let deployment_unresolved =0;
+            let deployment_unresolved = 0;
             for (
               let k = 0;
               k < project.deployments[j].error_events.length;
@@ -379,13 +385,13 @@ $(document).ready(function () {
                 project.deployments[j].error_events[k].status !== "resolved"
               ) {
                 unresolved_errors += 1;
-                deployment_unresolved+=1;
+                deployment_unresolved += 1;
               }
               const event_time = parseSqlTimestamp(
                 project.deployments[j].error_events[k].timestamp,
               );
               const now = new Date();
-              const hours_before = (now - event_time) / 1000 / 60/ 60;
+              const hours_before = (now - event_time) / 1000 / 60 / 60;
               if (hours_before < 24) {
                 newerrors += 1;
                 timeline[5 - Math.floor(hours_before / 4)] += 1;
@@ -395,14 +401,11 @@ $(document).ready(function () {
               } else if (event_time > parseSqlTimestamp(latest_time)) {
                 latest_time = project.deployments[j].error_events[k].timestamp;
               }
-
-
-
             }
             const last_deployed = parseSqlTimestamp(deployment.last_deployed);
 
             $("#sproject-dlist").append(`
-              <div class="dproject-card">
+              <div class="dproject-card" id="sproject-${project.id}-${deployment.id}">
                 <div class="dproject-info-item">
                   <h1>${deployment.name}</h1>
                   <div class="dproject-status ${deployment.status}">
@@ -426,6 +429,13 @@ $(document).ready(function () {
               </div>
               <hr />
             `);
+            $("#sproject-" + project.id + "-" + deployment.id).click(
+              function () {
+                console.log("deployment " + deployment.id);
+                window.location.href =
+                  "/dashboard.html?deploymentInfo&deploymentId=" + deployment.id;
+              },
+            );
           }
           timelineChart.data.datasets[0].data = timeline;
           timelineChart.data.labels = labels;
@@ -449,6 +459,12 @@ $(document).ready(function () {
         // redirect bcs no project id
         window.location.href = "/dashboard.html";
       }
+    } else if (params.has("deploymentInfo")) {
+      $("#dashboard-content").hide();
+      $("#settings-content").hide();
+      $("#sproject-content").hide();
+      $("#project-content").hide();
+      $("#sdeployment-content").show();
     } else if (params.has("settings")) {
       // show settings
       console.log("settings");
@@ -456,13 +472,14 @@ $(document).ready(function () {
       $("#project-content").hide();
       $("#sproject-content").hide();
       $("#settings-content").show();
+      $("#sdeployment-content").hide();
     } else {
       // dashboard overview
       $("#dashboard-content").show();
       $("#project-content").hide();
       $("#sproject-content").hide();
       $("#settings-content").hide();
-
+      $("#sdeployment-content").hide();
       // populate dashboard
 
       let active_deployment_count = 0;

@@ -53,10 +53,13 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Functionality -> mainly the timeline
      - [ ] project detail page
        - [x] Project detail page layout
-       - [ ] Load project 
+       - [x] Populate data 
        - [ ] Project detail page functionality
          - [ ] Settings box options
          - [ ] Project details editing
+     - [ ] deployment detail page
+       - [] Deployment detail page layout
+       - [ ] 
      - [ ] user account management
      - [x] Functionality to switch between pages
        - [ ] Loading animation to prevent weird UI glitches from being seen
@@ -116,8 +119,9 @@ Website planning:
              - General overview of errors (timeline + statistics)
              - List of deployments 
        - Deployment information
-         - Show some basic information and statistics
-         - list of error events
+         - top row -> all deployment information (version, name, environment, status)
+           - mid row and beyond -> full list of error events
+             - Search options 
        - Error information
          - Basically show everything that is available about the event
          - Options to delete, tag

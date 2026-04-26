@@ -257,7 +257,7 @@ a {
 #dashboard-content,
 #settings-content,
 #project-content,
-#sproject-content {
+#sproject-content, #sdeployment-content {
   width: 80%;
   height: 100%;
   background-color: rgb(253, 250, 242);
@@ -368,7 +368,7 @@ a {
 }
 
 .wdeployment-card,
-.dproject-card {
+.dproject-card, .sdeployment-card {
   width: 100%;
   border: none;
   padding: 20px;
@@ -380,7 +380,7 @@ a {
 }
 
 .wdeployment-card h1,
-.dproject-card h1 {
+.dproject-card h1, .sdeployment-card h1 {
   font-size: 20px !important;
   line-height: 20px !important;
   font-weight: 800;
@@ -388,7 +388,7 @@ a {
 }
 
 #wdeployment-container hr,
-#dashboard-plist hr, #sproject-dlist hr {
+#dashboard-plist hr, #sproject-dlist hr, #sdeployment-dlist hr {
   width: 100%;
   border: none;
   border-top: dotted 1.6px black;
@@ -401,7 +401,7 @@ a {
   height: 20vh;
 }
 
-#dashboard-plist, #sproject-dlist {
+#dashboard-plist, #sproject-dlist, #sdeployment-dlist {
   flex: 1;
   border-top: solid 2px black;
   overflow-y: scroll;
@@ -438,13 +438,28 @@ a {
   gap: 10px;
 }
 
+.sdeployment-card .sdeployment-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
 .dproject-card .dproject-info p {
   font-size: 16px !important;
   margin: 0;
   line-height: 16px !important;
 }
 
-.dproject-card:hover {
+.sdeployment-card .sdeployment-info p {
+  font-size: 16px !important;
+  margin: 0;
+  line-height: 16px !important;
+  
+}
+
+.dproject-card:hover , .sdeployment-card:hover{
   background-color: rgb(238, 238, 238);
 }
 
@@ -452,11 +467,12 @@ a {
   background-color: rgb(238, 238, 238);
 }
 
+
 .dproject-card .dproject-info i {
   font-size: 17px !important;
   margin-right:2px;
 }
-.dproject-info-item {
+.dproject-info-item, .sdeployment-info-item {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -468,12 +484,12 @@ a {
   color: rgb(56, 56, 56);
 }
 
-.dproject-info-item .dproject-status {
+.dproject-status {
   padding: 3px;
   border-radius: 2px;
 }
 
-.dproject-info-item .dproject-status p {
+.dproject-status p {
   font-size: 14px !important;
   color: black;
   line-height: 14px !important;
@@ -483,13 +499,15 @@ a {
   margin-right:0px;
 }
 
-.dproject-info-item .dproject-status.active {
+.dproject-status.active {
   background-color: #7fd58f;
 }
 
-.dproject-info-item .dproject-status.inactive {
+.dproject-status.inactive {
   background-color: rgb(186, 186, 186);
 }
+
+
 
 /*-- Project Overview page */
 
@@ -663,14 +681,58 @@ select {
   padding-right: 15px;
 }
 
-.dproject-info-item .dproject-status.staging {
+.dproject-status.staging {
   background-color: #bbdcc2;
 }
 
-.dproject-info-item .dproject-status.development {
+.dproject-status.development {
   background-color: rgb(199, 199, 199);
 }
 
-.dproject-info-item .dproject-status.production {
+.dproject-status.production {
   background-color: #7fd58f;
+}
+
+
+/* specific deployment styles */
+
+.sdeployment-info-row {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content: space-between;
+  margin-top:10px;
+  margin-bottom:10px;
+
+}
+
+.sdeployment-info-ritem {
+  display:flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  flex:1;
+}
+
+.sdeployment-info-ritem h3 {
+  font-size: 16px;
+  line-height: 16px;
+  font-weight:700;
+  margin-top:2px;
+  margin-bottom:3px;
+}
+
+.sdeployment-info-ritem p {
+  font-size: 16px;
+  line-height: 16px;
+  margin-top:2px;
+  margin-bottom:2px;
+}
+
+.dproject-status.resolved {
+  background-color: #7fd58f
+}
+
+.dproject-status.unresolved {
+  background-color: #fb9494;
 }
