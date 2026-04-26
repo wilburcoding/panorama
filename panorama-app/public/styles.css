@@ -388,7 +388,7 @@ a {
 }
 
 #wdeployment-container hr,
-#dashboard-plist hr, #dashboard-dlist hr {
+#dashboard-plist hr, #sproject-dlist hr {
   width: 100%;
   border: none;
   border-top: dotted 1.6px black;
@@ -401,7 +401,7 @@ a {
   height: 20vh;
 }
 
-#dashboard-plist, #dashboard-dlist {
+#dashboard-plist, #sproject-dlist {
   flex: 1;
   border-top: solid 2px black;
   overflow-y: scroll;
@@ -659,6 +659,18 @@ select {
   flex-direction:row;
   align-items:center;
   justify-content: space-between;
-  padding: 13px 8px;
+  padding: 10px 8px;
   padding-right: 15px;
+}
+
+.dproject-info-item .dproject-status.staging {
+  background-color: #bbdcc2;
+}
+
+.dproject-info-item .dproject-status.development {
+  background-color: rgb(199, 199, 199);
+}
+
+.dproject-info-item .dproject-status.production {
+  background-color: #7fd58f;
 }

@@ -253,10 +253,10 @@ $(document).ready(function () {
 
         let labels = [];
         for (let i = 5; i >= 0; i--) {
-            const time = new Date(Date.now() - i * 4 * 60 * 60 * 1000);
-            const hours = time.getHours();
-            const suffix = hours >= 12 ? "pm" : "am";
-            labels.push(((hours + 11) % 12) + 1 + " " + suffix);
+          const time = new Date(Date.now() - i * 4 * 60 * 60 * 1000);
+          const hours = time.getHours();
+          const suffix = hours >= 12 ? "pm" : "am";
+          labels.push(((hours + 11) % 12) + 1 + " " + suffix);
         }
 
         $("#project-overview-content").append(`
@@ -311,9 +311,10 @@ $(document).ready(function () {
         timelineChart.data.datasets[0].backgroundColor = project.color;
         timelineChart.update();
 
-        $("#project-overview-" + p_id).click(function( ) {
-            window.location.href="/dashboard.html?projectId=" + p_id + "&projectInfo";
-        })
+        $("#project-overview-" + p_id).click(function () {
+          window.location.href =
+            "/dashboard.html?projectId=" + p_id + "&projectInfo";
+        });
       }
     } else if (params.has("projectInfo")) {
       console.log("proj");
@@ -335,14 +336,115 @@ $(document).ready(function () {
         );
         const project = await project_res.json();
         if (project.success) {
+          // populate project info page
+          const project = projects.find((p) => p.id == project_id);
+          $("#sproject-name").text(project.name);
+          $("#sproject-description").text(project.description);
+          $(".sproject-color-picker").css("background-color", project.color);
+          const create_date = new Date(project.created_at);
+          $("#sproject-createdate").text(
+            `${create_date.getMonth() + 1}/${create_date.getDate()}/${create_date.getFullYear()}`,
+          );
 
-            // populate project info page
+          let unresolved_errors = 0;
+          let newerrors = 0;
+          let latest_time = null;
+          let active_deployments = 0;
+          let inactive_deployments = 0;
+          let timeline = [0, 0, 0, 0, 0, 0];
+          let labels = [];
+          for (let i =5; i >=0;i--) {
+            const time = new Date(Date.now() - i * 4 * 60 * 60 *1000);
+            const hours = time.getHours();
+            const suffix = hours >= 12 ? "pm" : "am";
+            labels.push(((hours + 11) % 12) + 1 + " " + suffix); 
+          }
+          const ctx = document.getElementById("sproject-timeline");
+          const timelineChart = new Chart(ctx, JSON.parse(JSON.stringify(config)));
 
+          for (let j = 0; j < project.deployments.length; j++) {
+            if (project.deployments[j].status == "active") {
+              active_deployments += 1;
+            } else {
+              inactive_deployments += 1;
+            }
+            const deployment = project.deployments[j];
+            let deployment_unresolved =0;
+            for (
+              let k = 0;
+              k < project.deployments[j].error_events.length;
+              k++
+            ) {
+              if (
+                project.deployments[j].error_events[k].status !== "resolved"
+              ) {
+                unresolved_errors += 1;
+                deployment_unresolved+=1;
+              }
+              const event_time = parseSqlTimestamp(
+                project.deployments[j].error_events[k].timestamp,
+              );
+              const now = new Date();
+              const hours_before = (now - event_time) / 1000 / 60/ 60;
+              if (hours_before < 24) {
+                newerrors += 1;
+                timeline[5 - Math.floor(hours_before / 4)] += 1;
+              }
+              if (latest_time == null) {
+                latest_time = project.deployments[j].error_events[k].timestamp;
+              } else if (event_time > parseSqlTimestamp(latest_time)) {
+                latest_time = project.deployments[j].error_events[k].timestamp;
+              }
+
+
+
+            }
+            const last_deployed = parseSqlTimestamp(deployment.last_deployed);
+
+            $("#sproject-dlist").append(`
+              <div class="dproject-card">
+                <div class="dproject-info-item">
+                  <h1>${deployment.name}</h1>
+                  <div class="dproject-status ${deployment.status}">
+                    <p>${deployment.status.charAt(0).toUpperCase() + deployment.status.slice(1)}</p>
+                  </div>
+                  <div class="dproject-status ${deployment.environment}">
+                    <p>${deployment.environment.charAt(0).toUpperCase() + deployment.environment.slice(1)}</p>
+                  </div>
+                </div>
+                <div class="dproject-info">
+                  <div class="dproject-info-item">
+                    <i class="ph ph-warning"></i>
+                    <p>${deployment_unresolved} Unresolved Errors</p>
+                  </div>
+                  <p class="dproject-divider">/</p>
+                  <div class="dproject-info-item">
+                    <i class="ph ph-clock"></i>
+                    <p>Active since ${last_deployed.getMonth() + 1}/${last_deployed.getDate()}/${last_deployed.getFullYear()}</p>
+                  </div>
+                </div>
+              </div>
+              <hr />
+            `);
+          }
+          timelineChart.data.datasets[0].data = timeline;
+          timelineChart.data.labels = labels;
+          timelineChart.data.datasets[0].backgroundColor = project.color;
+          timelineChart.update();
+
+          $("#sproject-unresolvedissues").text(unresolved_errors);
+          $("#sproject-newissues").text(newerrors);
+          $("#sproject-lasterror").text(
+            latest_time == null ? "No errors found" : formatTime(latest_time),
+          );
+          $("#sproject-activedeployments").text(active_deployments);
+          $("#sproject-inactivedeployments").text(inactive_deployments);
+
+          // $("#sproject-createdate")
         } else {
-            // redirect for now
-            window.location.href= "/dashboard.html?projectOverview";
+          // redirect for now
+          window.location.href = "/dashboard.html?projectOverview";
         }
-        console.log(project);
       } else {
         // redirect bcs no project id
         window.location.href = "/dashboard.html";

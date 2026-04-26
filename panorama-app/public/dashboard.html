@@ -239,43 +239,13 @@
       <div id="sproject-content">
         <!-- project content view -->
         <div class="dashboard-row">
-          <div class="dashboard-card" style="flex: 3; margin-top: 5vh">
-            <h1
-              style="
-                font-size: 35px !important;
-                color: black;
-                margin-top: 5px;
-                margin-bottom: 5px;
-                line-height: 35px;
-              "
-            >
-              Sample Project 1
-            </h1>
-            <p style="margin-top: 4px; color: rgb(68, 68, 68)">
-              Created on 3/15/2025
-            </p>
-            <p
-              style="
-                margin-top: 10px;
-                margin-bottom: 2px;
-                font-weight: 700;
-                font-size: 18px;
-              "
-            >
-              Description
-            </p>
-            <p style="margin-top: 2px">
-              Description here for Sample Project 1 blah blah blah blah blah
-              blah blah blah
-            </p>
-          </div>
           <div
-            class="dashboard-card"
+            class="dashboard-card sproject-color-picker"
             style="flex: 1; margin-top: 5vh"
             id="project-overview-settings"
           >
-            <!-- settings stuff -->
-            <h1 style="margin-bottom: 0px">Settings</h1>
+            <!-- settings stuff > edit: since color is teh only setting, im making teh whole box a color picker -->
+            <!-- <h1 style="margin-bottom: 0px">Settings</h1>
             <h2 style="margin-bottom: 2px">Color</h2>
             <div
               style="
@@ -288,6 +258,7 @@
               <div
                 class="project-color"
                 style="width: 100px; height: 25px; border: solid 2px black"
+                id="sproject-color-picker"
               ></div>
               <p
                 style="margin-top: 2px; margin-bottom: 2px"
@@ -295,15 +266,46 @@
               >
                 #523522
               </p>
-            </div>
+            </div> -->
+          </div>
+          <div class="dashboard-card" style="flex: 6; margin-top: 5vh">
+            <h1
+              style="
+                font-size: 35px !important;
+                color: black;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                line-height: 35px;
+              "
+              id="sproject-name"
+            >
+              Sample Project 1
+            </h1>
+            <p style="margin-top: 4px; color: rgb(68, 68, 68)">
+              Created on <span id="sproject-createdate"></span>
+            </p>
+            <p
+              style="
+                margin-top: 10px;
+                margin-bottom: 2px;
+                font-weight: 700;
+                font-size: 18px;
+              "
+            >
+              Description
+            </p>
+            <p style="margin-top: 2px" id="sproject-description">
+              Description here for Sample Project 1 blah blah blah blah blah
+              blah blah blah
+            </p>
           </div>
         </div>
         <div class="dashboard-row">
           <!-- project statistics and charts -->
-          <div class="dashboard-card" style="flex: 1.6">
+          <div class="dashboard-card" style="flex: 1.6;height:35vh;">
             <h2>Event Timeline</h2>
             <div style="flex: 1; height: auto; width: 100%">
-              <canvas id="timeline-chart"> </canvas>
+              <canvas id="sproject-timeline"> </canvas>
             </div>
           </div>
           <div
@@ -327,27 +329,23 @@
             >
               <div>
                 <h3>Unresolved Issues:</h3>
-                <p>5</p>
+                <p id="sproject-unresolvedissues">5</p>
               </div>
               <div>
                 <h3>New Issues (last 24 hours):</h3>
-                <p>3</p>
+                <p id="sproject-newissues">3</p>
               </div>
               <div>
                 <h3>Last Error:</h3>
-                <p>3 hours ago</p>
+                <p id="sproject-lasterror">3 hours ago</p>
               </div>
               <div>
                 <h3>Active Deployments:</h3>
-                <p>5</p>
+                <p id="sproject-activedeployments">5</p>
               </div>
               <div>
                 <h3>Inactive Deployments:</h3>
-                <p>2</p>
-              </div>
-              <div>
-                <h3>Project Created:</h3>
-                <p>3/15/2026</p>
+                <p id="sproject-inactivedeployments">2</p>
               </div>
             </div>
           </div>
@@ -365,10 +363,10 @@
             <!-- list of deployments for project -->
             <h2 style="margin-left: 20px">Deployment List</h2>
             <div
-              id="dashboard-dlist"
+              id="sproject-dlist"
               style="padding-bottom: 80px; max-height: 30vh"
             >
-              <div class="dproject-card">
+              <!-- <div class="dproject-card">
                 <div class="dproject-info-item">
                   <h1>Sample Deployment 1</h1>
                   <div class="dproject-status active">
@@ -390,7 +388,7 @@
                   </div>
                 </div>
               </div>
-              <hr />
+              <hr /> -->
             </div>
           </div>
         </div>
