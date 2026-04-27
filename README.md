@@ -55,11 +55,12 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Project detail page layout
        - [x] Populate data 
        - [ ] Project detail page functionality
-         - [ ] Settings box options
          - [ ] Project details editing
      - [ ] deployment detail page
-       - [] Deployment detail page layout
-       - [ ] 
+       - [x] Deployment detail page layout
+       - [ ] Populate data
+       - [ ] page functionality
+         - [ ] Error events sorting functionality
      - [ ] user account management
      - [x] Functionality to switch between pages
        - [ ] Loading animation to prevent weird UI glitches from being seen
@@ -121,7 +122,11 @@ Website planning:
        - Deployment information
          - top row -> all deployment information (version, name, environment, status)
            - mid row and beyond -> full list of error events
-             - Search options 
+             - Search options -> text based 
+               - Use queries
+               - Only going to have a status query FOR NOW (bcs no other one really works)
+                 - Ex. status:active
+             - Edit error_events -> change status, delete
        - Error information
          - Basically show everything that is available about the event
          - Options to delete, tag

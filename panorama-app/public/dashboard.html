@@ -411,39 +411,39 @@
             <div class="sdeployment-info-row">
               <div class="sdeployment-info-ritem">
                 <h3>Status</h3>
-                <div class="dproject-status active">
-                  <p>Active</p>
+                <div class="dproject-status" id="sdeployment-status-div">
+                  <p id="sdeployment-status">Active</p>
                 </div>
               </div>
               <div class="sdeployment-info-ritem">
                 <h3>Environment</h3>
-                <div class="dproject-status development">
-                  <p>Development</p>
+                <div class="dproject-status" id="sdeployment-environment-div">
+                  <p id="sdeployment-environment">Development</p>
                 </div>
               </div>
               <div class="sdeployment-info-ritem">
                 <h3>Version</h3>
-                <p>v0.1.1</p>
+                <p id="sdeployment-version">v0.1.1</p>
               </div>
             </div>
             <div class="sdeployment-info-row">
               <div class="sdeployment-info-ritem">
                 <h3>Last Deployed</h3>
-                <p>5/2/2025</p>
+                <p id="sdeployment-lastdeployed">5/2/2025</p>
               </div>
               <div class="sdeployment-info-ritem">
                 <h3>Created On</h3>
-                <p>4/23/2025</p>
+                <p id="sdeployment-createdon">4/23/2025</p>
               </div>
               <div class="sdeployment-info-ritem">
                 <h3>Parent Project</h3>
-                <p>Sample Project 1</p>
+                <p id="sdeployment-parentproject">Sample Project 1</p>
               </div>
             </div>
             <div class="sdeployment-info-row">
               <div class="sdeployment-info-ritem">
                 <h3>API key</h3>
-                <p>92h489howaigniwyt98anyomo</p>
+                <p id="sdeployment-apikey">92h489howaigniwyt98anyomo</p>
               </div>
             </div>
           </div>
@@ -452,15 +452,15 @@
             <div class="sdeployment-info-row">
               <div class="sdeployment-info-ritem">
                 <h3>Unresolved Errors</h3>
-                <p>5</p>
+                <p id="sdeployment-unresolvederrors">5</p>
               </div>
               <div class="sdeployment-info-ritem">
                 <h3>Last Error</h3>
-                <p>5 hours ago</p>
+                <p id="sdeployment-lasterror">5 hours ago</p>
               </div>
               <div class="sdeployment-info-ritem">
                 <h3>Total Errors</h3>
-                <p>15</p>
+                <p id="sdeployment-totalerrors">15</p>
               </div>
             </div>
             <div class="sdeployment-info-row">
@@ -485,16 +485,20 @@
             </h2>
             <input
               type="text"
+              value="status:unresolved"
               id="error-search"
               placeholder="Search errors..."
               style="margin-left: 0px; margin-left: 20px; margin-bottom: 15px"
             />
             <div
-              id="sdeployment-dlist"
+              id="sdeployment-elist"
               style="padding-bottom: 80px; max-height: 30vh"
             >
-              <div class="sdeployment-card">
+              <!-- <div class="sdeployment-card">
                 <div class="sdeployment-info-item">
+                  <div class="checkbox checked">
+                    <i class="ph ph-check"></i>
+                  </div>
                   <h1>Assignment to constant variable</h1>
                   <div class="dproject-status unresolved">
                     <p>Unresolved</p>
@@ -507,7 +511,7 @@
                   </div>
                 </div>
               </div>
-              <hr />
+              <hr /> -->
             </div>
           </div>
         </div>
