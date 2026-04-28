@@ -20,6 +20,7 @@
       type="text/css"
       href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
     />
+    <link href="/prism.css" rel="stylesheet" />
 
     <title>Panorama App</title>
   </head>
@@ -393,6 +394,53 @@
           </div>
         </div>
       </div>
+      <div id="serror-content">
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="flex: 1; margin-top: 5vh">
+            <h1
+              style="
+                font-size: 35px;
+                color: black;
+                margin-top: 5px;
+                margin-bottom: 10px;
+                line-height: 35px;
+              "
+              id="serror-title"
+            >
+              Sample Error: Blah blah blah stuff here something
+            </h1>
+            <div class="error-info-row">
+              <div class="error-info-ritem">
+                <h3>Status</h3>
+                <div class="dproject-status" id="serror-status-div">
+                  <p id="serror-status">Active</p>
+                </div>
+              </div>
+              <div class="error-info-ritem">
+                <h3>Environment</h3>
+                <p id="serror-environment">v0.1.1</p>
+              </div>
+            </div>
+            <div class="error-info-row">
+              <div class="error-info-ritem">
+                <h3>Parent Deployment</h3>
+                <p id="serror-deployment">v0.1.1</p>
+              </div>
+              <div class="error-info-ritem">
+                <h3>Created On</h3>
+                <p id="serror-createdon">v0.1.1</p>
+              </div>
+            </div>
+            <div class="error-info-row">
+              <div class="error-info-ritem">
+                <h3>Stack Trace</h3>
+                <pre><code class="language-javascript" id="serror-stacktrace"></code></pre>
+              </div>
+            </div>
+            <!-- more tbd -->
+          </div>
+        </div>
+      </div>
       <div id="sdeployment-content">
         <div class="dashboard-row">
           <div class="dashboard-card" style="flex: 2; margin-top: 5vh">
@@ -443,7 +491,9 @@
             <div class="sdeployment-info-row">
               <div class="sdeployment-info-ritem">
                 <h3>API key</h3>
-                <p id="sdeployment-apikey">92h489howaigniwyt98anyomo</p>
+                <div class="apikey-container">
+                  <p id="sdeployment-apikey">92h489howaigniwyt98anyomo</p>
+                </div>
               </div>
             </div>
           </div>
@@ -483,13 +533,35 @@
             <h2 style="margin-bottom: 5px; margin-left: 20px">
               Error Events List
             </h2>
-            <input
-              type="text"
-              value="status:unresolved"
-              id="error-search"
-              placeholder="Search errors..."
-              style="margin-left: 0px; margin-left: 20px; margin-bottom: 15px"
-            />
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                margin-top: 10px;
+              "
+            >
+              <div
+                class="checkbox"
+                style="
+                  margin-left: 20px;
+                  margin-right: 10px;
+                  margin-top: 0px;
+                  margin-bottom: 15px;
+                "
+                id="elist-select"
+              >
+                <i class="ph ph-check"></i>
+              </div>
+              <input
+                type="text"
+                value="status:unresolved"
+                id="error-search"
+                placeholder="Search errors..."
+                style="margin-left: 0px; margin-left: 5px; margin-bottom: 15px"
+              />
+            </div>
             <div
               id="sdeployment-elist"
               style="padding-bottom: 80px; max-height: 30vh"
@@ -519,6 +591,7 @@
       <div id="settings-content"></div>
     </div>
   </body>
+  <script src="prism.js"></script>
   <script
     src="https://code.jquery.com/jquery-4.0.0.min.js"
     integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao="

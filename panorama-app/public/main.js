@@ -215,6 +215,7 @@ $(document).ready(function () {
       $("#settings-content").hide();
       $("#sproject-content").hide();
       $("#project-content").show();
+      $("#serror-content").hide();
       $("#sdeployment-content").hide();
 
       for (let i = 0; i < projects.length; i++) {
@@ -329,6 +330,7 @@ $(document).ready(function () {
         $("#project-content").hide();
         $("#sproject-content").show();
         $("#sdeployment-content").hide();
+        $("#serror-content").hide();
 
         // get project info
         const project_res = await fetch(
@@ -466,6 +468,7 @@ $(document).ready(function () {
       $("#sproject-content").hide();
       $("#project-content").hide();
       $("#sdeployment-content").show();
+      $("#serror-content").hide();
 
       const deployment_id = params.get("deploymentId");
       const project = projects.find((p) =>
@@ -561,6 +564,7 @@ $(document).ready(function () {
         );
         timelineChart.data.datasets[0].data = timeline;
         timelineChart.data.labels = labels;
+        timelineChart.data.datasets[0].backgroundColor = project.color;
         timelineChart.update();
 
         // populate error events table
@@ -570,24 +574,30 @@ $(document).ready(function () {
           let filtered_events = deployment.error_events;
 
           if (options.includes("status:unresolved")) {
-            filtered_events = filtered_events.filter((e) => e.status !== "resolved");
+            filtered_events = filtered_events.filter(
+              (e) => e.status !== "resolved",
+            );
             options = options.replace("status:unresolved", "");
           }
 
           if (options.includes("status:resolved")) {
-            filtered_events = filtered_events.filter((e) => e.status === "resolved");
-            options = options.replace("status:resolved", "")
+            filtered_events = filtered_events.filter(
+              (e) => e.status === "resolved",
+            );
+            options = options.replace("status:resolved", "");
           }
 
-          filtered_events = filtered_events.filter((e) => e.title.toLowerCase().includes(options));
-          
+          filtered_events = filtered_events.filter((e) =>
+            e.title.toLowerCase().includes(options),
+          );
+
           current_filtering = filtered_events.map((e) => e.id);
 
-          for (let i =0; i < filtered_events.length; i++) {
+          for (let i = 0; i < filtered_events.length; i++) {
             const event = filtered_events[i];
             const created_at = parseSqlTimestamp(event.timestamp);
             $("#sdeployment-elist").append(`
-              <div class="sdeployment-card">
+              <div class="sdeployment-card" id="errorevent-${event.id}">
 
                 <div class="sdeployment-info-item">
                   <div class="checkbox ${checked_errors.includes(event.id) ? "checked" : ""}" id="checkbox-${event.id}" >
@@ -608,29 +618,87 @@ $(document).ready(function () {
               <hr />
             `);
 
-            $("#checkbox-" + event.id).click(function() {
+            $("#checkbox-" + event.id).click(function () {
               if (checked_errors.includes(event.id)) {
                 // remove from checked
                 checked_errors = checked_errors.filter((id) => id !== event.id);
                 $(this).removeClass("checked");
-
               } else {
                 checked_errors.push(event.id);
                 $(this).addClass("checked");
-
               }
               console.log(checked_errors);
-            })
-          }
+            });
 
+            $("#errorevent-" + event.id).click(function () {
+              window.location.href =
+                "/dashboard.html?errorEventInfo&eventId=" + event.id;
+            });
+          }
         }
         populateErrorTable($("#error-search").val().toLowerCase());
-        $("#error-search").on("input", function() {
+        $("#error-search").on("input", function () {
           populateErrorTable($(this).val().toLowerCase());
+        });
 
-        })
+        $("#elist-select").click(function () {
+          // check if not all current selected
+          if (checked_errors.length < current_filtering.length) {
+            // select all
+            checked_errors = [...current_filtering];
+            current_filtering.forEach((id) => {
+              $("#checkbox-" + id).addClass("checked");
+            });
+            $(this).addClass("checked");
+          } else {
+            // deselect all
+            checked_errors = [];
+            current_filtering.forEach((id) => {
+              $("#checkbox-" + id).removeClass("checked");
+            });
+            $(this).removeClass("checked");
+          }
+        });
+
+        $(".apikey-container").click(function () {
+          $(this).toggleClass("show");
+        });
       } else {
         // redirect bcs not a valid deployment
+        window.location.href = "/dashboard.html";
+      }
+    } else if (params.has("errorEventInfo")) {
+      $("#dashboard-content").hide();
+      $("#project-content").hide();
+      $("#sproject-content").hide();
+      $("#settings-content").hide();
+      $("#sdeployment-content").hide();
+      $("#serror-content").show();
+      const event_id = params.get("eventId");
+
+      let deployments = projects.map((p) => p.deployments).flat();
+      let deployment = null;
+
+      for (let i = 0; i < deployments.length; i++) {
+        const d = deployments[i];
+        const event = d.error_events.find((e) => e.id == event_id);
+        if (event) {
+          deployment = d;
+          break;
+        }
+      }
+      if (deployment != null) {
+        const event = deployment.error_events.find((e) => e.id == event_id);
+        $("#serror-title").text(event.title);
+        $("#serror-status-div").addClass(event.status);
+        $("#serror-status").text(event.status.charAt(0).toUpperCase() + event.status.slice(1));
+        $("#serror-environment").text(event.environment.charAt(0).toUpperCase() + event.environment.slice(1));
+        $("#serror-deployment").text(deployment.name);
+        const created_at = parseSqlTimestamp(event.timestamp);
+        $("#serror-createdon").text(created_at.getMonth() + 1 + "/" + created_at.getDate() + "/" + created_at.getFullYear());
+          $("#serror-stacktrace").text(String(event.stack_trace).trim());
+      } else {
+        // not a valid event -> redirect
         window.location.href = "/dashboard.html";
       }
     } else if (params.has("settings")) {
@@ -641,6 +709,7 @@ $(document).ready(function () {
       $("#sproject-content").hide();
       $("#settings-content").show();
       $("#sdeployment-content").hide();
+      $("#serror-content").hide();
     } else {
       // dashboard overview
       $("#dashboard-content").show();
@@ -648,6 +717,8 @@ $(document).ready(function () {
       $("#sproject-content").hide();
       $("#settings-content").hide();
       $("#sdeployment-content").hide();
+      $("#serror-content").hide();
+
       // populate dashboard
 
       let active_deployment_count = 0;

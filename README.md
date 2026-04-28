@@ -56,11 +56,15 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Populate data 
        - [ ] Project detail page functionality
          - [ ] Project details editing
-     - [ ] deployment detail page
+     - [x] deployment detail page
        - [x] Deployment detail page layout
-       - [ ] Populate data
-       - [ ] page functionality
-         - [ ] Error events sorting functionality
+       - [x] Populate data
+       - [x] page functionality
+         - [x] Error events sorting functionality
+     - [ ] error event detail page
+       - [ ] page layout
+       - [ ] populate data
+       - [ ] functionality (mainly just changing status + deleting)
      - [ ] user account management
      - [x] Functionality to switch between pages
        - [ ] Loading animation to prevent weird UI glitches from being seen
