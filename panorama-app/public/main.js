@@ -164,6 +164,69 @@ $(document).ready(function () {
       });
   }
 
+  // handle modals
+  function openModal(options) {
+    $("#edit-modal-content").html(`<h1 id="modal-title">Edit Project Details</h1>`);
+    $("#modal-title").text(options.title);
+    for (let i = 0; i < options.fields.length; i++) {
+      const field = options.fields[i];
+      // field data: placeholder, value (text/textarea), options (select), label (label of field), type (text/textarea/select), id (for when data is returned)
+      // for select, options is array of {label, value}
+
+      if (field.type === "text") {
+        $("#edit-modal-content").append(`
+        <p class="modal-label">${field.label}</p>
+        <input type="text" placeholder="${field.placeholder}" value="${field.value}" />
+      `);
+      } else if (field.type == "textarea") {
+        $("#edit-modal-content").append(`
+          <p class="modal-label">${field.label}</p>
+          <textarea placeholder="${field.placeholder}">${field.value}</textarea>
+        `);
+      } else if (field.type == "select") {
+        let options_html = "";
+        for (let j =0; j < field.options.length; j++) {
+          const option = field.options[j];
+          options_html += `<option value="${option.value}">${option.label}</option>`;
+        }
+
+        $("#edit-modal-content").append(`
+            <p class="modal-label">${field.label}</p>
+            <select id="modal-item-${field.id}">
+            ${options_html}
+            </select>
+          `);
+      }
+    }
+    $("#edit-modal-content").append(`<button id="modal-save">Save</button>`);
+    $("#edit-modal-content").append(`<p id="error-message"></p>`);
+    $("#modal-save").off("click");
+    let return_data = {};
+    function returnData() {
+      return return_data;
+    }
+    $("#modal-save").click(function() {
+      let data = {};
+      for (let i = 0; i < options.fields.length; i++) {
+        const field = options.fields[i];
+        data[field.id] = $("#modal-item-" + field.id).val();
+      }
+
+      // validate data -> no empty fields
+      for (let key in data) {
+        if (data[key] === "") {
+          $("#error-message").text("Please fill out all fields");
+          return;
+        }
+      }
+
+      return_data = data;
+      returnData();
+
+      
+    })
+
+  }
   // check page state
   async function checkPage() {
     function parseSqlTimestamp(timestamp) {
@@ -691,12 +754,24 @@ $(document).ready(function () {
         const event = deployment.error_events.find((e) => e.id == event_id);
         $("#serror-title").text(event.title);
         $("#serror-status-div").addClass(event.status);
-        $("#serror-status").text(event.status.charAt(0).toUpperCase() + event.status.slice(1));
-        $("#serror-environment").text(event.environment.charAt(0).toUpperCase() + event.environment.slice(1));
+        $("#serror-status").text(
+          event.status.charAt(0).toUpperCase() + event.status.slice(1),
+        );
+        $("#serror-environment").text(
+          event.environment.charAt(0).toUpperCase() +
+            event.environment.slice(1),
+        );
         $("#serror-deployment").text(deployment.name);
         const created_at = parseSqlTimestamp(event.timestamp);
-        $("#serror-createdon").text(created_at.getMonth() + 1 + "/" + created_at.getDate() + "/" + created_at.getFullYear());
-          $("#serror-stacktrace").text(String(event.stack_trace).trim());
+        $("#serror-createdon").text(
+          created_at.getMonth() +
+            1 +
+            "/" +
+            created_at.getDate() +
+            "/" +
+            created_at.getFullYear(),
+        );
+        $("#serror-stacktrace").text(String(event.stack_trace).trim());
       } else {
         // not a valid event -> redirect
         window.location.href = "/dashboard.html";

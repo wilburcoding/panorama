@@ -59,16 +59,19 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] deployment detail page
        - [x] Deployment detail page layout
        - [x] Populate data
-       - [x] page functionality
+       - [ ] page functionality
          - [x] Error events sorting functionality
+         - [ ] Changing deployment name, status, environment, version
      - [ ] error event detail page
-       - [ ] page layout
-       - [ ] populate data
+       - [x] page layout
+       - [x] populate data
        - [ ] functionality (mainly just changing status + deleting)
+         - [ ] Handle user posting updates to keep track of progress
      - [ ] user account management
      - [x] Functionality to switch between pages
        - [ ] Loading animation to prevent weird UI glitches from being seen
      - [ ] Switch to async/await instead of promises
+     - [ ] Back buttons for each page
    - [ ] Toast messages
 
 

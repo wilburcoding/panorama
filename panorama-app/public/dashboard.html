@@ -270,6 +270,9 @@
             </div> -->
           </div>
           <div class="dashboard-card" style="flex: 6; margin-top: 5vh">
+            <button class="edit-button">
+              <i class="ph ph-pencil-simple"></i>
+            </button>
             <h1
               style="
                 font-size: 35px !important;
@@ -437,6 +440,11 @@
                 <pre><code class="language-javascript" id="serror-stacktrace"></code></pre>
               </div>
             </div>
+            <div class="error-info-row">
+              <div class="error-info-ritem">
+                <h3>Updates</h3>
+              </div>
+            </div>
             <!-- more tbd -->
           </div>
         </div>
@@ -589,6 +597,30 @@
         </div>
       </div>
       <div id="settings-content"></div>
+      <div id="edit-modal-container">
+        <!-- generic edit modal for editing project/deployment details-->
+        <div id="edit-modal-content">
+          <h1 id="modal-title">Edit Project Details</h1>
+          <p class="modal-label">Project Name</p>
+          <input type="text" placeholder="Project Name" value="Project 1" />
+          <p class="modal-label">Project Description</p>
+          <input
+            type="text"
+            placeholder="Project Description"
+            value="Project 1"
+          />
+          <p class="modal-label">Project Description</p>
+          <textarea placeholder="Project Description">Project 1</textarea>
+
+          <select id="environment">
+            <option value="production">Production</option>
+            <option value="staging">Staging</option>
+            <option value="development">Development</option>
+          </select>
+          <p id="error-message"></p>
+          <button id="modal-save">Save</button>
+        </div>
+      </div>
     </div>
   </body>
   <script src="prism.js"></script>
