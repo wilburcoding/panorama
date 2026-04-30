@@ -749,7 +749,7 @@ select {
   align-items: flex-start;
   justify-content: center;
   flex: 1;
-  width:max-content;
+  width: max-content;
 }
 
 .sdeployment-info-ritem h3 {
@@ -766,7 +766,6 @@ select {
   font-weight: 700;
   margin-top: 2px;
   margin-bottom: 5px;
-
 }
 
 .error-info-ritem p {
@@ -775,7 +774,6 @@ select {
   margin-top: 2px;
   margin-bottom: 2px;
 }
-
 
 .sdeployment-info-ritem p {
   font-size: 16px;
@@ -806,17 +804,16 @@ select {
   background-color: rgb(237, 237, 237);
 }
 
-
 /* additional styling for other things (like global buttons, possible toast messages, modals) */
 .edit-button {
-  width:35px;
-  height:35px;
+  width: 35px;
+  height: 35px;
   position: absolute;
-  top:0px;
-  right:0px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  top: 0px;
+  right: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   box-shadow: 2px 2px 0px #000;
   border: solid 1.5px black;
 }
@@ -828,12 +825,12 @@ select {
 
 #edit-modal-container {
   position: fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(97, 97, 97, 0.319);
-  display:flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   z-index: 200;
@@ -841,10 +838,12 @@ select {
 }
 
 #edit-modal-content {
-  padding:40px;
+  padding: 40px;
   background-color: white;
   border: solid 2px black;
   border-radius: 2px;
+  width: 420px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -857,23 +856,21 @@ select {
   font-size: 30px;
   line-height: 30px;
   margin-top: 10px;
-  margin-bottom:20px;
-  
-
+  margin-bottom: 20px;
 }
 
 #edit-modal-content input[type="text"] {
   min-width: 300px;
-  margin:0;
-  margin-top:2px;
-  margin-bottom:10px;
+  margin: 0;
+  margin-top: 2px;
+  margin-bottom: 10px;
   font-size: 18px;
 }
 
 #edit-modal-content button {
-  margin:0;
-  margin-top:10px;
-  margin-bottom:10px;
+  margin: 0;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 textarea {
@@ -881,13 +878,13 @@ textarea {
   border-radius: 2px;
   outline: none;
   font-family: "Sora", sans-serif;
-  padding:10px;
-  font-size:18px;
+  padding: 10px;
+  font-size: 18px;
   box-sizing: border-box;
 }
 
 #edit-modal-content textarea {
-  min-width:300px;
+  min-width: 300px;
   resize: none;
   margin-top: 2px;
   margin-bottom: 10px;
@@ -895,30 +892,41 @@ textarea {
 }
 
 #edit-modal-content .modal-label {
-  margin-top:10px;
-  margin-bottom:2px;
-  font-size:16px;
+  margin-top: 10px;
+  margin-bottom: 2px;
+  font-size: 16px;
 }
 
 #edit-modal-content button {
-  
 }
 
 #edit-modal-content select {
   box-shadow: none;
-  width:100%;
-  margin:0;
+  width: 100%;
+  margin: 0;
   margin-top: 2px;
-  margin-bottom:10px;
+  margin-bottom: 10px;
 }
 
 #edit-modal-content #error-message {
   color: red;
   font-size: 15px;
-  margin-top:5px;
-  margin-bottom:3px;
+  margin-top: 5px;
+  margin-bottom: 3px;
+  font-weight: 700;
+  width: 100%;
+  overflow-wrap: anywhere;
 }
 
 #edit-modal-content #modal-save {
-  margin-top:6px;
+  margin-top: 6px;
+}
+
+#edit-modal-content input[type="color"] {
+  width: 250px;
+  border: solid 2px black;
+  padding:0;
+  height:40px;
+  background-color: white;
+
 }

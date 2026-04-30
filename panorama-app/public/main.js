@@ -163,70 +163,85 @@ $(document).ready(function () {
         }
       });
   }
-
+  $("#edit-modal-container").hide();
   // handle modals
   function openModal(options) {
-    $("#edit-modal-content").html(`<h1 id="modal-title">Edit Project Details</h1>`);
-    $("#modal-title").text(options.title);
-    for (let i = 0; i < options.fields.length; i++) {
-      const field = options.fields[i];
-      // field data: placeholder, value (text/textarea), options (select), label (label of field), type (text/textarea/select), id (for when data is returned)
-      // for select, options is array of {label, value}
+    return new Promise((resolve, reject) => {
+      $("#edit-modal-container").show();
+      $("#edit-modal-content").html(
+        `<h1 id="modal-title">Edit Project Details</h1>`,
+      );
+      $("#modal-title").text(options.title);
+      for (let i = 0; i < options.fields.length; i++) {
+        const field = options.fields[i];
+        // field data: placeholder, value (text/textarea), options (select), label (label of field), type (text/textarea/select), id (for when data is returned)
+        // for select, options is array of {label, value}
 
-      if (field.type === "text") {
-        $("#edit-modal-content").append(`
+        if (field.type === "text") {
+          $("#edit-modal-content").append(`
         <p class="modal-label">${field.label}</p>
-        <input type="text" placeholder="${field.placeholder}" value="${field.value}" />
+        <input type="text" placeholder="${field.placeholder}" value="${field.value}"  id="modal-item-${field.id}"/>
       `);
-      } else if (field.type == "textarea") {
-        $("#edit-modal-content").append(`
+        } else if (field.type == "textarea") {
+          $("#edit-modal-content").append(`
           <p class="modal-label">${field.label}</p>
-          <textarea placeholder="${field.placeholder}">${field.value}</textarea>
+          <textarea placeholder="${field.placeholder}" id="modal-item-${field.id}">${field.value}</textarea>
         `);
-      } else if (field.type == "select") {
-        let options_html = "";
-        for (let j =0; j < field.options.length; j++) {
-          const option = field.options[j];
-          options_html += `<option value="${option.value}">${option.label}</option>`;
-        }
+        } else if (field.type == "select") {
+          let options_html = "";
+          for (let j = 0; j < field.options.length; j++) {
+            const option = field.options[j];
+            options_html += `<option value="${option.value}">${option.label}</option>`;
+          }
 
-        $("#edit-modal-content").append(`
+          $("#edit-modal-content").append(`
             <p class="modal-label">${field.label}</p>
             <select id="modal-item-${field.id}">
             ${options_html}
             </select>
           `);
-      }
-    }
-    $("#edit-modal-content").append(`<button id="modal-save">Save</button>`);
-    $("#edit-modal-content").append(`<p id="error-message"></p>`);
-    $("#modal-save").off("click");
-    let return_data = {};
-    function returnData() {
-      return return_data;
-    }
-    $("#modal-save").click(function() {
-      let data = {};
-      for (let i = 0; i < options.fields.length; i++) {
-        const field = options.fields[i];
-        data[field.id] = $("#modal-item-" + field.id).val();
-      }
-
-      // validate data -> no empty fields
-      for (let key in data) {
-        if (data[key] === "") {
-          $("#error-message").text("Please fill out all fields");
-          return;
+        } else if (field.type == "color") {
+          $("#edit-modal-content").append(`
+            <p class="modal-label">${field.label}</p>
+            <input type="color" id="modal-item-${field.id}" value="${field.value}">
+          `);
         }
       }
+      $("#edit-modal-content").append(`<button id="modal-save">Save</button>`);
+      $("#edit-modal-content").append(`<p id="error-message"></p>`);
+      $("#modal-save").off("click");
+      let return_data = {};
+      $("#modal-save").click(function () {
+        let data = {};
+        for (let i = 0; i < options.fields.length; i++) {
+          const field = options.fields[i];
+          data[field.id] = $("#modal-item-" + field.id).val();
+        }
 
-      return_data = data;
-      returnData();
+        // validate data -> use custom validation functions if provided
+        for (let key in data) {
+          if (options.fields.find((f) => f.id === key).validate) {
+            const validate_function = options.fields.find((f) => f.id === key).validate;
+            const func_result = validate_function(data[key]);
+            if (validate_function(data[key]).success === false) {
+              $("#error-message").text(func_result.message);
+              return;
+            } 
+          }
+        }
 
-      
-    })
+        return_data = data;
+        $("#error-message").text("")
+        $("#edit-modal-container").hide();
+        resolve(return_data);
 
+      });
+    });
   }
+
+  // openModal({fields: [{id: "name", label: "Project Name", type: "text", placeholder:"Enter project name", value:"Sample Project 1"}], title: "Edit Project Details"}).then((data) => {
+  //   console.log(data);
+  // })
   // check page state
   async function checkPage() {
     function parseSqlTimestamp(timestamp) {
@@ -383,6 +398,7 @@ $(document).ready(function () {
         });
       }
     } else if (params.has("projectInfo")) {
+      // individual project info page
       console.log("proj");
       const project_id = params.get("projectId");
       if (project_id) {
@@ -517,6 +533,43 @@ $(document).ready(function () {
           $("#sproject-inactivedeployments").text(inactive_deployments);
 
           // $("#sproject-createdate")
+
+          $("#sproject-edit").click(function() {
+            openModal({
+              title: "Edit Project Details",
+              fields: [
+                {
+                  id: "name",
+                  label: "Project Name",
+                  type: "text",
+                  placeholder:"",
+                  value: project.name,
+                  validate: (value) => (value.length > 1 ? {success: true} : {success: false, message: "Project name must be at least 2 characters long"})
+                },
+                {
+                  id:"description",
+                  label: "Project Description",
+                  type: "textarea",
+                  placeholder: "",
+                  value: project.description,
+                },
+                {
+                  id: "color",
+                  label: "Project Color",
+                  type: "color",
+                  value: project.color,
+                }
+              ]
+            }).then((data) => {
+              console.log(data);
+              // fetch("/api/projects/" + project.id, {
+              //   method: "PUT",
+              //   headers: {
+              //     "Content-Type": "application/json"
+              //   }
+              // })
+            })
+          })
         } else {
           // redirect for now
           window.location.href = "/dashboard.html?projectOverview";
@@ -526,6 +579,7 @@ $(document).ready(function () {
         window.location.href = "/dashboard.html";
       }
     } else if (params.has("deploymentInfo")) {
+      // individual deployment info page
       $("#dashboard-content").hide();
       $("#settings-content").hide();
       $("#sproject-content").hide();
@@ -731,6 +785,7 @@ $(document).ready(function () {
         window.location.href = "/dashboard.html";
       }
     } else if (params.has("errorEventInfo")) {
+      // individual error event info page
       $("#dashboard-content").hide();
       $("#project-content").hide();
       $("#sproject-content").hide();

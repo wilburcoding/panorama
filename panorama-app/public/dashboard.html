@@ -270,7 +270,7 @@
             </div> -->
           </div>
           <div class="dashboard-card" style="flex: 6; margin-top: 5vh">
-            <button class="edit-button">
+            <button class="edit-button" id="sproject-edit">
               <i class="ph ph-pencil-simple"></i>
             </button>
             <h1
@@ -452,6 +452,9 @@
       <div id="sdeployment-content">
         <div class="dashboard-row">
           <div class="dashboard-card" style="flex: 2; margin-top: 5vh">
+            <button class="edit-button" id="sproject-edit">
+              <i class="ph ph-pencil-simple"></i>
+            </button>
             <h1
               style="
                 font-size: 35px !important;
@@ -617,6 +620,11 @@
             <option value="staging">Staging</option>
             <option value="development">Development</option>
           </select>
+
+          <p class="modal-label">Project Description</p>
+          <input type="color" id="colorPicker" value="#ff0000">
+
+          
           <p id="error-message"></p>
           <button id="modal-save">Save</button>
         </div>

@@ -55,7 +55,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Project detail page layout
        - [x] Populate data 
        - [ ] Project detail page functionality
-         - [ ] Project details editing
+         - [ ] Project details editing (only description and name)
      - [x] deployment detail page
        - [x] Deployment detail page layout
        - [x] Populate data
@@ -73,6 +73,9 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] Switch to async/await instead of promises
      - [ ] Back buttons for each page
    - [ ] Toast messages
+   - [ ] Modal
+     - [ ] Modal layout and styling
+     - [ ] Modal functionality
 
 
 
@@ -139,6 +142,10 @@ Website planning:
          - Options to delete, tag
        - Settings
          - With user account options
+   - Modal
+     - From program -> calls modal function (which is a promise)
+     - Wait till promise is fulfilled
+     - Return data with promise
 
 # NOTES
 

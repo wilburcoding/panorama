@@ -308,10 +308,10 @@ app.post("/api/error-events", express.json(), (req, res) => {
 
 app.put("/api/projects/:id", express.json(), (req, res) => {
   const { id } = req.params;
-  const { name, environment, description } = req.body;
+  const { name, color, description } = req.body;
   db.prepare(
-    "UPDATE projects SET name = ?, environment = ?, description = ? WHERE id = ?",
-  ).run(name, environment, description, id);
+    "UPDATE projects SET name = ?, color = ?, description = ? WHERE id = ?",
+  ).run(name, color, description, id);
   const project = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
   res.json({ success: true, project: project });
 });
