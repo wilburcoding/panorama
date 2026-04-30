@@ -88,12 +88,14 @@ $(document).ready(function () {
     // populate sidebar project list
     for (let i = 0; i < projects.length; i++) {
       const project = projects[i];
+      const project_id = project.id;
       $("#sidebar-plist").append(`
-            <button class="sidebar-project" id="sbp-${i + 2}">
-                <div class="project-color" style="background-color: ${project.color}"></div>${project.name}
+            <button class="sidebar-project" id="sbp-${project_id}">
+                <div class="project-color" id="sbp-${project_id}-color" style="background-color: ${project.color}"></div>
+                <p id="sbp-${project_id}-name">${project.name}</p>
             </button>`);
-      $("#sbp-" + (i + 2)).click(function () {
-        console.log("project " + project.id);
+      $("#sbp-" + (project_id)).click(function () {
+        console.log("project " + project_id);
         window.location.href =
           "/dashboard.html?projectId=" + project.id + "&projectInfo";
       });
@@ -562,12 +564,30 @@ $(document).ready(function () {
               ]
             }).then((data) => {
               console.log(data);
-              // fetch("/api/projects/" + project.id, {
-              //   method: "PUT",
-              //   headers: {
-              //     "Content-Type": "application/json"
-              //   }
-              // })
+              fetch("/api/projects/" + project.id, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  name: data.name,
+                  description: data.description,
+                  color: data.color,
+                })
+              }).then((resp) => resp.json())
+              .then((json) => {
+                if (json.success) {
+                  // update project info on page
+                  $("#sproject-name").text(json.project.name);
+                  $("#sproject-description").text(json.project.description);
+                  $(".sproject-color-picker").css("background-color", json.project.color);
+
+                  timelineChart.data.datasets[0].backgroundColor = json.project.color;
+                  timelineChart.update();
+                  $("#sbp-" + (project.id) + "-color").css("background-color", json.project.color);
+                  $("#sbp-" + (project.id) + "-name").text(json.project.name);
+                }
+              })
             })
           })
         } else {
@@ -780,6 +800,13 @@ $(document).ready(function () {
         $(".apikey-container").click(function () {
           $(this).toggleClass("show");
         });
+
+        $("#sdeployment-edit").click(function() {
+          openModal({
+            title: "Edit Deployment Details",
+            
+          })
+        })
       } else {
         // redirect bcs not a valid deployment
         window.location.href = "/dashboard.html";
@@ -1066,7 +1093,7 @@ $(document).ready(function () {
   $("#sidebar-dashboardb").click(function () {
     window.location.href = "/dashboard.html";
   });
-  $("#sbp-1").click(function () {
+  $("#sbp-overview").click(function () {
     window.location.href = "/dashboard.html?projectOverview";
   });
 });

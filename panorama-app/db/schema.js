@@ -45,7 +45,7 @@ export function migrate() {
             stack_trace TEXT NOT NULL,
             environment TEXT NOT NULL,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updates TEXT DEFAULT '[]',
+            updates TEXT DEFAULT '[]'
         ) `);
   console.log("Database migrated");
 }
