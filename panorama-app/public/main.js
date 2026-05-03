@@ -166,6 +166,7 @@ $(document).ready(function () {
       });
   }
   $("#edit-modal-container").hide();
+  $("#elist-delete").attr("disabled", true);
   // handle modals
   function openModal(options) {
     return new Promise((resolve, reject) => {
@@ -764,6 +765,9 @@ $(document).ready(function () {
 
           current_filtering = filtered_events.map((e) => e.id);
 
+          checked_errors = checked_errors.filter((id) => current_filtering.includes(id));
+          $("#elist-delete").attr("disabled", checked_errors.length === 0);
+
           for (let i = 0; i < filtered_events.length; i++) {
             const event = filtered_events[i];
             const created_at = parseSqlTimestamp(event.timestamp);
@@ -789,7 +793,8 @@ $(document).ready(function () {
               <hr />
             `);
 
-            $("#checkbox-" + event.id).click(function () {
+            $("#checkbox-" + event.id).click(function (e) {
+              console.log(event.id);
               if (checked_errors.includes(event.id)) {
                 // remove from checked
                 checked_errors = checked_errors.filter((id) => id !== event.id);
@@ -798,8 +803,13 @@ $(document).ready(function () {
                 checked_errors.push(event.id);
                 $(this).addClass("checked");
               }
+              e.stopPropagation();
               console.log(checked_errors);
+
+              $("#elist-delete").attr("disabled", checked_errors.length === 0);
+              
             });
+
 
             $("#errorevent-" + event.id).click(function () {
               window.location.href =
@@ -820,7 +830,10 @@ $(document).ready(function () {
             current_filtering.forEach((id) => {
               $("#checkbox-" + id).addClass("checked");
             });
+            console.log(current_filtering);
+            console.log(checked_errors);
             $(this).addClass("checked");
+            $("#elist-delete").attr("disabled", false);
           } else {
             // deselect all
             checked_errors = [];
@@ -828,6 +841,7 @@ $(document).ready(function () {
               $("#checkbox-" + id).removeClass("checked");
             });
             $(this).removeClass("checked");
+            $("#elist-delete").attr("disabled", true);
           }
         });
 
@@ -939,6 +953,30 @@ $(document).ready(function () {
               });
           });
         });
+
+
+        // handle deleting error events
+        $("#elist-delete").click(function() {
+          if (checked_errors.length > 0) {
+            fetch("/api/error-events/delete", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                ids: checked_errors
+              })
+            }).then((resp) => resp.json())
+            .then((json) => {
+              if (json.success) {
+                // update deployments object and repopulate error table
+                deployment.error_events = deployment.error_events.filter((e) => !checked_errors.includes(e.id));
+                populateErrorTable($("#error-search").val().toLowerCase());
+                $("#elist-select").removeClass("checked");
+              }
+            })
+          }
+        })
       } else {
         // redirect bcs not a valid deployment
         window.location.href = "/dashboard.html";
@@ -1228,4 +1266,11 @@ $(document).ready(function () {
   $("#sbp-overview").click(function () {
     window.location.href = "/dashboard.html?projectOverview";
   });
+
+  window.addEventListener("pageshow", function() {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  })
+
 });

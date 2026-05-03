@@ -361,8 +361,10 @@ app.delete("/api/deployments/:id", (req, res) => {
   res.json({ success: true });
 });
 
-app.delete("/api/error-events/:id", (req, res) => {
-  const { id } = req.params;
-  db.prepare("DELETE FROM error_events WHERE id = ?").run("id");
+app.post("/api/error-events/delete", express.json(), (req, res) => {
+  const { ids } = req.body;
+  let ids_string = ids.join(",");
+  console.log(ids_string);
+  db.prepare("DELETE FROM error_events WHERE id IN (" + ids_string + ")").run();
   res.json({ success: true });
 });

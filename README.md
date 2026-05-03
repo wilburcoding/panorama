@@ -46,26 +46,29 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Dashboard layout
          - [x] Stacked bar graph
        - [x] dashboard populating
-       - [ ] interactive dashboard functions
-     - [x] project overview 
+       - [x] interactive dashboard functions
+     - [ ] project overview 
        - [x] Cards for each project
        - [x] Dynamically populate
        - [x] Functionality -> mainly the timeline
+         - [ ] Project creating
      - [ ] project detail page
        - [x] Project detail page layout
        - [x] Populate data 
        - [x] Project detail page functionality
          - [x] Project details editing (only description and name)
+         - [ ] Deployment creation
      - [x] deployment detail page
        - [x] Deployment detail page layout
        - [x] Populate data
        - [ ] page functionality
          - [x] Error events sorting functionality
-         - [ ] Changing deployment name, status, environment, version
+         - [x] Changing deployment name, status, environment, version
+         - [ ] Error list functionality (deleting multiple)
      - [ ] error event detail page
        - [x] page layout
        - [x] populate data
-       - [ ] functionality (mainly just changing status + deleting)
+       - [x] functionality (mainly just deleting)
          - [ ] Handle user posting updates to keep track of progress
      - [ ] user account management
      - [x] Functionality to switch between pages
