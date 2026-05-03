@@ -318,10 +318,19 @@ app.put("/api/projects/:id", express.json(), (req, res) => {
 
 app.put("/api/deployments/:id", express.json(), (req, res) => {
   const { id } = req.params;
-  const { version, environment, status } = req.body;
+  const { name, version, environment, status, regen } = req.body;
+  let api_key = "";
+  if (regen) {
+    api_key = generateApiKey();
+    db.prepare("UPDATE deployments SET api_key = ? WHERE id = ?").run(
+      api_key,
+      id,
+    );
+    console.log("api key regenerated ")
+  }
   db.prepare(
-    "UPDATE deployments SET version = ?, environment = ?, status = ? WHERE id = ?",
-  ).run(version, environment, status, id);
+    "UPDATE deployments SET name = ?, version = ?, environment = ?, status = ? WHERE id = ?",
+  ).run(name, version, environment, status, id);
   const deployment = db
     .prepare("SELECT * FROM deployments WHERE id = ?")
     .get(id);

@@ -54,8 +54,8 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] project detail page
        - [x] Project detail page layout
        - [x] Populate data 
-       - [ ] Project detail page functionality
-         - [ ] Project details editing (only description and name)
+       - [x] Project detail page functionality
+         - [x] Project details editing (only description and name)
      - [x] deployment detail page
        - [x] Deployment detail page layout
        - [x] Populate data
@@ -73,8 +73,8 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] Switch to async/await instead of promises
      - [ ] Back buttons for each page
    - [ ] Toast messages
-   - [ ] Modal
-     - [ ] Modal layout and styling
+   - [x] Modal
+     - [x] Modal layout and styling
      - [ ] Modal functionality
 
 

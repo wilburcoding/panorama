@@ -94,7 +94,7 @@ $(document).ready(function () {
                 <div class="project-color" id="sbp-${project_id}-color" style="background-color: ${project.color}"></div>
                 <p id="sbp-${project_id}-name">${project.name}</p>
             </button>`);
-      $("#sbp-" + (project_id)).click(function () {
+      $("#sbp-" + project_id).click(function () {
         console.log("project " + project_id);
         window.location.href =
           "/dashboard.html?projectId=" + project.id + "&projectInfo";
@@ -193,7 +193,7 @@ $(document).ready(function () {
           let options_html = "";
           for (let j = 0; j < field.options.length; j++) {
             const option = field.options[j];
-            options_html += `<option value="${option.value}">${option.label}</option>`;
+            options_html += `<option value="${option.value}" ${option.value === field.value ? "selected" : ""}>${option.label}</option>`;
           }
 
           $("#edit-modal-content").append(`
@@ -207,6 +207,15 @@ $(document).ready(function () {
             <p class="modal-label">${field.label}</p>
             <input type="color" id="modal-item-${field.id}" value="${field.value}">
           `);
+        } else if (field.type == "checkbox") {
+          $("#edit-modal-content").append(`
+            <p class="modal-label">${field.label}</p>
+            <div class="checkbox" id="modal-item-${field.id}">
+            <i class="ph ph-check"></i>
+            </div>`);
+          $("#modal-item-" + field.id).on("click", function () {
+            $(this).toggleClass("checked");
+          });
         }
       }
       $("#edit-modal-content").append(`<button id="modal-save">Save</button>`);
@@ -217,26 +226,31 @@ $(document).ready(function () {
         let data = {};
         for (let i = 0; i < options.fields.length; i++) {
           const field = options.fields[i];
-          data[field.id] = $("#modal-item-" + field.id).val();
+          if (options.fields[i].type == "checkbox") {
+            data[field.id] = $("#modal-item-" + field.id).hasClass("checked");
+          } else {
+            data[field.id] = $("#modal-item-" + field.id).val();
+          }
         }
 
         // validate data -> use custom validation functions if provided
         for (let key in data) {
           if (options.fields.find((f) => f.id === key).validate) {
-            const validate_function = options.fields.find((f) => f.id === key).validate;
+            const validate_function = options.fields.find(
+              (f) => f.id === key,
+            ).validate;
             const func_result = validate_function(data[key]);
             if (validate_function(data[key]).success === false) {
               $("#error-message").text(func_result.message);
               return;
-            } 
+            }
           }
         }
 
         return_data = data;
-        $("#error-message").text("")
+        $("#error-message").text("");
         $("#edit-modal-container").hide();
         resolve(return_data);
-
       });
     });
   }
@@ -299,7 +313,7 @@ $(document).ready(function () {
       $("#sdeployment-content").hide();
 
       for (let i = 0; i < projects.length; i++) {
-        const project = projects[i];
+        let project = projects[i];
         const create_date = parseSqlTimestamp(project.created_at);
 
         let unresolved_errors = 0;
@@ -420,10 +434,10 @@ $(document).ready(function () {
             "?session_id=" +
             localStorage.getItem("session_id"),
         );
-        const project = await project_res.json();
+        let project = await project_res.json();
         if (project.success) {
           // populate project info page
-          const project = projects.find((p) => p.id == project_id);
+          let project = projects.find((p) => p.id == project_id);
           $("#sproject-name").text(project.name);
           $("#sproject-description").text(project.description);
           $(".sproject-color-picker").css("background-color", project.color);
@@ -536,7 +550,7 @@ $(document).ready(function () {
 
           // $("#sproject-createdate")
 
-          $("#sproject-edit").click(function() {
+          $("#sproject-edit").click(function () {
             openModal({
               title: "Edit Project Details",
               fields: [
@@ -544,12 +558,19 @@ $(document).ready(function () {
                   id: "name",
                   label: "Project Name",
                   type: "text",
-                  placeholder:"",
+                  placeholder: "",
                   value: project.name,
-                  validate: (value) => (value.length > 1 ? {success: true} : {success: false, message: "Project name must be at least 2 characters long"})
+                  validate: (value) =>
+                    value.length > 1
+                      ? { success: true }
+                      : {
+                          success: false,
+                          message:
+                            "Project name must be at least 2 characters long",
+                        },
                 },
                 {
-                  id:"description",
+                  id: "description",
                   label: "Project Description",
                   type: "textarea",
                   placeholder: "",
@@ -560,36 +581,49 @@ $(document).ready(function () {
                   label: "Project Color",
                   type: "color",
                   value: project.color,
-                }
-              ]
+                },
+              ],
             }).then((data) => {
               console.log(data);
               fetch("/api/projects/" + project.id, {
                 method: "PUT",
                 headers: {
-                  "Content-Type": "application/json"
+                  "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                   name: data.name,
                   description: data.description,
                   color: data.color,
-                })
-              }).then((resp) => resp.json())
-              .then((json) => {
-                if (json.success) {
-                  // update project info on page
-                  $("#sproject-name").text(json.project.name);
-                  $("#sproject-description").text(json.project.description);
-                  $(".sproject-color-picker").css("background-color", json.project.color);
-
-                  timelineChart.data.datasets[0].backgroundColor = json.project.color;
-                  timelineChart.update();
-                  $("#sbp-" + (project.id) + "-color").css("background-color", json.project.color);
-                  $("#sbp-" + (project.id) + "-name").text(json.project.name);
-                }
+                }),
               })
-            })
-          })
+                .then((resp) => resp.json())
+                .then((json) => {
+                  if (json.success) {
+                    // update project info on page
+                    $("#sproject-name").text(json.project.name);
+                    $("#sproject-description").text(json.project.description);
+                    $(".sproject-color-picker").css(
+                      "background-color",
+                      json.project.color,
+                    );
+
+                    timelineChart.data.datasets[0].backgroundColor =
+                      json.project.color;
+                    timelineChart.update();
+                    $("#sbp-" + project.id + "-color").css(
+                      "background-color",
+                      json.project.color,
+                    );
+                    $("#sbp-" + project.id + "-name").text(json.project.name);
+                    project.name = json.project.name;
+                    project.description = json.project.description;
+                    project.color = json.project.color;
+                    projects[projects.findIndex((p) => p.id === project.id)] =
+                      project;
+                  }
+                });
+            });
+          });
         } else {
           // redirect for now
           window.location.href = "/dashboard.html?projectOverview";
@@ -801,12 +835,110 @@ $(document).ready(function () {
           $(this).toggleClass("show");
         });
 
-        $("#sdeployment-edit").click(function() {
+        $("#sdeployment-edit").click(function () {
+          // editing deployment details
           openModal({
             title: "Edit Deployment Details",
-            
-          })
-        })
+            fields: [
+              {
+                id: "name",
+                label: "Deployment Name",
+                type: "text",
+                placeholder: "",
+                value: deployment.name,
+                validate: (value) =>
+                  value.length > 1
+                    ? { success: true }
+                    : {
+                        success: false,
+                        message:
+                          "Deployment name must be at least 2 characters long",
+                      },
+              },
+              {
+                id: "version",
+                label: "Deployment Version",
+                type: "text",
+                placeholder: "",
+                value: deployment.version,
+                validate: (value) =>
+                  value.length > 1
+                    ? { success: true }
+                    : {
+                        success: false,
+                        message:
+                          "Deployment version must be at least 2 characters long",
+                      },
+              },
+              {
+                id: "environment",
+                label: "Deployment Environment",
+                type: "select",
+                options: [
+                  { label: "Production", value: "production" },
+                  { label: "Staging", value: "staging" },
+                  { label: "Development", value: "development" },
+                ],
+                value: deployment.environment,
+              },
+              {
+                id: "status",
+                label: "Deployment Status",
+                type: "select",
+                options: [
+                  { label: "Active", value: "active" },
+                  { label: "Inactive", value: "inactive" },
+                ],
+              },
+              {
+                id: "regen",
+                label: "Regenerate API Key (irreversible!)",
+                type: "checkbox",
+              },
+            ],
+          }).then((data) => {
+            console.log(data);
+            fetch("/api/deployments/" + deployment.id, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                name: data.name,
+                version: data.version,
+                environment: data.environment,
+                status: data.status,
+                regen: data.regen,
+              }),
+            })
+              .then((resp) => resp.json())
+              .then((json) => {
+                console.log(json);
+                $("#sdeployment-name").text(json.deployment.name);
+                $("#sdeployment-version").text(json.deployment.version);
+                $("#sdeployment-environment").text(
+                  json.deployment.environment.charAt(0).toUpperCase() +
+                    json.deployment.environment.slice(1),
+                );
+                $("#sdeployment-environment-div").removeClass("production");
+                $("#sdeployment-environment-div").removeClass("staging");
+                $("#sdeployment-environment-div").removeClass("development");
+                $("#sdeployment-environment-div").addClass(
+                  json.deployment.environment,
+                );
+
+                $("#sdeployment-status").text(
+                  json.deployment.status.charAt(0).toUpperCase() +
+                    json.deployment.status.slice(1),
+                );
+                $("#sdeployment-status-div").removeClass("active");
+                $("#sdeployment-status-div").removeClass("inactive");
+                $("#sdeployment-status-div").addClass(json.deployment.status);
+                $("#sdeployment-apikey").text(json.deployment.api_key);
+
+              });
+          });
+        });
       } else {
         // redirect bcs not a valid deployment
         window.location.href = "/dashboard.html";
