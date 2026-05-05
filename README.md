@@ -51,20 +51,22 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Cards for each project
        - [x] Dynamically populate
        - [x] Functionality -> mainly the timeline
-         - [ ] Project creating
+         - [x] Project creating
      - [ ] project detail page
        - [x] Project detail page layout
        - [x] Populate data 
        - [x] Project detail page functionality
          - [x] Project details editing (only description and name)
-         - [ ] Deployment creation
+         - [x] Deployment creation
+         - [ ] Deleting project functionality
      - [x] deployment detail page
        - [x] Deployment detail page layout
        - [x] Populate data
-       - [ ] page functionality
+       - [x] page functionality
          - [x] Error events sorting functionality
          - [x] Changing deployment name, status, environment, version
-         - [ ] Error list functionality (deleting multiple)
+         - [x] Error list functionality (deleting multiple)
+         - [ ] Deleting project functionality
      - [ ] error event detail page
        - [x] page layout
        - [x] populate data
@@ -75,6 +77,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [ ] Loading animation to prevent weird UI glitches from being seen
      - [ ] Switch to async/await instead of promises
      - [ ] Back buttons for each page
+     - [ ] More security for requests (require session_id)
    - [ ] Toast messages
    - [x] Modal
      - [x] Modal layout and styling
@@ -142,7 +145,9 @@ Website planning:
              - Edit error_events -> change status, delete
        - Error information
          - Basically show everything that is available about the event
-         - Options to delete, tag
+         - Options to delete, tag, update
+         - Update UI
+           - 
        - Settings
          - With user account options
    - Modal

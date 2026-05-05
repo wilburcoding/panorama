@@ -242,12 +242,24 @@ app.get("/api/error_events/:id", (req, res) => {
 });
 
 app.post("/api/projects", express.json(), (req, res) => {
-  const { name, environment, description } = req.body;
+  const { name, description, color, session_id } = req.body;
+
+  // check session id and get user
+  if (!session_id) {
+    res.status(403).json({ success: false, message: "Session ID required"});
+    return;
+  }
+
+  const user = db.prepare("SELECT * FROM users WHERE session_Id = ?").get(session_id);
+  if (!user) {
+    res.status(403).json({ success: false, message: "Invalid session ID"});
+    return;
+  }
   const result = db
     .prepare(
-      "INSERT INTO projects (name, environment, description) VALUES (?, ?, ?)",
+      "INSERT INTO projects (name, description, color, user_id) VALUES (?, ?, ?, ?)",
     )
-    .run(name, environment, description);
+    .run(name, description, color, user.id);
   const project = db
     .prepare("SELECT * FROM projects WHERE id = ?")
     .get(result.lastInsertRowid);
@@ -256,12 +268,12 @@ app.post("/api/projects", express.json(), (req, res) => {
 });
 
 app.post("/api/deployments", express.json(), (req, res) => {
-  const { project_id, version, environment } = req.body;
+  const { project_id, name, version, environment, status } = req.body;
   const result = db
     .prepare(
-      "INSERT INTO deployments (project_id, version, environment, status, api_key) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO deployments (project_id, name, version, environment, status, api_key) VALUES (?, ?, ?, ?, ?, ?)",
     )
-    .run(project_id, version, environment, "enabled", generateApiKey());
+    .run(project_id, name, version, environment, status, generateApiKey());
   const deployment = db
     .prepare("SELECT * FROM deployments WHERE id = ?")
     .get(result.lastInsertRowid);

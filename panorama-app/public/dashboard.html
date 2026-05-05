@@ -3,12 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 
-
-      
     <link rel="stylesheet" href="/styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -452,6 +453,28 @@
                 <h3>Updates</h3>
               </div>
             </div>
+            <div id="error-update-content">
+              <div class="error-update">
+                <div class="error-update-row">
+                  <p class="error-update-name">wilburw2026@gmail.com</p>
+                  <p class="error-update-date">5/1/2026 2:30 PM</p>
+                </div>
+                <p class="error-update-message">
+                  Update message about this error something something somethign
+                  something something something something something something
+                </p>
+                <div class="error-update-row" style="margin-top: 10px;margin-bottom:0px;">
+                  <p class="error-update-change">Status updated to</p>
+                  <div class="dproject-status resolved" style="margin-left:10px">
+                    <p>Resolved</p>
+                  </div>
+                </div>
+              </div>
+              <div class="error-update" id="error-update-add">
+                <i class="ph ph-plus" style="font-size: 20px;margin-right:10px;"></i>
+                <p>New Update</p>
+              </div>
+            </div>
             <!-- more tbd -->
           </div>
         </div>
@@ -577,12 +600,15 @@
                 value="status:unresolved"
                 id="error-search"
                 placeholder="Search errors..."
-                style="margin-left: 0px; margin-left: 5px; margin-bottom: 15px;font-size: 20px;"
+                style="
+                  margin-left: 0px;
+                  margin-left: 5px;
+                  margin-bottom: 15px;
+                  font-size: 20px;
+                "
               />
               <button id="elist-delete">
-                <i class="ph ph-trash">
-
-                </i>
+                <i class="ph ph-trash"> </i>
               </button>
             </div>
             <div

@@ -219,7 +219,11 @@ $(document).ready(function () {
           });
         }
       }
-      $("#edit-modal-content").append(`<button id="modal-save">Save</button>`);
+      $("#edit-modal-content").append(`
+        <div style="display:flex;justify-content: flex-start;">
+        <button id="modal-cancel" style="margin-right:15px;">Cancel</button>
+        <button id="modal-save">Save</button>
+        </div>`);
       $("#edit-modal-content").append(`<p id="error-message"></p>`);
       $("#modal-save").off("click");
       let return_data = {};
@@ -252,6 +256,12 @@ $(document).ready(function () {
         $("#error-message").text("");
         $("#edit-modal-container").hide();
         resolve(return_data);
+      });
+
+      $("#modal-cancel").click(function () {
+        $("#error-message").text("");
+        $("#edit-modal-container").hide();
+        reject();
       });
     });
   }
@@ -379,7 +389,7 @@ $(document).ready(function () {
                 Description
               </h2>
 
-              <p class="main-p">
+              <p class="main-p" style="height:40px; max-height: 40px;text-overflow: ellipsis;overflow:hidden;max-width: 100%;">
                 ${project.description}
               </p>
 
@@ -414,6 +424,95 @@ $(document).ready(function () {
             "/dashboard.html?projectId=" + p_id + "&projectInfo";
         });
       }
+      $("#project-overview-content").append(`
+        <div class="dashboard-card project-overview-card"
+          style="width: 45%; padding: 0;min-height: 300px;" id="project-overview-newproject"
+        >
+          <div style="padding: 20px;width:100%;box-sizing: border-box; display:flex; align-items: center;justify-content: center; flex-direction:column;height:100%;">
+          <i class="ph ph-plus" style="font-size: 60px;margin-top:10px;"></i>
+          </div>
+        </div>
+      `);
+
+      $("#project-overview-newproject").click(function () {
+        openModal({
+          title: "Create New Project",
+          fields: [
+            {
+              id: "name",
+              label: "Project Name",
+              type: "text",
+              placeholder: "",
+              value: "",
+              validate: (value) => {
+                if (value.length < 2) {
+                  return {
+                    success: false,
+                    message: "Project name must be at least 2 characters long",
+                  };
+                }
+                if (value.length > 30) {
+                  return {
+                    success: false,
+                    message: "Project name can be at most 30 characters long",
+                  };
+                }
+                return {
+                  success: true,
+                };
+              },
+            },
+            {
+              id: "description",
+              label: "Project Description",
+              type: "textarea",
+              placeholder: "",
+              value: "",
+              validate: (value) => {
+                if (value.length > 100) {
+                  return {
+                    success: false,
+                    message:
+                      "Project description can be at most 200 characters long",
+                  };
+                }
+                return {
+                  success: true,
+                };
+              },
+            },
+            {
+              id: "color",
+              label: "Project Color",
+              type: "color",
+              value: "#4aa2bb",
+            },
+          ],
+        }).then((data) => {
+          fetch("/api/projects", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: data.name,
+              description: data.description,
+              color: data.color,
+              session_id: localStorage.getItem("session_id"),
+            }),
+          })
+            .then((resp) => resp.json())
+            .then((json) => {
+              console.log(json);
+              if (json.success) {
+                window.location.href =
+                  "/dashboard.html?projectId=" +
+                  json.project.id +
+                  "&projectInfo";
+              }
+            });
+        });
+      });
     } else if (params.has("projectInfo")) {
       // individual project info page
       console.log("proj");
@@ -452,7 +551,8 @@ $(document).ready(function () {
           let latest_time = null;
           let active_deployments = 0;
           let inactive_deployments = 0;
-          let timeline = [0, 0, 0, 0, 0, 0];
+          let unresolved_timeline = [0, 0, 0, 0, 0, 0];
+          let resolved_timeline = [0, 0, 0, 0, 0, 0];
           let labels = [];
           for (let i = 5; i >= 0; i--) {
             const time = new Date(Date.now() - i * 4 * 60 * 60 * 1000);
@@ -492,7 +592,13 @@ $(document).ready(function () {
               const hours_before = (now - event_time) / 1000 / 60 / 60;
               if (hours_before < 24) {
                 newerrors += 1;
-                timeline[5 - Math.floor(hours_before / 4)] += 1;
+                if (
+                  project.deployments[j].error_events[k].status !== "resolved"
+                ) {
+                  unresolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
+                } else {
+                  resolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
+                }
               }
               if (latest_time == null) {
                 latest_time = project.deployments[j].error_events[k].timestamp;
@@ -536,9 +642,111 @@ $(document).ready(function () {
               },
             );
           }
-          timelineChart.data.datasets[0].data = timeline;
+
+          // project creation item
+          $("#sproject-dlist").append(`
+            <div class="dproject-card" id="sproject-newdeployment" style="justify-content: center">
+              <div class="dproject-info">
+              <i class="ph ph-plus" style="font-size: 20px;"></i>
+              <p style="margin-top:5px;margin-bottom:5px;" >New Deployment</p>
+              </div>
+            </div>
+            <hr />
+          `);
+
+          $("#sproject-newdeployment").click(function () {
+            openModal({
+              title: "Create New Deployment",
+              fields: [
+                {
+                  id: "name",
+                  label: "Deployment Name",
+                  type: "text",
+                  placeholder: "",
+                  value: "",
+                  validate: (value) =>
+                    value.length > 1
+                      ? { success: true }
+                      : {
+                          success: false,
+                          message:
+                            "Deployment name must be at least 2 characters long",
+                        },
+                },
+                {
+                  id: "version",
+                  label: "Version",
+                  type: "text",
+                  placeholder: "",
+                  value: "",
+                  validate: (value) =>
+                    value.length > 0
+                      ? { success: true }
+                      : { success: false, message: "Version must be provided" },
+                },
+                {
+                  id: "environment",
+                  label: "Environment",
+                  type: "select",
+                  options: [
+                    { label: "Production", value: "production" },
+                    { label: "Staging", value: "Staging" },
+                    { label: "Development", value: "development" },
+                  ],
+                  value: "production",
+                },
+                {
+                  id: "status",
+                  label: "Status",
+                  type: "select",
+                  options: [
+                    { label: "Active", value: "active" },
+                    { label: "Inactive", value: "inactive" },
+                  ],
+                  value: "active",
+                },
+              ],
+            }).then((data) => {
+              console.log(data);
+              fetch("/api/deployments", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  name: data.name,
+                  version: data.version,
+                  environment: data.environment,
+                  status: data.status,
+                  project_id: project.id,
+                }),
+              });
+            });
+          });
+          timelineChart.data.datasets = [
+            {
+              label: "Unresolved Errors",
+              data: unresolved_timeline,
+              backgroundColor: "rgb(245, 140, 140)",
+              borderColor: "#000000",
+              borderWidth: 2,
+              borderSkipped: false,
+              borderRadius: 3,
+            },
+            {
+              label: "Resolved Errors",
+              data: resolved_timeline,
+              backgroundColor: "#7fd58f",
+              borderColor: "#000000",
+              borderWidth: 2,
+              borderSkipped: false,
+              borderRadius: 3,
+            },
+          ];
+          // timelineChart.data.datasets.push({
+          //   label: "Resolved Errors"
+          // })
           timelineChart.data.labels = labels;
-          timelineChart.data.datasets[0].backgroundColor = project.color;
           timelineChart.update();
 
           $("#sproject-unresolvedissues").text(unresolved_errors);
@@ -561,14 +769,25 @@ $(document).ready(function () {
                   type: "text",
                   placeholder: "",
                   value: project.name,
-                  validate: (value) =>
-                    value.length > 1
-                      ? { success: true }
-                      : {
-                          success: false,
-                          message:
-                            "Project name must be at least 2 characters long",
-                        },
+                  validate: (value) => {
+                    if (value.length < 2) {
+                      return {
+                        success: false,
+                        message:
+                          "Project name must be at least 2 characters long",
+                      };
+                    }
+                    if (value.length > 30) {
+                      return {
+                        success: false,
+                        message:
+                          "Project name can be at most 30 characters long",
+                      };
+                    }
+                    return {
+                      success: true,
+                    };
+                  },
                 },
                 {
                   id: "description",
@@ -576,6 +795,18 @@ $(document).ready(function () {
                   type: "textarea",
                   placeholder: "",
                   value: project.description,
+                  validate: (value) => {
+                    if (value.length > 200) {
+                      return {
+                        success: false,
+                        message:
+                          "Project description can be at most 200 characters long",
+                      };
+                    }
+                    return {
+                      success: true,
+                    };
+                  },
                 },
                 {
                   id: "color",
@@ -667,15 +898,19 @@ $(document).ready(function () {
         );
         $("#sdeployment-status-div").addClass(deployment.status);
 
-        const last_deployed = parseSqlTimestamp(deployment.last_deployed);
-        $("#sdeployment-lastdeployed").text(
-          last_deployed.getMonth() +
-            1 +
-            "/" +
-            last_deployed.getDate() +
-            "/" +
-            last_deployed.getFullYear(),
-        );
+        if (deployment.last_deployed) {
+          const last_deployed = parseSqlTimestamp(deployment.last_deployed);
+          $("#sdeployment-lastdeployed").text(
+            last_deployed.getMonth() +
+              1 +
+              "/" +
+              last_deployed.getDate() +
+              "/" +
+              last_deployed.getFullYear(),
+          );
+        } else {
+          $("#sdeployment-lastdeployed").text("N/A");
+        }
 
         const created_at = parseSqlTimestamp(deployment.created_at);
         $("#sdeployment-createdon").text(
@@ -697,7 +932,8 @@ $(document).ready(function () {
         ).length;
         $("#sdeployment-unresolvederrors").text(unresolved_errors);
 
-        let timeline = [0, 0, 0, 0, 0, 0];
+        let unresolved_timeline = [0, 0, 0, 0, 0, 0];
+        let resolved_timeline = [0, 0, 0, 0, 0, 0];
 
         let latest_time = null;
         for (let i = 0; i < deployment.error_events.length; i++) {
@@ -713,7 +949,11 @@ $(document).ready(function () {
           const now = new Date();
           const hours_before = (now - event_time) / 1000 / 60 / 60;
           if (hours_before < 24) {
-            timeline[5 - Math.floor(hours_before / 4)] += 1;
+            if (deployment.error_events[i].status !== "resolved") {
+              unresolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
+            } else {
+              resolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
+            }
           }
         }
         $("#sdeployment-lasterror").text(
@@ -734,9 +974,27 @@ $(document).ready(function () {
           ctx,
           JSON.parse(JSON.stringify(config)),
         );
-        timelineChart.data.datasets[0].data = timeline;
+        timelineChart.data.datasets = [
+          {
+            label: "Unresolved Errors",
+            data: unresolved_timeline,
+            backgroundColor: "rgb(245, 140, 140)",
+            borderColor: "#000000",
+            borderWidth: 2,
+            borderSkipped: false,
+            borderRadius: 3,
+          },
+          {
+            label: "Resolved Errors",
+            data: resolved_timeline,
+            backgroundColor: "#7fd58f",
+            borderColor: "#000000",
+            borderWidth: 2,
+            borderSkipped: false,
+            borderRadius: 3,
+          },
+        ];
         timelineChart.data.labels = labels;
-        timelineChart.data.datasets[0].backgroundColor = project.color;
         timelineChart.update();
 
         // populate error events table
@@ -765,7 +1023,9 @@ $(document).ready(function () {
 
           current_filtering = filtered_events.map((e) => e.id);
 
-          checked_errors = checked_errors.filter((id) => current_filtering.includes(id));
+          checked_errors = checked_errors.filter((id) =>
+            current_filtering.includes(id),
+          );
           $("#elist-delete").attr("disabled", checked_errors.length === 0);
 
           for (let i = 0; i < filtered_events.length; i++) {
@@ -807,9 +1067,7 @@ $(document).ready(function () {
               console.log(checked_errors);
 
               $("#elist-delete").attr("disabled", checked_errors.length === 0);
-              
             });
-
 
             $("#errorevent-" + event.id).click(function () {
               window.location.href =
@@ -949,14 +1207,12 @@ $(document).ready(function () {
                 $("#sdeployment-status-div").removeClass("inactive");
                 $("#sdeployment-status-div").addClass(json.deployment.status);
                 $("#sdeployment-apikey").text(json.deployment.api_key);
-
               });
           });
         });
 
-
         // handle deleting error events
-        $("#elist-delete").click(function() {
+        $("#elist-delete").click(function () {
           if (checked_errors.length > 0) {
             fetch("/api/error-events/delete", {
               method: "POST",
@@ -964,19 +1220,22 @@ $(document).ready(function () {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                ids: checked_errors
-              })
-            }).then((resp) => resp.json())
-            .then((json) => {
-              if (json.success) {
-                // update deployments object and repopulate error table
-                deployment.error_events = deployment.error_events.filter((e) => !checked_errors.includes(e.id));
-                populateErrorTable($("#error-search").val().toLowerCase());
-                $("#elist-select").removeClass("checked");
-              }
+                ids: checked_errors,
+              }),
             })
+              .then((resp) => resp.json())
+              .then((json) => {
+                if (json.success) {
+                  // update deployments object and repopulate error table
+                  deployment.error_events = deployment.error_events.filter(
+                    (e) => !checked_errors.includes(e.id),
+                  );
+                  populateErrorTable($("#error-search").val().toLowerCase());
+                  $("#elist-select").removeClass("checked");
+                }
+              });
           }
-        })
+        });
       } else {
         // redirect bcs not a valid deployment
         window.location.href = "/dashboard.html";
@@ -1024,6 +1283,15 @@ $(document).ready(function () {
             created_at.getFullYear(),
         );
         $("#serror-stacktrace").text(String(event.stack_trace).trim());
+
+
+        // populate error updates
+        $("#error-update-content").html("");
+        console.log(event.updates);
+        // add new error update
+        $("#error-update-add").click(function() {
+
+        })
       } else {
         // not a valid event -> redirect
         window.location.href = "/dashboard.html";
@@ -1267,10 +1535,9 @@ $(document).ready(function () {
     window.location.href = "/dashboard.html?projectOverview";
   });
 
-  window.addEventListener("pageshow", function() {
+  window.addEventListener("pageshow", function () {
     if (event.persisted) {
       window.location.reload();
     }
-  })
-
+  });
 });

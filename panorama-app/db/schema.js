@@ -31,7 +31,7 @@ export function migrate() {
             environment TEXT NOT NULL,
             name TEXT NOT NULL,
             status TEXT NOT NULL,
-            last_deployed DATETIME DEFAULT CURRENT_TIMESTAMP,
+            last_deployed DATETIME,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             meta TEXT DEFAULT '{}',
             api_key TEXT NOT NULL
