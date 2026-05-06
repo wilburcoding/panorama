@@ -118,10 +118,12 @@ app.get("/api/users/check-session", (req, res) => {
   const user = db
     .prepare("SELECT * FROM users WHERE session_id = ?")
     .get(session_id);
+
   if (!user) {
     res.status(404).json({ success: false, message: "Session not found" });
   } else {
-    res.status(200).json({ success: true, user_email: user.email });
+    user.password_hash = undefined;
+    res.status(200).json({ success: true, user: user });
   }
 });
 
@@ -406,4 +408,60 @@ app.post("/api/error-events/update", express.json(), (req, res) => {
   }
 
   res.json({ success: true });
+});
+
+// users settings options -> change name, change password, delete account
+app.post("/api/users/:id/update_name", express.json(), (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  const { first_name, last_name, session_id } = req.body;
+  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(id);
+  if (!user) {
+    res.status(404).json({ success: false, message: "User not found" });
+    return;
+  }
+  if (user.session_id !== session_id) {
+    res.status(403).json({ success: false, message: "Unauthorized" });
+    return;
+  }
+  db.prepare("UPDATE users SET first_name = ?, last_name = ? WHERE id = ?").run(
+    first_name,
+    last_name,
+    id,
+  );
+  let updated_user = db.prepare("SELECT * FROM users WHERE id = ?").get(id);
+
+  updated_user.session_id = session_id;
+  res.json({ success: true, user: updated_user });
+});
+
+app.post("/api/users/:id/update_password", express.json(), async (req, res) => {
+  const { id } = req.params;
+  const { current_password, new_password, session_id } = req.body;
+  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(id);
+  if (!user) {
+    res.status(404).json({ success: false, message: "User not found" });
+    return;
+  }
+
+  if (user.session_id !== session_id) {
+    res.status(403).json({ success: false, message: "Unauthorized" });
+    return;
+  }
+  console.log(current_password);
+  console.log(user);
+  const old_valid = await checkPassword(current_password, user.password_hash);
+  if (!old_valid) {
+    res.status(403).json({ success: false, message: "Unauthorized" });
+    return;
+  }
+
+  const new_hash = await hashPassword(new_password);
+  db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(
+    new_hash,
+    id,
+  );
+  let updated_user = db.prepare("SELECT * FROM users WHERE id = ?").get(id);
+  updated_user.password_hash = undefined;
+  res.json({ success: true, user: updated_user });
 });

@@ -73,7 +73,9 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] populate data
        - [x] functionality (mainly just deleting)
          - [x] Handle user posting updates to keep track of progress
-     - [ ] user account management
+     - [x] user account management
+       - [x] Change account password
+       - [x] Change account name
      - [x] Functionality to switch between pages
        - [ ] Loading animation to prevent weird UI glitches from being seen
      - [ ] Switch to async/await instead of promises
@@ -149,6 +151,9 @@ Website planning:
          - Options to delete, tag, update
          - Update UI + functionality
        - Settings 
+         - UI
+           - Singular card with account infmoration
+           - Bottom row with buttons for actions
          - With user account options
            - CHange password
            - More TBD (maybe display name options in the future?)

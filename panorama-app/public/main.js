@@ -1,6 +1,6 @@
 $(document).ready(function () {
   let projects = [];
-  let user_email = "";
+  let user = {};
   let dashboardTimeline = null;
 
   // base chart config
@@ -160,7 +160,7 @@ $(document).ready(function () {
           localStorage.removeItem("session_id");
           window.location.href = "/signin.html";
         } else {
-          user_email = json.user_email;
+          user = json.user;
           loadData().then(() => {
             checkPage();
           });
@@ -169,7 +169,7 @@ $(document).ready(function () {
   }
   $("#edit-modal-container").hide();
   $("#elist-delete").attr("disabled", true);
-  $("#elist-update").attr('disabled', true);
+  $("#elist-update").attr("disabled", true);
   // handle modals
   function openModal(options) {
     return new Promise((resolve, reject) => {
@@ -193,6 +193,11 @@ $(document).ready(function () {
           <p class="modal-label">${field.label}</p>
           <textarea placeholder="${field.placeholder}" id="modal-item-${field.id}">${field.value}</textarea>
         `);
+        } else if (field.type == "password") {
+          $("#edit-modal-content").append(`
+            <p class="modal-label">${field.label}</p>
+            <input type="password" placeholder="${field.placeholder}" id="modal-item-${field.id}"/>
+          `);
         } else if (field.type == "select") {
           let options_html = "";
           for (let j = 0; j < field.options.length; j++) {
@@ -247,8 +252,15 @@ $(document).ready(function () {
             const validate_function = options.fields.find(
               (f) => f.id === key,
             ).validate;
-            const func_result = validate_function(data[key]);
-            if (validate_function(data[key]).success === false) {
+            let func_result = "";
+            if (
+              options.fields.find((f) => f.id === key).id == "confirm_password"
+            ) {
+              func_result = validate_function(data[key], data["new_password"]);
+            } else {
+              func_result = validate_function(data[key]);
+            }
+            if (func_result.success === false) {
               $("#error-message").text(func_result.message);
               return;
             }
@@ -1038,8 +1050,9 @@ $(document).ready(function () {
             let last_update = null;
             const event_updates = JSON.parse(event.updates);
             if (event_updates.length > 0) {
-              last_update = parseSqlTimestamp(event_updates[event_updates.length - 1].timestamp);
-
+              last_update = parseSqlTimestamp(
+                event_updates[event_updates.length - 1].timestamp,
+              );
             }
             $("#sdeployment-elist").append(`
               <div class="sdeployment-card" id="errorevent-${event.id}">
@@ -1257,7 +1270,7 @@ $(document).ready(function () {
         });
 
         // handle updating multiple error events
-        $("#elist-update").click(function() {
+        $("#elist-update").click(function () {
           openModal({
             title: "Add Error Update",
             fields: [
@@ -1302,13 +1315,14 @@ $(document).ready(function () {
                 },
                 ids: checked_errors,
               }),
-            }).then((resp) => resp.json())
+            })
+              .then((resp) => resp.json())
               .then((json) => {
                 console.log(json);
                 window.location.reload();
-              })
-          })
-        })
+              });
+          });
+        });
       } else {
         // redirect bcs not a valid deployment
         window.location.href = "/dashboard.html";
@@ -1458,6 +1472,179 @@ $(document).ready(function () {
       $("#settings-content").show();
       $("#sdeployment-content").hide();
       $("#serror-content").hide();
+
+      $("#settings-fname").text(user.first_name);
+      $("#settings-lname").text(user.last_name);
+      $("#settings-email").text(user.email);
+      let created_at = parseSqlTimestamp(user.created_at);
+      $("#settings-created-on").text(`
+        ${created_at.getMonth() + 1}/${created_at.getDate()}/${created_at.getFullYear()}`);
+
+      $("#edit-name-button").click(function () {
+        console.log(user);
+        openModal({
+          title: "Edit Name",
+          fields: [
+            {
+              id: "first_name",
+              label: "First Name",
+              type: "text",
+              placeholder: "",
+              value: user.first_name,
+              validate: (value) => {
+                if (value.length < 1) {
+                  return {
+                    success: false,
+                    message: "First name field is required",
+                  };
+                }
+                return {
+                  success: true,
+                };
+              },
+            },
+            {
+              id: "last_name",
+              label: "Last Name",
+              type: "text",
+              placeholder: "",
+              value: user.last_name,
+              validate: (value) => {
+                if (value.length < 1) {
+                  return {
+                    success: false,
+                    message: "Last name field is required",
+                  };
+                }
+                return {
+                  success: true,
+                };
+              },
+            },
+          ],
+        }).then((data) => {
+          fetch("/api/users/" + user.id + "/update_name", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              first_name: data.first_name,
+              last_name: data.last_name,
+              session_id: localStorage.getItem("session_id"),
+            }),
+          })
+            .then((resp) => resp.json())
+            .then((json) => {
+              user = json.user;
+
+              $("#settings-fname").text(user.first_name);
+              $("#settings-lname").text(user.last_name);
+              $("#settings-email").text(user.email);
+              let created_at = parseSqlTimestamp(user.created_at);
+              $("#settings-created-on").text(
+                `${created_at.getMonth() + 1}/${created_at.getDate()}/${created_at.getFullYear()}`,
+              );
+            });
+        });
+      });
+
+      $("#change-password-button").click(function () {
+        openModal({
+          title: "Change Password",
+          fields: [
+            {
+              id: "current_password",
+              label: "Current Password",
+              type: "password",
+              placeholder: "",
+              validate: (value) => {
+                if (value.length < 1) {
+                  return {
+                    success: false,
+                    message: "Current password field is required",
+                  };
+                }
+                return {
+                  success: true,
+                };
+              },
+            },
+            {
+              id: "new_password",
+              label: "New Password",
+              type: "password",
+              placeholder: "",
+              validate: (value) => {
+                if (value.length < 8) {
+                  return {
+                    success: false,
+                    message: "New password must be at least 8 characters long",
+                  };
+                }
+                return {
+                  success: true,
+                };
+              },
+            },
+            {
+              id: "confirm_password",
+              label: "Confirm New Password",
+              type: "password",
+              placeholder: "",
+              validate: (value, password) => {
+                if (value.length < 8) {
+                  return {
+                    success: false,
+                    message:
+                      "Confirm password must be at least 8 characters long",
+                  };
+                }
+                if (value !== password) {
+                  console.log(value);
+                  console.log(password);
+                  return {
+                    success: false,
+                    message: "Confirm password does not match new password",
+                  };
+                }
+                return {
+                  success: true,
+                };
+              },
+            },
+            {
+              id: "confirmation",
+              label:
+                "I understand that changing my password will log me out of all active sessions.",
+              type: "checkbox",
+            },
+          ],
+        }).then((data) => {
+          console.log(data);
+          if (data.confirmation == true) {
+            fetch("/api/users/" + user.id + "/update_password", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                current_password: data.current_password,
+                new_password: data.new_password,
+                session_id: localStorage.getItem("session_id"),
+              }),
+            })
+              .then((resp) => resp.json())
+              .then((json) => {
+                console.log(json);
+                if (json.success) {
+                  localStorage.removeItem("session_id");
+                  window.location.href= "/signin.html";
+                }
+              });
+          }
+        });
+      });
     } else {
       // dashboard overview
       $("#dashboard-content").show();

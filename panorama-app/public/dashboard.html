@@ -445,7 +445,9 @@
             <div class="error-info-row">
               <div class="error-info-ritem">
                 <h3>Stack Trace</h3>
-                <pre style="max-width: 90%;"><code class="language-javascript" id="serror-stacktrace"></code></pre>
+                <pre
+                  style="max-width: 90%"
+                ><code class="language-javascript" id="serror-stacktrace"></code></pre>
               </div>
             </div>
             <div class="error-info-row">
@@ -454,9 +456,11 @@
               </div>
             </div>
             <div id="error-update-content">
-
               <div class="error-update" id="error-update-add">
-                <i class="ph ph-plus" style="font-size: 20px;margin-right:10px;"></i>
+                <i
+                  class="ph ph-plus"
+                  style="font-size: 20px; margin-right: 10px"
+                ></i>
                 <p>New Update</p>
               </div>
             </div>
@@ -625,7 +629,34 @@
           </div>
         </div>
       </div>
-      <div id="settings-content"></div>
+      <div id="settings-content">
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="margin-top: 5vh; min-width: 50%">
+            <h1
+              style="
+                font-size: 35px;
+                color: black;
+                margin-top: 5px;
+                margin-bottom: 10px;
+                line-height: 35px;
+              "
+            >
+              Settings
+            </h1>
+            <p class="settings-htitle">Email Address</p>
+            <p style="margin-top: 2px" id="settings-email">john@example.com</p>
+            <p class="settings-htitle">First Name</p>
+            <p style="margin-top: 2px" id="settings-fname">John</p>
+            <p class="settings-htitle">Last Name</p>
+            <p style="margin-top: 2px" id="settings-lname">Doe</p>
+            <p class="settings-htitle">Account Created On</p>
+            <p style="margin-top: 2px" id="settings-created-on">2/3/1024</p>
+
+            <button style="width: fit-content;margin-top:5px;" id="edit-name-button"class="settings-button">Edit Name</button>
+            <button style="width: fit-content" class="settings-button" id="change-password-button">Change Password</button>
+          </div>
+        </div>
+      </div>
       <div id="edit-modal-container">
         <!-- generic edit modal for editing project/deployment details-->
         <div id="edit-modal-content">

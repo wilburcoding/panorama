@@ -866,7 +866,7 @@ select {
   margin-bottom: 20px;
 }
 
-#edit-modal-content input[type="text"] {
+#edit-modal-content input[type="text"], #edit-modal-content input[type="password"] {
   min-width: 300px;
   margin: 0;
   margin-top: 2px;
@@ -942,7 +942,8 @@ textarea {
   background-color: white;
 }
 
-#elist-delete, #elist-update {
+#elist-delete,
+#elist-update {
   margin-top: 0px;
   margin-bottom: 0px;
   padding: 8px;
@@ -953,23 +954,25 @@ textarea {
   transition-duration: 0.2s;
 }
 
-#elist-delete i, #elist-update i {
+#elist-delete i,
+#elist-update i {
   margin: 0px;
   padding: 0px;
   color: black;
 }
 
-#elist-delete:hover, #elist-update:hover {
+#elist-delete:hover,
+#elist-update:hover {
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0px 0px #000000;
 }
 
-#elist-delete:disabled, #elist-update:disabled {
+#elist-delete:disabled,
+#elist-update:disabled {
   opacity: 0.5;
   transform: none;
   pointer-events: none;
 }
-
 
 .error-update {
   background-color: white;
@@ -1034,6 +1037,19 @@ textarea {
 }
 
 pre[class*="language-"] {
-    white-space: pre-wrap !important;
-    word-break: break-word !important; 
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+
+/* somet settings styling */
+.settings-htitle {
+  margin-top: 8px;
+  margin-bottom: 2px;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.settings-button {
+  margin-left:0px;
+  font-size:17px;
 }
