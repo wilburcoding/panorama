@@ -942,7 +942,7 @@ textarea {
   background-color: white;
 }
 
-#elist-delete {
+#elist-delete, #elist-update {
   margin-top: 0px;
   margin-bottom: 0px;
   padding: 8px;
@@ -953,18 +953,18 @@ textarea {
   transition-duration: 0.2s;
 }
 
-#elist-delete i {
+#elist-delete i, #elist-update i {
   margin: 0px;
   padding: 0px;
   color: black;
 }
 
-#elist-delete:hover {
+#elist-delete:hover, #elist-update:hover {
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0px 0px #000000;
 }
 
-#elist-delete:disabled {
+#elist-delete:disabled, #elist-update:disabled {
   opacity: 0.5;
   transform: none;
   pointer-events: none;
@@ -1009,7 +1009,7 @@ textarea {
 }
 
 .error-update-message {
-  margin-top: 3px;
+  margin-top: 8px;
   margin-bottom: 3px;
   font-size: 16px;
 }
@@ -1031,4 +1031,9 @@ textarea {
 
 #error-update-add:hover {
   background-color: rgb(241, 241, 241);
+}
+
+pre[class*="language-"] {
+    white-space: pre-wrap !important;
+    word-break: break-word !important; 
 }

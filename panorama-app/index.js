@@ -119,9 +119,9 @@ app.get("/api/users/check-session", (req, res) => {
     .prepare("SELECT * FROM users WHERE session_id = ?")
     .get(session_id);
   if (!user) {
-    res.status(404).json({ success: false });
+    res.status(404).json({ success: false, message: "Session not found" });
   } else {
-    res.status(200).json({ success: true });
+    res.status(200).json({ success: true, user_email: user.email });
   }
 });
 
@@ -173,7 +173,7 @@ app.get("/api/projects/:id", (req, res) => {
       res.status(403).json({ success: false, message: "Unauthorized" });
       return;
     }
-    res.json({ success: true, project: project});
+    res.json({ success: true, project: project });
     return;
   }
   res.status(403).json({ success: false, message: "Session ID required" });
@@ -246,13 +246,15 @@ app.post("/api/projects", express.json(), (req, res) => {
 
   // check session id and get user
   if (!session_id) {
-    res.status(403).json({ success: false, message: "Session ID required"});
+    res.status(403).json({ success: false, message: "Session ID required" });
     return;
   }
 
-  const user = db.prepare("SELECT * FROM users WHERE session_Id = ?").get(session_id);
+  const user = db
+    .prepare("SELECT * FROM users WHERE session_Id = ?")
+    .get(session_id);
   if (!user) {
-    res.status(403).json({ success: false, message: "Invalid session ID"});
+    res.status(403).json({ success: false, message: "Invalid session ID" });
     return;
   }
   const result = db
@@ -338,7 +340,7 @@ app.put("/api/deployments/:id", express.json(), (req, res) => {
       api_key,
       id,
     );
-    console.log("api key regenerated ")
+    console.log("api key regenerated ");
   }
   db.prepare(
     "UPDATE deployments SET name = ?, version = ?, environment = ?, status = ? WHERE id = ?",
@@ -378,5 +380,30 @@ app.post("/api/error-events/delete", express.json(), (req, res) => {
   let ids_string = ids.join(",");
   console.log(ids_string);
   db.prepare("DELETE FROM error_events WHERE id IN (" + ids_string + ")").run();
+  res.json({ success: true });
+});
+
+app.post("/api/error-events/update", express.json(), (req, res) => {
+  const { update, ids } = req.body;
+  //get list of existing updates for each error event
+  console.log(ids);
+  for (let id of ids) {
+    console.log(id);
+    const error_event = db
+      .prepare("SELECT * FROM error_events WHERE id = ?")
+      .get(id);
+
+    console.log(error_event);
+    let updates = JSON.parse(error_event.updates);
+    update.timestamp = new Date().toISOString();
+    updates.push(update);
+    db.prepare(
+      "UPDATE error_events SET updates = ?, status = ? WHERE id = ?",
+    ).run(JSON.stringify(updates), update.status, id);
+    const updated_event = db
+      .prepare("SELECT * FROM error_events WHERE id = ?")
+      .get(id);
+  }
+
   res.json({ success: true });
 });

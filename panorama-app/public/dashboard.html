@@ -445,7 +445,7 @@
             <div class="error-info-row">
               <div class="error-info-ritem">
                 <h3>Stack Trace</h3>
-                <pre><code class="language-javascript" id="serror-stacktrace"></code></pre>
+                <pre style="max-width: 90%;"><code class="language-javascript" id="serror-stacktrace"></code></pre>
               </div>
             </div>
             <div class="error-info-row">
@@ -454,22 +454,7 @@
               </div>
             </div>
             <div id="error-update-content">
-              <div class="error-update">
-                <div class="error-update-row">
-                  <p class="error-update-name">wilburw2026@gmail.com</p>
-                  <p class="error-update-date">5/1/2026 2:30 PM</p>
-                </div>
-                <p class="error-update-message">
-                  Update message about this error something something somethign
-                  something something something something something something
-                </p>
-                <div class="error-update-row" style="margin-top: 10px;margin-bottom:0px;">
-                  <p class="error-update-change">Status updated to</p>
-                  <div class="dproject-status resolved" style="margin-left:10px">
-                    <p>Resolved</p>
-                  </div>
-                </div>
-              </div>
+
               <div class="error-update" id="error-update-add">
                 <i class="ph ph-plus" style="font-size: 20px;margin-right:10px;"></i>
                 <p>New Update</p>
@@ -607,8 +592,11 @@
                   font-size: 20px;
                 "
               />
-              <button id="elist-delete">
+              <button id="elist-delete" title="Delete">
                 <i class="ph ph-trash"> </i>
+              </button>
+              <button id="elist-update" title="Update status">
+                <i class="ph ph-pen"> </i>
               </button>
             </div>
             <div

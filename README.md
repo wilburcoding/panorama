@@ -66,12 +66,13 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
          - [x] Error events sorting functionality
          - [x] Changing deployment name, status, environment, version
          - [x] Error list functionality (deleting multiple)
+           - [ ] Updating multiple items functionality 
          - [ ] Deleting project functionality
      - [ ] error event detail page
        - [x] page layout
        - [x] populate data
        - [x] functionality (mainly just deleting)
-         - [ ] Handle user posting updates to keep track of progress
+         - [x] Handle user posting updates to keep track of progress
      - [ ] user account management
      - [x] Functionality to switch between pages
        - [ ] Loading animation to prevent weird UI glitches from being seen
@@ -146,10 +147,11 @@ Website planning:
        - Error information
          - Basically show everything that is available about the event
          - Options to delete, tag, update
-         - Update UI
-           - 
-       - Settings
+         - Update UI + functionality
+       - Settings 
          - With user account options
+           - CHange password
+           - More TBD (maybe display name options in the future?)
    - Modal
      - From program -> calls modal function (which is a promise)
      - Wait till promise is fulfilled

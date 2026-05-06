@@ -1,5 +1,6 @@
 $(document).ready(function () {
   let projects = [];
+  let user_email = "";
   let dashboardTimeline = null;
 
   // base chart config
@@ -159,6 +160,7 @@ $(document).ready(function () {
           localStorage.removeItem("session_id");
           window.location.href = "/signin.html";
         } else {
+          user_email = json.user_email;
           loadData().then(() => {
             checkPage();
           });
@@ -167,6 +169,7 @@ $(document).ready(function () {
   }
   $("#edit-modal-container").hide();
   $("#elist-delete").attr("disabled", true);
+  $("#elist-update").attr('disabled', true);
   // handle modals
   function openModal(options) {
     return new Promise((resolve, reject) => {
@@ -1027,10 +1030,17 @@ $(document).ready(function () {
             current_filtering.includes(id),
           );
           $("#elist-delete").attr("disabled", checked_errors.length === 0);
+          $("#elist-update").attr("disabled", checked_errors.length === 0);
 
           for (let i = 0; i < filtered_events.length; i++) {
             const event = filtered_events[i];
             const created_at = parseSqlTimestamp(event.timestamp);
+            let last_update = null;
+            const event_updates = JSON.parse(event.updates);
+            if (event_updates.length > 0) {
+              last_update = parseSqlTimestamp(event_updates[event_updates.length - 1].timestamp);
+
+            }
             $("#sdeployment-elist").append(`
               <div class="sdeployment-card" id="errorevent-${event.id}">
 
@@ -1044,9 +1054,15 @@ $(document).ready(function () {
                   </div>
                 </div>
                 <div class="sdeployment-info">
-                  <div class="dproject-info-item">
+                  <div class="sdeployment-info-item">
                     <i class="ph ph-clock"></i>
                     <p>Created on ${created_at.getMonth() + 1}/${created_at.getDate()}/${created_at.getFullYear()}</p>
+
+                  </div>
+                  <p class="dproject-divider">/</p>
+                  <div class="sdeployment-info-item">
+                    <i class="ph ph-arrow-clockwise"></i>
+                    <p>${last_update ? `Last updated on ${last_update.getMonth() + 1}/${last_update.getDate()}/${last_update.getFullYear()}` : "No updates yet"}</p>
                   </div>
                 </div>
               </div>
@@ -1067,6 +1083,7 @@ $(document).ready(function () {
               console.log(checked_errors);
 
               $("#elist-delete").attr("disabled", checked_errors.length === 0);
+              $("#elist-update").attr("disabled", checked_errors.length === 0);
             });
 
             $("#errorevent-" + event.id).click(function () {
@@ -1092,6 +1109,7 @@ $(document).ready(function () {
             console.log(checked_errors);
             $(this).addClass("checked");
             $("#elist-delete").attr("disabled", false);
+            $("#elist-update").attr("disabled", false);
           } else {
             // deselect all
             checked_errors = [];
@@ -1100,6 +1118,7 @@ $(document).ready(function () {
             });
             $(this).removeClass("checked");
             $("#elist-delete").attr("disabled", true);
+            $("#elist-update").attr("disabled", true);
           }
         });
 
@@ -1236,6 +1255,60 @@ $(document).ready(function () {
               });
           }
         });
+
+        // handle updating multiple error events
+        $("#elist-update").click(function() {
+          openModal({
+            title: "Add Error Update",
+            fields: [
+              {
+                id: "message",
+                label: "Update Message",
+                type: "textarea",
+                placeholder: "",
+                value: "",
+                validation: (value) => {
+                  if (value.length < 5) {
+                    return {
+                      success: false,
+                      message:
+                        "Update message must be at least 5 characters long",
+                    };
+                  }
+                },
+              },
+              {
+                id: "status",
+                label: "New Status",
+                type: "select",
+                options: [
+                  { label: "Unresolved", value: "unresolved" },
+                  { label: "Resolved", value: "resolved" },
+                ],
+                value: event.status,
+              },
+            ],
+          }).then((data) => {
+            fetch("/api/error-events/update", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                update: {
+                  message: data.message,
+                  status: data.status,
+                  email: user_email,
+                },
+                ids: checked_errors,
+              }),
+            }).then((resp) => resp.json())
+              .then((json) => {
+                console.log(json);
+                window.location.reload();
+              })
+          })
+        })
       } else {
         // redirect bcs not a valid deployment
         window.location.href = "/dashboard.html";
@@ -1284,14 +1357,94 @@ $(document).ready(function () {
         );
         $("#serror-stacktrace").text(String(event.stack_trace).trim());
 
-
         // populate error updates
         $("#error-update-content").html("");
-        console.log(event.updates);
-        // add new error update
-        $("#error-update-add").click(function() {
+        const updates = JSON.parse(event.updates);
+        console.log(updates);
 
-        })
+        for (let i = updates.length - 1; i >= 0; i--) {
+          const update = updates[i];
+          const update_time = parseSqlTimestamp(update.timestamp);
+          $("#error-update-content").append(`
+            <div class="error-update">
+              <div class="error-update-row">
+                <p class="error-update-name">${update.email}</p>
+                <p class="error-update-date">${update_time.getMonth() + 1}/${update_time.getDate()}/${update_time.getFullYear()} ${update_time.getHours()}:${update_time.getMinutes().toString().padStart(2, "0")}</p>
+              </div>
+              <p class="error-update-message">
+                ${update.message}
+              </p>
+              <div class="error-update-row" style="margin-top: 8px;margin-bottom:0px;">
+                <p class="error-update-change">Status updated to</p>
+                <div class="dproject-status ${update.status}" style="margin-left:10px">
+                  <p>${update.status.charAt(0).toUpperCase() + update.status.slice(1)}</p>
+                </div>
+              </div>
+            </div>
+            `);
+        }
+        $("#error-update-content").append(`
+          <div class="error-update" id="error-update-add">
+            <i class="ph ph-plus" style="font-size: 20px;margin-right:10px;"></i>
+            <p>New Update</p>
+          </div>
+          `);
+        // add new error update
+
+        $("#error-update-add").click(function () {
+          openModal({
+            title: "Add Error Update",
+            fields: [
+              {
+                id: "message",
+                label: "Update Message",
+                type: "textarea",
+                placeholder: "",
+                value: "",
+                validation: (value) => {
+                  if (value.length < 5) {
+                    return {
+                      success: false,
+                      message:
+                        "Update message must be at least 5 characters long",
+                    };
+                  }
+                },
+              },
+              {
+                id: "status",
+                label: "New Status",
+                type: "select",
+                options: [
+                  { label: "Unresolved", value: "unresolved" },
+                  { label: "Resolved", value: "resolved" },
+                ],
+                value: event.status,
+              },
+            ],
+          }).then((data) => {
+            fetch("/api/error-events/update", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                update: {
+                  message: data.message,
+                  status: data.status,
+                  email: user_email,
+                },
+                ids: [event.id],
+              }),
+            })
+              .then((resp) => resp.json())
+              .then((json) => {
+                if (json.success) {
+                  window.location.reload();
+                }
+              });
+          });
+        });
       } else {
         // not a valid event -> redirect
         window.location.href = "/dashboard.html";
