@@ -101,13 +101,15 @@ $(document).ready(function () {
           "/dashboard.html?projectId=" + project.id + "&projectInfo";
       });
     }
-
     // get deployments for each project
     let pids = "";
     for (let i = 0; i < projects.length; i++) {
       pids += projects[i].id + ",";
     }
     pids = pids.slice(0, -1); // extra comma at end
+    if (pids.length === 0) {
+      pids = "null";
+    }
     const response = await fetch("/api/deployments?project_id=" + pids, {
       method: "GET",
     });
@@ -124,6 +126,7 @@ $(document).ready(function () {
       }
     }
     dids = dids.slice(0, -1);
+    console.log(deployments);
 
     // get error events for each deploymentx
     console.log(dids);
@@ -138,6 +141,7 @@ $(document).ready(function () {
       const event = error_events[i];
       const deployment = deployments.find((d) => d.id === event.deployment_id);
       if (deployment) {
+        console.log(deployment);
         deployment.error_events.push(event);
       }
     }
@@ -331,6 +335,7 @@ $(document).ready(function () {
     const params = new URLSearchParams(window.location.search);
     if (params.has("projectOverview")) {
       // projects overview -> cards with each project
+      $("#sbp-overview").addClass("active");
       $("#dashboard-content").hide();
       $("#settings-content").hide();
       $("#sproject-content").hide();
@@ -530,9 +535,9 @@ $(document).ready(function () {
       });
     } else if (params.has("projectInfo")) {
       // individual project info page
-      console.log("proj");
       const project_id = params.get("projectId");
       if (project_id) {
+        $("#sbp-" + project_id).addClass("active");
         // populate project info page
         console.log("Project ID:  " + project_id);
         $("#dashboard-content").hide();
@@ -892,6 +897,7 @@ $(document).ready(function () {
       const project = projects.find((p) =>
         p.deployments.find((d) => d.id == deployment_id),
       );
+      $("#sbp-" + project.id).addClass("active");
       const deployment = project.deployments.find((d) => d.id == deployment_id);
 
       let checked_errors = [];
@@ -1349,6 +1355,8 @@ $(document).ready(function () {
         }
       }
       if (deployment != null) {
+        const project = projects.find((p) => p.deployments.find((d) => d.id == deployment.id));
+        $("#sbp-" + project.id).addClass("active");
         const event = deployment.error_events.find((e) => e.id == event_id);
         $("#serror-title").text(event.title);
         $("#serror-status-div").addClass(event.status);
@@ -1465,6 +1473,7 @@ $(document).ready(function () {
       }
     } else if (params.has("settings")) {
       // show settings
+      $("#sidebar-settings").addClass('active');
       console.log("settings");
       $("#dashboard-content").hide();
       $("#project-content").hide();
@@ -1645,8 +1654,14 @@ $(document).ready(function () {
           }
         });
       });
+
+      $("#sign-out-button").click(function() {
+        localStorage.removeItem("session_id");
+        window.location.href="/signin.html";
+      })
     } else {
       // dashboard overview
+      $("#sidebar-dashboardb").addClass('active');
       $("#dashboard-content").show();
       $("#project-content").hide();
       $("#sproject-content").hide();

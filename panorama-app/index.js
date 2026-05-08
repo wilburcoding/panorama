@@ -187,6 +187,11 @@ app.get("/api/deployments", (req, res) => {
   let query = "SELECT * FROM deployments";
   const conditions = [];
   if (project_id) {
+    console.log("project id filter");
+    if (project_id === "null") {
+      res.json([]);
+        return;
+      }
     conditions.push(`project_id IN (${project_id})`);
   }
   if (environment) {
@@ -285,7 +290,7 @@ app.post("/api/deployments", express.json(), (req, res) => {
 });
 
 app.post("/api/deployments/:id/connect", express.json(), (req, res) => {
-  // initializing connection from comment
+  // initializing connection from comment where id is the deployment id
   const { id, api_key } = req.body;
   const deployment = db
     .prepare("SELECT * FROM deployments WHERE id = ?")
@@ -297,30 +302,70 @@ app.post("/api/deployments/:id/connect", express.json(), (req, res) => {
 
   if (deployment.api_key !== api_key) {
     res.status(403).json({ success: false, message: "Invalid API key" });
+    return;
   }
 
-  if (deployment.status !== "enabled") {
+  if (deployment.status !== "active") {
     res
       .status(403)
       .json({ success: false, message: "Deployment is not active" });
   }
   // don't send api_key back in response
   deployment.api_key = "";
+
+  db.prepare("UPDATE deployments SET last_deployed = ? WHERE id = ?").run(
+    new Date().toISOString(),
+    id
+  )
   res.json({ success: true, deployment: deployment });
 });
 
 app.post("/api/error-events", express.json(), (req, res) => {
-  const { deployment_id, title, stack_trace, environment, status } = req.body;
+  const { deployment_id, title, stack_trace, environment,breadcrumbs } = req.body;
+
+  // check for similar events
+  const one_hour = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  let similar_events = db.prepare("SELECT * FROM error_events WHERE deployment_id = ? AND title = ? AND stack_trace = ?").all(deployment_id, title, stack_trace);
+  console.log(similar_events);
+  similar_events = similar_events.filter(
+    (event) => (event.timestamp.replace(" ", "T") + "Z") > one_hour,
+  );
+  console.log(similar_events);
+  if (similar_events.length > 0) {
+    console.log("similar events found")
+    for (let event of similar_events) {
+      const event_similar_count = event.similar_count;
+      db.prepare("UPDATE error_events SET similar_count = ? WHERE id = ?").run(event_similar_count + 1, event.id);
+    }
+    res.json({ success: true, message: "Similar error event already exists"});
+    return;
+  }
+  const meta = {
+    breadcrumbs: breadcrumbs || []
+  }
   const result = db
     .prepare(
-      "INSERT INTO error_events (deployment_id, title, stack_trace, environment, status) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO error_events (deployment_id, title, stack_trace, environment, status, meta) VALUES (?, ?, ?, ?, ?, ?)",
     )
-    .run(deployment_id, title, stack_trace, environment, status);
+    .run(deployment_id, title, stack_trace, environment, "unresolved", JSON.stringify(meta));
   const error_event = db
     .prepare("SELECT * FROM error_events WHERE id=?")
     .get(result.lastInsertRowid);
   res.json({ success: true, error_event: error_event });
 });
+
+app.post("/api/error-events/similar", express.json(), (req, res) => {
+  const {deployment_id, title, stack_trace} = req.body;
+  // check similar events in the same deployment from the past 1 hour
+  const one_hour = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const similar_events = db.prepare("SELECT * FROM error_events WHERE deployment_id = ? AND title = ? AND stack_trace = ? AND timestamp > ?").all(deployment_id, title, stack_trace, one_hour);
+  for (let event of similar_events) {
+    const event_similar_count = event.similar_count;
+    db.prepare("UPDATE error_events SET similar_count = ? WHERE id = ?").run(event_similar_count + 1, event.id);
+  }
+
+  res.json({ success: true})
+})
 
 app.put("/api/projects/:id", express.json(), (req, res) => {
   const { id } = req.params;

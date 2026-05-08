@@ -22,26 +22,25 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] Handle user credentials check
  - [ ] javascript sdk -> going to start with a js sdk first
    - [x] initiate
-   - [ ] track errors
-     - [ ] incorporate data straight from node.js error catching
+   - [x] track errors
+     - [x] incorporate data straight from node.js error catching
      - [ ] track breadcrumbs 
+     - [x] avoid recent duplicate errors
+       - [x] count recent duplicates
    - [ ] track logs
    - [ ] track metrics
    - [ ] track performance
+   - [ ] sample project for testing sdk
  - [ ] python sdk
  - [ ] web app
-   - [ ] UI
-     - [ ] Home page
-     - [ ] Dashboard
-     - [ ] user signin/create account
    - [x] User signup + sign in base functionality
      - [x] Check if user is logged in already
      - [x] Handle sessions 
    - [ ] Dashboard
-     - [ ] Sidebar 
+     - [x] Sidebar 
        - [x] Sidebar layout
        - [x] Populate sidebar project list
-       - [ ] Sidebar project list functionality
+       - [x] Sidebar project list functionality
      - [x] main dashboard page
        - [x] Dashboard layout
          - [x] Stacked bar graph
@@ -162,6 +161,10 @@ Website planning:
      - Wait till promise is fulfilled
      - Return data with promise
 
+SDK planning
+ - Finding duplicate errors:
+   - SDK client itself keeps list of last one hour of errors -> should keep individual clients from spamming
+   - Checks on actual API side for all individual clients -> this is where the actual similar event counting is going to be
 # NOTES
 
 Used a tiny bit of Claude to work out the database stuff but I think I figured it out
