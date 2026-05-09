@@ -321,7 +321,7 @@ app.post("/api/deployments/:id/connect", express.json(), (req, res) => {
 });
 
 app.post("/api/error-events", express.json(), (req, res) => {
-  const { deployment_id, title, stack_trace, environment,breadcrumbs } = req.body;
+  const { deployment_id, title, stack_trace, environment,breadcrumbs, console_logs } = req.body;
 
   // check for similar events
   const one_hour = new Date(Date.now() - 60 * 60 * 1000).toISOString();
@@ -341,7 +341,8 @@ app.post("/api/error-events", express.json(), (req, res) => {
     return;
   }
   const meta = {
-    breadcrumbs: breadcrumbs || []
+    breadcrumbs: breadcrumbs || [],
+    console_logs: console_logs || []
   }
   const result = db
     .prepare(
@@ -412,13 +413,26 @@ app.put("/api/error-events/:id", express.json(), (req, res) => {
 
 app.delete("/api/projects/:id", (req, res) => {
   const { id } = req.params;
-  db.prepare("DELETE FROM projects WHERE id = ?").run("id");
+  // get deployments with the project
+  const deployments = db.prepare("SELECT * FROM deployments WHERE project_id = ?").all(id);
+  for (let deployment of deployments) {
+    let error_events = db.prepare("SELECT * FROM error_events WHERE deployment_id = ?").all(deployment.id);
+    for (let event of error_events) {
+      db.prepare("DELETE FROM error_events WHERE id = ?").run(event.id);
+    }
+    db.prepare("DELETE FROM deployments WHERE id = ?").run(deployment.id);
+  }
+  db.prepare("DELETE FROM projects WHERE id = ?").run(id);
   res.json({ success: true });
 });
 
 app.delete("/api/deployments/:id", (req, res) => {
   const { id } = req.params;
-  db.prepare("DELETE FROM deployments WHERE id = ?").run("id");
+  let error_events = db.prepare("SELECT * FROM error_events WHERE deployment_id = ?").all(id);
+  for (let event of error_events) {
+    db.prepare("DELETE FROM error_events WHERE id = ?").run(event.id);
+  }
+  db.prepare("DELETE FROM deployments WHERE id = ?").run(id);
   res.json({ success: true });
 });
 

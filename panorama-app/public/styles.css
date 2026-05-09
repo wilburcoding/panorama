@@ -812,12 +812,18 @@ select {
 }
 
 /* additional styling for other things (like global buttons, possible toast messages, modals) */
-.edit-button {
-  width: 35px;
-  height: 35px;
+.options-brow {
+  display:flex;
+  flex-direction: row;
   position: absolute;
   top: 0px;
   right: 0px;
+  align-items: center;
+  justify-content: center;;
+}
+.options-button {
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -825,7 +831,7 @@ select {
   border: solid 1.5px black;
 }
 
-.edit-button:hover {
+.options-button:hover {
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0px 0px #000;
 }

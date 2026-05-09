@@ -11,8 +11,11 @@ class PanoramaClient {
   max_breadcrumbs = 20;
   past_errors = []; // check for very recent duplicate errors
   system = "";
+  console_logs = [];
 
-  constructor() {}
+  constructor() {
+
+  }
 
   async init({ api_key, id }) {
     if (this.initialized) {
@@ -46,6 +49,34 @@ class PanoramaClient {
           // get system information
           this.system = `${os.type()} ${os.release()} Node ${process.version}`;
           console.log(this.system);
+
+          // read console logs, errors, warns
+          const original_log = console.log;
+          console.log = (...args) => {
+            this.console_logs.push({ text: args.join(" "), type: "log"});
+            if (this.console_logs.length > 100) {
+                this.console_logs.shift();
+            }
+            original_log.apply(console, args);
+          }
+
+          const original_error = console.error;
+          console.error = (...args) => {
+            this.console_logs.push({ text: args.join(" "), type: "error"});
+            if (this.console_logs.length > 100) {
+                this.console_logs.shift();
+            }
+            original_error.apply(console, args);
+          }
+
+          const original_warn = console.warn;
+          console.warn = (...args) => {
+            this.console_logs.push({ text: args.join(" "), type: "warn"});
+            if (this.console_logs.length > 100) {
+                this.console_logs.shift();
+            }
+            original_warn.apply(console, args);
+          }
         } else {
           console.error(
             "Failed to connect to Panorama backend: " + response.message,

@@ -876,6 +876,36 @@ $(document).ready(function () {
                 });
             });
           });
+
+          // deleting project
+          $("#sproject-delete").click(function () {
+            openModal({
+              title: "Delete Project",
+              fields: [
+                {
+                  id: "confirm",
+                  label:
+                    "Confirm you want to delete this project (this action cannot be undone)",
+                  type: "checkbox",
+                },
+              ],
+            }).then((data) => {
+              console.log(data);
+              if (data.confirm) {
+                fetch("/api/projects/" + project.id, {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((resp) => resp.json())
+                  .then((json) => {
+                    console.log(json);
+                    window.location.href = "/dashboard.html?projectOverview";
+                  });
+              }
+            });
+          });
         } else {
           // redirect for now
           window.location.href = "/dashboard.html?projectOverview";
@@ -1249,6 +1279,34 @@ $(document).ready(function () {
           });
         });
 
+        // handle deleting deployment
+        $("#sdeployment-delete").click(function () {
+          openModal({
+            title: "Delete Deployment",
+            fields: [
+              {
+                id: "confirm",
+                label:
+                  "Confirm you want to delete this deployment (this action cannot be undone)",
+                type: "checkbox",
+              },
+            ],
+          }).then((data) => {
+            console.log(data);
+            if (data.confirm) {
+              fetch("/api/deployments/" + deployment.id, {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                }
+              }).then((resp) => resp.json())
+                .then((json) => {
+                  console.log(json);
+                  window.location.href = "/dashboard.html?projectId=" + project.id + "&projectInfo";
+                })
+            }
+          });
+        });
         // handle deleting error events
         $("#elist-delete").click(function () {
           if (checked_errors.length > 0) {
@@ -1317,7 +1375,7 @@ $(document).ready(function () {
                 update: {
                   message: data.message,
                   status: data.status,
-                  email: user_email,
+                  email: user.email,
                 },
                 ids: checked_errors,
               }),
@@ -1355,7 +1413,9 @@ $(document).ready(function () {
         }
       }
       if (deployment != null) {
-        const project = projects.find((p) => p.deployments.find((d) => d.id == deployment.id));
+        const project = projects.find((p) =>
+          p.deployments.find((d) => d.id == deployment.id),
+        );
         $("#sbp-" + project.id).addClass("active");
         const event = deployment.error_events.find((e) => e.id == event_id);
         $("#serror-title").text(event.title);
@@ -1381,7 +1441,6 @@ $(document).ready(function () {
         $("#serror-similarevents").text(event.similar_count + " events");
 
         let meta = JSON.parse(event.meta);
-
 
         // populate error updates
         $("#error-update-content").html("");
@@ -1418,7 +1477,7 @@ $(document).ready(function () {
 
         // populate breadcrumbs list
         const breadcrumbs = meta.breadcrumbs || [];
-        for (let i =0; i < breadcrumbs.length; i++) {
+        for (let i = 0; i < breadcrumbs.length; i++) {
           const breadcrumb = breadcrumbs[i];
           console.log(breadcrumb);
           $("#breadcrumbs-list").append(`
@@ -1435,7 +1494,7 @@ $(document).ready(function () {
             <hr />
           `);
         }
-        
+
         // add new error update
 
         $("#error-update-add").click(function () {
@@ -1479,7 +1538,7 @@ $(document).ready(function () {
                 update: {
                   message: data.message,
                   status: data.status,
-                  email: user_email,
+                  email: user.email,
                 },
                 ids: [event.id],
               }),
@@ -1498,7 +1557,7 @@ $(document).ready(function () {
       }
     } else if (params.has("settings")) {
       // show settings
-      $("#sidebar-settings").addClass('active');
+      $("#sidebar-settings").addClass("active");
       console.log("settings");
       $("#dashboard-content").hide();
       $("#project-content").hide();
@@ -1673,20 +1732,20 @@ $(document).ready(function () {
                 console.log(json);
                 if (json.success) {
                   localStorage.removeItem("session_id");
-                  window.location.href= "/signin.html";
+                  window.location.href = "/signin.html";
                 }
               });
           }
         });
       });
 
-      $("#sign-out-button").click(function() {
+      $("#sign-out-button").click(function () {
         localStorage.removeItem("session_id");
-        window.location.href="/signin.html";
-      })
+        window.location.href = "/signin.html";
+      });
     } else {
       // dashboard overview
-      $("#sidebar-dashboardb").addClass('active');
+      $("#sidebar-dashboardb").addClass("active");
       $("#dashboard-content").show();
       $("#project-content").hide();
       $("#sproject-content").hide();

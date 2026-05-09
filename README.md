@@ -24,13 +24,15 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
    - [x] initiate
    - [x] track errors
      - [x] incorporate data straight from node.js error catching
-     - [ ] track breadcrumbs 
+     - [x] track breadcrumbs 
      - [x] avoid recent duplicate errors
        - [x] count recent duplicates
    - [ ] track logs
    - [ ] track metrics
    - [ ] track performance
    - [ ] sample project for testing sdk
+     - [ ] basic usage (initialization, post error)
+     - [ ] breadcrumbs?
  - [ ] python sdk
  - [ ] web app
    - [x] User signup + sign in base functionality
@@ -57,16 +59,20 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Project detail page functionality
          - [x] Project details editing (only description and name)
          - [x] Deployment creation
-         - [ ] Deleting project functionality
+         - [x] Deleting project functionality
      - [x] deployment detail page
        - [x] Deployment detail page layout
+         - [ ] logs UI
        - [x] Populate data
        - [x] page functionality
          - [x] Error events sorting functionality
          - [x] Changing deployment name, status, environment, version
          - [x] Error list functionality (deleting multiple)
-           - [ ] Updating multiple items functionality 
-         - [ ] Deleting project functionality
+           - [x] Updating multiple items functionality 
+         - [x] Deleting project functionality
+         - [ ] logs functionality
+           - [ ] searching logs
+           - [ ] deleting logs
      - [ ] error event detail page
        - [x] page layout
        - [x] populate data

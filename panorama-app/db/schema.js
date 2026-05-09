@@ -33,7 +33,6 @@ export function migrate() {
             status TEXT NOT NULL,
             last_deployed DATETIME,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            meta TEXT DEFAULT '{}',
             api_key TEXT NOT NULL
         )`);
   db.exec(`
@@ -117,13 +116,13 @@ export function sample_data() {
       const title = "Sample Error " + (j + 1);
       const status = j % 2 === 0 ? "unresolved" : "resolved";
       const stack_trace = `
-      Error: Sample error track message
-          at Object.<anonymous> (/app/index.js:10:15)
-          at Module._compile (internal/modules/cjs/loader.js:999:19)
-          at Module._extensions..js (internal/modules/cjs/loader.js:1027:10)
-          at Module.load (internal/modules/cjs/loader.js:863:32)
-          at Function.Module._load (internal/modules/cjs/loader.js:708:14)
-          at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:12)
+Error: Sample error track message
+at Object.<anonymous> (/app/index.js:10:15)
+at Module._compile (internal/modules/cjs/loader.js:999:19)
+at Module._extensions..js (internal/modules/cjs/loader.js:1027:10)
+at Module.load (internal/modules/cjs/loader.js:863:32)
+at Function.Module._load (internal/modules/cjs/loader.js:708:14)
+at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:12)
       `
       const environment = "Windows 10, Node.js v14.17.0";
       const timestamp = new Date(Date.now());
@@ -150,6 +149,11 @@ export function sample_data() {
             source: "log",
           },
         ],
+        console_logs: [
+          {
+            text: "Console log message 1"
+          }
+        ]
       };
       timestamp.setHours(timestamp.getHours() - j * 2 - Math.floor(Math.random() * 5)); 
       db.prepare("INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp, similar_count, meta) values (?, ?, ?, ?, ?, ?, ?, ?)").run(deployment_id, title, status, stack_trace, environment, timestamp.toISOString(), Math.floor(Math.random() * 5), JSON.stringify(meta));
