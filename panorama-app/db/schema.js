@@ -127,8 +127,32 @@ export function sample_data() {
       `
       const environment = "Windows 10, Node.js v14.17.0";
       const timestamp = new Date(Date.now());
+      const meta = {
+        breadcrumbs: [
+          {
+            message: "Some message here",
+            type: "info",
+            source: "log",
+          },
+          {
+            message: "Some message here",
+            type: "error",
+            source: "log",
+          },
+          {
+            message: "Some message here",
+            type: "warning",
+            source: "log",
+          },
+          {
+            message: "Some message here",
+            type: "debug",
+            source: "log",
+          },
+        ],
+      };
       timestamp.setHours(timestamp.getHours() - j * 2 - Math.floor(Math.random() * 5)); 
-      db.prepare("INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp) values (?, ?, ?, ?, ?, ?)").run(deployment_id, title, status, stack_trace, environment, timestamp.toISOString());
+      db.prepare("INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp, similar_count, meta) values (?, ?, ?, ?, ?, ?, ?, ?)").run(deployment_id, title, status, stack_trace, environment, timestamp.toISOString(), Math.floor(Math.random() * 5), JSON.stringify(meta));
     
     }
   }

@@ -866,7 +866,8 @@ select {
   margin-bottom: 20px;
 }
 
-#edit-modal-content input[type="text"], #edit-modal-content input[type="password"] {
+#edit-modal-content input[type="text"],
+#edit-modal-content input[type="password"] {
   min-width: 300px;
   margin: 0;
   margin-top: 2px;
@@ -1050,6 +1051,93 @@ pre[class*="language-"] {
 }
 
 .settings-button {
-  margin-left:0px;
-  font-size:17px;
+  margin-left: 0px;
+  font-size: 17px;
+}
+
+.breadcrumb-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: white;
+
+  margin: 0px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+.breadcrumb-item p {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.breadcrumbs-timestamp {
+  font-size: 16px;
+  line-height: 16px;
+  color: rgb(125, 125, 125);
+  min-width: 160px;
+}
+
+.breadcrumb-item .breadcrumb-tag {
+  color: black;
+  padding: 2px;
+  margin-left: 3px;
+  margin-right: 3px;
+  border-radius: 2px;
+}
+
+.breadcrumb-tag.source {
+  background-color: #a0b8eb;
+  color: #0d2965;
+} 
+
+.breadcrumb-tag p {
+  font-size: 14px;
+  line-height: 14px;
+  margin-left:2px;
+  margin-right:2px;
+}
+
+.breadcrumb-tag.warning {
+  background-color: #f5b38c;
+  color: rgb(84, 59, 14);
+}
+
+.breadcrumb-tag.error {
+  background-color: #f5988c;
+  color: #733932;
+}
+
+.breadcrumb-tag.info {
+  background-color: #cecece;
+}
+
+.breadcrumb-tag.debug {
+  background-color: #f5f58c;
+  color: #49490f;
+}
+
+#breadcrumbs-list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  max-height: 40vh;
+  max-width: 70%;
+  overflow-x: scroll;
+  border: solid 2px black;
+  padding-bottom: 15px;
+}
+
+#breadcrumbs-list hr {
+  width: 100%;
+  border: none;
+  border-top: dotted 1.6px black;
+  margin-bottom: 0;
+  background-color: transparent;
+  margin-top: 0;
+}
+.breadcrumb-message {
+  margin-left: 4px;
 }

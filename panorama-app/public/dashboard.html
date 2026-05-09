@@ -444,10 +444,37 @@
             </div>
             <div class="error-info-row">
               <div class="error-info-ritem">
+                <h3>Similar Occurences</h3>
+                <p id="serror-similarevents"></p>
+              </div>
+            </div>
+            <div class="error-info-row">
+              <div class="error-info-ritem">
                 <h3>Stack Trace</h3>
                 <pre
                   style="max-width: 90%"
                 ><code class="language-javascript" id="serror-stacktrace"></code></pre>
+              </div>
+            </div>
+            <div class="error-info-row" style="width: 100%">
+              <div class="error-info-ritem" style="width: 100%">
+                <h3>Breadcrumbs</h3>
+                <div id="breadcrumbs-list">
+
+                  <!-- <div class="breadcrumb-item">
+                    <p class="breadcrumbs-timestamp">2/5/2026 5:25 PM</p>
+                    <div class="breadcrumb-tag source">
+                      <p>Navigation</p>
+                    </div>
+                    <div class="breadcrumb-tag debug">
+                      <p>Debug</p>
+                    </div>
+                    <p class="breadcrumb-message">POST something here</p>
+                  </div>
+                  <hr /> -->
+
+
+                </div>
               </div>
             </div>
             <div class="error-info-row">
@@ -652,10 +679,27 @@
             <p class="settings-htitle">Account Created On</p>
             <p style="margin-top: 2px" id="settings-created-on">2/3/1024</p>
 
-            <button style="width: fit-content;margin-top:5px;" id="edit-name-button"class="settings-button">Edit Name</button>
-            <button style="width: fit-content" class="settings-button" id="change-password-button">Change Password</button>
-            <button style="width: fit-content" class="settings-button" id="sign-out-button">Sign Out</button>
-
+            <button
+              style="width: fit-content; margin-top: 5px"
+              id="edit-name-button"
+              class="settings-button"
+            >
+              Edit Name
+            </button>
+            <button
+              style="width: fit-content"
+              class="settings-button"
+              id="change-password-button"
+            >
+              Change Password
+            </button>
+            <button
+              style="width: fit-content"
+              class="settings-button"
+              id="sign-out-button"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </div>

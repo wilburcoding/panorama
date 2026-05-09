@@ -1378,6 +1378,10 @@ $(document).ready(function () {
             created_at.getFullYear(),
         );
         $("#serror-stacktrace").text(String(event.stack_trace).trim());
+        $("#serror-similarevents").text(event.similar_count + " events");
+
+        let meta = JSON.parse(event.meta);
+
 
         // populate error updates
         $("#error-update-content").html("");
@@ -1411,6 +1415,27 @@ $(document).ready(function () {
             <p>New Update</p>
           </div>
           `);
+
+        // populate breadcrumbs list
+        const breadcrumbs = meta.breadcrumbs || [];
+        for (let i =0; i < breadcrumbs.length; i++) {
+          const breadcrumb = breadcrumbs[i];
+          console.log(breadcrumb);
+          $("#breadcrumbs-list").append(`
+            <div class="breadcrumb-item">
+              <p class="breadcrumbs-timestamp">2/5/2026 5:25 PM</p>
+              <div class="breadcrumb-tag source">
+                <p>${breadcrumb.source.charAt(0).toUpperCase() + breadcrumb.source.slice(1)}</p>
+              </div>
+              <div class="breadcrumb-tag ${breadcrumb.type}">
+                <p>${breadcrumb.type.charAt(0).toUpperCase() + breadcrumb.type.slice(1)}</p>
+              </div>
+              <p class="breadcrumb-message">${breadcrumb.message}</p>
+            </div>
+            <hr />
+          `);
+        }
+        
         // add new error update
 
         $("#error-update-add").click(function () {

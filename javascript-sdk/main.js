@@ -10,7 +10,6 @@ class PanoramaClient {
   breadcrumbs = []; // later feature
   max_breadcrumbs = 20;
   past_errors = []; // check for very recent duplicate errors
-  post_interval = 5000;
   system = "";
 
   constructor() {}
@@ -22,7 +21,6 @@ class PanoramaClient {
     }
 
     this._setupHandlers();
-    this._postBreadcrumbs();
 
     await fetch("http://localhost:3000/api/deployments/" + id + "/connect", {
       method: "POST",
@@ -116,6 +114,7 @@ class PanoramaClient {
         title: error_title,
         stack_trace: stacktrace,
         environment: this.system,
+        breadcrumbs: this.breadcrumbs.slice(),
       }),
     });
 
@@ -126,10 +125,9 @@ class PanoramaClient {
   addBreadcrumb({message, source, type}) {
     // add to queue and post with new error events
     this.breadcrumbs.push({
-      message: message,
-      source: source, //
+      message: message, // some text descrpition
+      source: source, // navigation, user, log, etc
       type: type, //info, warning, error, debug
-      breadcrumbs: this.breadcrumbs.slice(),
       timestamp: new Date().toISOString(),
     });
     if (this.breadcrumbs.length > this.max_breadcrumbs) {
@@ -159,14 +157,6 @@ class PanoramaClient {
     });
   }
 
-  _postBreadcrumbs() {
-    // continuously post errors from queue
-    setInterval(async () => {
-      if (this.queue.length === 0) {
-        return;
-      }
-    }, this.post_interval);
-  }
 }
 
 export default PanoramaClient;
