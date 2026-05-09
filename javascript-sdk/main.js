@@ -11,11 +11,15 @@ class PanoramaClient {
   max_breadcrumbs = 20;
   past_errors = []; // check for very recent duplicate errors
   system = "";
-  console_logs = [];
-
-  constructor() {
-
+  // console_logs = []; SCRAPPED -> pretty redundant honestly
+  performance_metrics = {
+    memory: [],
+    cpu: [],
+    timestamps: [], // when metrics were recorded
+    response_times: {}, // record response times for different processes of functions -> user sets this up
   }
+
+  constructor() {}
 
   async init({ api_key, id }) {
     if (this.initialized) {
@@ -24,6 +28,7 @@ class PanoramaClient {
     }
 
     this._setupHandlers();
+    this._performanceMonitoring();
 
     await fetch("http://localhost:3000/api/deployments/" + id + "/connect", {
       method: "POST",
@@ -44,39 +49,11 @@ class PanoramaClient {
           this.initialized = true;
           this.environment = response.deployment.environment;
           this.version = response.deployment.version;
-          console.log("Deployment: ", response.deployment);
 
           // get system information
           this.system = `${os.type()} ${os.release()} Node ${process.version}`;
-          console.log(this.system);
 
-          // read console logs, errors, warns
-          const original_log = console.log;
-          console.log = (...args) => {
-            this.console_logs.push({ text: args.join(" "), type: "log"});
-            if (this.console_logs.length > 100) {
-                this.console_logs.shift();
-            }
-            original_log.apply(console, args);
-          }
-
-          const original_error = console.error;
-          console.error = (...args) => {
-            this.console_logs.push({ text: args.join(" "), type: "error"});
-            if (this.console_logs.length > 100) {
-                this.console_logs.shift();
-            }
-            original_error.apply(console, args);
-          }
-
-          const original_warn = console.warn;
-          console.warn = (...args) => {
-            this.console_logs.push({ text: args.join(" "), type: "warn"});
-            if (this.console_logs.length > 100) {
-                this.console_logs.shift();
-            }
-            original_warn.apply(console, args);
-          }
+          console.log("Deployment: ", response.deployment);
         } else {
           console.error(
             "Failed to connect to Panorama backend: " + response.message,
@@ -134,6 +111,9 @@ class PanoramaClient {
       stack_trace: stack_trace,
       timestamp: Date.now(),
     });
+    console.log("ea");
+    console.log(this.console_logs);
+    console.log(this.id);
 
     const response = await fetch("http://localhost:3000/api/error-events", {
       method: "POST",
@@ -153,7 +133,7 @@ class PanoramaClient {
     console.log(data);
   }
 
-  addBreadcrumb({message, source, type}) {
+  addBreadcrumb({ message, source, type }) {
     // add to queue and post with new error events
     this.breadcrumbs.push({
       message: message, // some text descrpition
@@ -162,9 +142,9 @@ class PanoramaClient {
       timestamp: new Date().toISOString(),
     });
     if (this.breadcrumbs.length > this.max_breadcrumbs) {
-        this.breadcrumbs.shift();
+      this.breadcrumbs.shift();
     }
-  } 
+  }
 
   _setupHandlers() {
     // watch process for uncaught exceptions and unhandled rejections
@@ -178,16 +158,19 @@ class PanoramaClient {
     });
 
     process.on("unhandledRejection", (reason, promise) => {
-      console.log("unhandled rejection: ", reason);
       this._postError({
         error_title: reason.message || "Unhandled Rejection",
         stack_trace: reason.stack || "",
       }).catch((e) => {
-        console.log("Faile to post error: ", e);
+        console.log("Failed to post error: ", e);
       });
     });
   }
 
+  _performanceMonitoring() {
+    setInterval(() => {
+    })
+  }
 }
 
 export default PanoramaClient;

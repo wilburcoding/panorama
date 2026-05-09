@@ -346,6 +346,9 @@ $(document).ready(function () {
       for (let i = 0; i < projects.length; i++) {
         let project = projects[i];
         const create_date = parseSqlTimestamp(project.created_at);
+        let chours = create_date.getHours() % 12;
+        let cminutes = create_date.getMinutes().toString().padStart(2, "0");
+        let csuffix = create_date.getHours() >= 12 ? "PM" : "AM";  
 
         let unresolved_errors = 0;
         let latest_time = null;
@@ -404,7 +407,7 @@ $(document).ready(function () {
               <div class="project-card-info" style="justify-content: space-between;">
                 <h1>${project.name}</h1>
               </div>
-              <p class="project-card-create">Created on ${create_date.getMonth() + 1}/${create_date.getDate()}/${create_date.getFullYear()}</p>
+              <p class="project-card-create">Created on ${create_date.getMonth() + 1}/${create_date.getDate()}/${create_date.getFullYear()} at ${chours}:${cminutes} ${csuffix}</p>
               <h2 class="project-card-sectionh" style="margin-top: 20px">
                 Description
               </h2>
@@ -561,9 +564,13 @@ $(document).ready(function () {
           $("#sproject-name").text(project.name);
           $("#sproject-description").text(project.description);
           $(".sproject-color-picker").css("background-color", project.color);
-          const create_date = new Date(project.created_at);
+          const create_date = parseSqlTimestamp(project.created_at);
+          let hours = create_date.getHours() % 12;
+          let minutes = create_date.getMinutes().toString().padStart(2, "0");
+          let suffix = create_date.getHours() >= 12 ? "PM" : "AM";
+
           $("#sproject-createdate").text(
-            `${create_date.getMonth() + 1}/${create_date.getDate()}/${create_date.getFullYear()}`,
+            `${create_date.getMonth() + 1}/${create_date.getDate()}/${create_date.getFullYear()} at ${hours}:${minutes} ${suffix}`,
           );
 
           let unresolved_errors = 0;
@@ -647,7 +654,7 @@ $(document).ready(function () {
                   <p class="dproject-divider">/</p>
                   <div class="dproject-info-item">
                     <i class="ph ph-clock"></i>
-                    <p>Active since ${last_deployed.getMonth() + 1}/${last_deployed.getDate()}/${last_deployed.getFullYear()}</p>
+                    <p>${deployment.last_deployed == null ? "Not deployed yet" : `Active since ${last_deployed.getMonth() + 1}/${last_deployed.getDate()}/${last_deployed.getFullYear()}`}</p>
                   </div>
                 </div>
               </div>
@@ -964,13 +971,16 @@ $(document).ready(function () {
         }
 
         const created_at = parseSqlTimestamp(deployment.created_at);
+        let hours = created_at.getHours() % 12;
+        let minutes = created_at.getMinutes().toString().padStart(2, "0");
+        let suffix = created_at.getHours() >= 12 ? "PM" : "AM";
         $("#sdeployment-createdon").text(
           created_at.getMonth() +
             1 +
             "/" +
             created_at.getDate() +
             "/" +
-            created_at.getFullYear(),
+            created_at.getFullYear() + " at " + hours + ":" + minutes + " " + suffix 
         );
 
         $("#sdeployment-parentproject").text(project.name);
@@ -1083,6 +1093,9 @@ $(document).ready(function () {
           for (let i = 0; i < filtered_events.length; i++) {
             const event = filtered_events[i];
             const created_at = parseSqlTimestamp(event.timestamp);
+            let hours = created_at.getHours() % 12;
+            let minutes = created_at.getMinutes().toString().padStart(2, "0");
+            let suffix = created_at.getHours() >= 12 ? "PM": "AM";
             let last_update = null;
             const event_updates = JSON.parse(event.updates);
             if (event_updates.length > 0) {
@@ -1105,7 +1118,7 @@ $(document).ready(function () {
                 <div class="sdeployment-info">
                   <div class="sdeployment-info-item">
                     <i class="ph ph-clock"></i>
-                    <p>Created on ${created_at.getMonth() + 1}/${created_at.getDate()}/${created_at.getFullYear()}</p>
+                    <p>Created on ${created_at.getMonth() + 1}/${created_at.getDate()}/${created_at.getFullYear()} at ${hours}:${minutes} ${suffix}</p>
 
                   </div>
                   <p class="dproject-divider">/</p>
@@ -1298,12 +1311,14 @@ $(document).ready(function () {
                 method: "DELETE",
                 headers: {
                   "Content-Type": "application/json",
-                }
-              }).then((resp) => resp.json())
+                },
+              })
+                .then((resp) => resp.json())
                 .then((json) => {
                   console.log(json);
-                  window.location.href = "/dashboard.html?projectId=" + project.id + "&projectInfo";
-                })
+                  window.location.href =
+                    "/dashboard.html?projectId=" + project.id + "&projectInfo";
+                });
             }
           });
         });
@@ -1429,13 +1444,20 @@ $(document).ready(function () {
         );
         $("#serror-deployment").text(deployment.name);
         const created_at = parseSqlTimestamp(event.timestamp);
+        let hours = created_at.getHours() % 12;
+        if (hours === 0) {
+          hours = 12;
+        }
+        let minutes = created_at.getMinutes().toString().padStart(2, "0");
+        let suffix = created_at.getHours() >= 12 ? "PM" : "AM";
         $("#serror-createdon").text(
           created_at.getMonth() +
             1 +
             "/" +
             created_at.getDate() +
             "/" +
-            created_at.getFullYear(),
+            created_at.getFullYear() +
+            " at " + hours + ":" + minutes + " " + suffix
         );
         $("#serror-stacktrace").text(String(event.stack_trace).trim());
         $("#serror-similarevents").text(event.similar_count + " events");
@@ -1570,8 +1592,12 @@ $(document).ready(function () {
       $("#settings-lname").text(user.last_name);
       $("#settings-email").text(user.email);
       let created_at = parseSqlTimestamp(user.created_at);
+      let hours = created_at.getHours() % 12;
+      let minutes = created_at.getMinutes().toString().padStart(2, "0");
+      let suffix = created_at.getHours() >= 12 ? "PM" : "AM";
+
       $("#settings-created-on").text(`
-        ${created_at.getMonth() + 1}/${created_at.getDate()}/${created_at.getFullYear()}`);
+        ${created_at.getMonth() + 1}/${created_at.getDate()}/${created_at.getFullYear()} at ${hours}:${minutes} ${suffix}`);
 
       $("#edit-name-button").click(function () {
         console.log(user);
@@ -1635,8 +1661,11 @@ $(document).ready(function () {
               $("#settings-lname").text(user.last_name);
               $("#settings-email").text(user.email);
               let created_at = parseSqlTimestamp(user.created_at);
+              let hours = created_at.getHours() % 12;
+              let minutes = created_at.getMinutes().toString().padStart(2, "0");
+              let suffix = created_at.getHours() >= 12 ? "PM" : "AM";
               $("#settings-created-on").text(
-                `${created_at.getMonth() + 1}/${created_at.getDate()}/${created_at.getFullYear()}`,
+                `${created_at.getMonth() + 1}/${created_at.getDate()}/${created_at.getFullYear()} at ${hours}:${minutes} ${suffix}`,
               );
             });
         });

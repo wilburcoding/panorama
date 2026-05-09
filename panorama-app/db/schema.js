@@ -95,8 +95,8 @@ export function sample_data() {
       const api_key = "sample_api_key_" + i + "_" + j;
       const deployment = "Deployment " + (j + 1 + (i - 1) * 2);
       db.prepare(
-        "INSERT into deployments (project_id, version, environment, status, api_key, name) values (?, ?, ?, ?, ?, ?)",
-      ).run(project_id, version, environment, status, api_key, deployment);
+        "INSERT into deployments (project_id, version, environment, status, api_key, name, last_deployed) values (?, ?, ?, ?, ?, ?, ?)",
+      ).run(project_id, version, environment, status, api_key, deployment, null);
     }
   }
   console.log("Sample data created");
@@ -148,11 +148,6 @@ at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:
             type: "debug",
             source: "log",
           },
-        ],
-        console_logs: [
-          {
-            text: "Console log message 1"
-          }
         ]
       };
       timestamp.setHours(timestamp.getHours() - j * 2 - Math.floor(Math.random() * 5)); 

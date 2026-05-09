@@ -321,8 +321,13 @@ app.post("/api/deployments/:id/connect", express.json(), (req, res) => {
 });
 
 app.post("/api/error-events", express.json(), (req, res) => {
-  const { deployment_id, title, stack_trace, environment,breadcrumbs, console_logs } = req.body;
+  const { deployment_id, title, stack_trace, environment,breadcrumbs } = req.body;
 
+  // check if deployment exists
+  const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(deployment_id);
+  if (!deployment) {
+    res.status(404).json({ success: false, message: "Deployment not found"});
+  }
   // check for similar events
   const one_hour = new Date(Date.now() - 60 * 60 * 1000).toISOString();
   let similar_events = db.prepare("SELECT * FROM error_events WHERE deployment_id = ? AND title = ? AND stack_trace = ?").all(deployment_id, title, stack_trace);
@@ -342,7 +347,9 @@ app.post("/api/error-events", express.json(), (req, res) => {
   }
   const meta = {
     breadcrumbs: breadcrumbs || [],
-    console_logs: console_logs || []
+    performance_metrics: {
+      
+    }
   }
   const result = db
     .prepare(
@@ -355,18 +362,6 @@ app.post("/api/error-events", express.json(), (req, res) => {
   res.json({ success: true, error_event: error_event });
 });
 
-app.post("/api/error-events/similar", express.json(), (req, res) => {
-  const {deployment_id, title, stack_trace} = req.body;
-  // check similar events in the same deployment from the past 1 hour
-  const one_hour = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  const similar_events = db.prepare("SELECT * FROM error_events WHERE deployment_id = ? AND title = ? AND stack_trace = ? AND timestamp > ?").all(deployment_id, title, stack_trace, one_hour);
-  for (let event of similar_events) {
-    const event_similar_count = event.similar_count;
-    db.prepare("UPDATE error_events SET similar_count = ? WHERE id = ?").run(event_similar_count + 1, event.id);
-  }
-
-  res.json({ success: true})
-})
 
 app.put("/api/projects/:id", express.json(), (req, res) => {
   const { id } = req.params;

@@ -176,10 +176,10 @@ SDK planning
 Used a tiny bit of Claude to work out the database stuff but I think I figured it out
 
 Timeline:
-- [ ] API
-- [ ] dashboard
+- [x] API
+- [x] dashboard
 - [ ] SDK
-- [ ] dashboard functionality
+- [x] dashboard functionality
 - [ ] testing
 
 Color for database schema should be in HEX
