@@ -30,6 +30,8 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
    - [ ] track logs
    - [ ] track metrics
    - [ ] track performance
+     - [x] Backend (SDK + API) functionality
+     - [x] CLient side UI/UX
    - [ ] sample project for testing sdk
      - [ ] basic usage (initialization, post error)
      - [ ] breadcrumbs?

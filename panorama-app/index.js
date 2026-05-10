@@ -321,7 +321,7 @@ app.post("/api/deployments/:id/connect", express.json(), (req, res) => {
 });
 
 app.post("/api/error-events", express.json(), (req, res) => {
-  const { deployment_id, title, stack_trace, environment,breadcrumbs } = req.body;
+  const { deployment_id, title, stack_trace, environment,breadcrumbs, performance_metrics} = req.body;
 
   // check if deployment exists
   const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(deployment_id);
@@ -331,11 +331,9 @@ app.post("/api/error-events", express.json(), (req, res) => {
   // check for similar events
   const one_hour = new Date(Date.now() - 60 * 60 * 1000).toISOString();
   let similar_events = db.prepare("SELECT * FROM error_events WHERE deployment_id = ? AND title = ? AND stack_trace = ?").all(deployment_id, title, stack_trace);
-  console.log(similar_events);
   similar_events = similar_events.filter(
     (event) => (event.timestamp.replace(" ", "T") + "Z") > one_hour,
   );
-  console.log(similar_events);
   if (similar_events.length > 0) {
     console.log("similar events found")
     for (let event of similar_events) {
@@ -347,9 +345,7 @@ app.post("/api/error-events", express.json(), (req, res) => {
   }
   const meta = {
     breadcrumbs: breadcrumbs || [],
-    performance_metrics: {
-      
-    }
+    performance_metrics: performance_metrics || {}
   }
   const result = db
     .prepare(

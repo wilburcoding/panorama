@@ -126,6 +126,19 @@ at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:
       `
       const environment = "Windows 10, Node.js v14.17.0";
       const timestamp = new Date(Date.now());
+      let sample_timestamps = [];
+      for (let k = 0; k < 20; k++) {
+        sample_timestamps.push(new Date(Date.now() - 30000 * (7 - k)).toISOString());
+      }
+      let sample_cpu = [];
+      for (let k =0; k < 20; k++) {
+        sample_cpu.push(Math.floor(Math.random() * 50 + 10));
+      }
+      let sample_memory = [];
+      for (let k =0; k < 20; k++) {
+        sample_memory.push(Math.floor(Math.random() * 50 + 20));
+      }
+
       const meta = {
         breadcrumbs: [
           {
@@ -148,7 +161,12 @@ at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:
             type: "debug",
             source: "log",
           },
-        ]
+        ],
+        performance: { // sample performance metrics data
+          cpu: sample_cpu,
+          memory: sample_memory,
+          timestamps: sample_timestamps
+        }
       };
       timestamp.setHours(timestamp.getHours() - j * 2 - Math.floor(Math.random() * 5)); 
       db.prepare("INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp, similar_count, meta) values (?, ?, ?, ?, ?, ?, ?, ?)").run(deployment_id, title, status, stack_trace, environment, timestamp.toISOString(), Math.floor(Math.random() * 5), JSON.stringify(meta));

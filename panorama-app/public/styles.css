@@ -813,13 +813,13 @@ select {
 
 /* additional styling for other things (like global buttons, possible toast messages, modals) */
 .options-brow {
-  display:flex;
+  display: flex;
   flex-direction: row;
   position: absolute;
   top: 0px;
   right: 0px;
   align-items: center;
-  justify-content: center;;
+  justify-content: center;
 }
 .options-button {
   width: 35px;
@@ -1097,13 +1097,13 @@ pre[class*="language-"] {
 .breadcrumb-tag.source {
   background-color: #a0b8eb;
   color: #0d2965;
-} 
+}
 
 .breadcrumb-tag p {
   font-size: 14px;
   line-height: 14px;
-  margin-left:2px;
-  margin-right:2px;
+  margin-left: 2px;
+  margin-right: 2px;
 }
 
 .breadcrumb-tag.warning {
@@ -1146,4 +1146,19 @@ pre[class*="language-"] {
 }
 .breadcrumb-message {
   margin-left: 4px;
+}
+
+.pmetrics-box {
+  flex: 1;
+  border: solid 2px black;
+}
+
+.pmetrics-box h3 {
+  font-size: 17px;
+  line-height: 17px;
+  font-weight: 700;
+  margin-top: 8px;
+  margin-bottom: 5px;
+  margin-left: 3px;
+  
 }

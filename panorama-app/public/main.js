@@ -348,7 +348,7 @@ $(document).ready(function () {
         const create_date = parseSqlTimestamp(project.created_at);
         let chours = create_date.getHours() % 12;
         let cminutes = create_date.getMinutes().toString().padStart(2, "0");
-        let csuffix = create_date.getHours() >= 12 ? "PM" : "AM";  
+        let csuffix = create_date.getHours() >= 12 ? "PM" : "AM";
 
         let unresolved_errors = 0;
         let latest_time = null;
@@ -980,7 +980,13 @@ $(document).ready(function () {
             "/" +
             created_at.getDate() +
             "/" +
-            created_at.getFullYear() + " at " + hours + ":" + minutes + " " + suffix 
+            created_at.getFullYear() +
+            " at " +
+            hours +
+            ":" +
+            minutes +
+            " " +
+            suffix,
         );
 
         $("#sdeployment-parentproject").text(project.name);
@@ -1095,7 +1101,7 @@ $(document).ready(function () {
             const created_at = parseSqlTimestamp(event.timestamp);
             let hours = created_at.getHours() % 12;
             let minutes = created_at.getMinutes().toString().padStart(2, "0");
-            let suffix = created_at.getHours() >= 12 ? "PM": "AM";
+            let suffix = created_at.getHours() >= 12 ? "PM" : "AM";
             let last_update = null;
             const event_updates = JSON.parse(event.updates);
             if (event_updates.length > 0) {
@@ -1457,7 +1463,12 @@ $(document).ready(function () {
             created_at.getDate() +
             "/" +
             created_at.getFullYear() +
-            " at " + hours + ":" + minutes + " " + suffix
+            " at " +
+            hours +
+            ":" +
+            minutes +
+            " " +
+            suffix,
         );
         $("#serror-stacktrace").text(String(event.stack_trace).trim());
         $("#serror-similarevents").text(event.similar_count + " events");
@@ -1515,6 +1526,97 @@ $(document).ready(function () {
             </div>
             <hr />
           `);
+        }
+        // populate performance metrics data
+        const performance = meta.performance || {};
+        if (performance.cpu != {}) {
+          const ctx = document.getElementById("cpu-chart");
+          const cpuChart = new Chart(ctx, JSON.parse(JSON.stringify(config)));
+          cpuChart.data.datasets = [
+            {
+              label: "CPU Usage (%)",
+              data: performance.cpu,
+              backgroundColor: "#8c98ff",
+            },
+          ];
+          console.log(performance);
+          cpuChart.data.labels = performance.timestamps.map((t) => {
+            const date = parseSqlTimestamp(t);
+            let hours = date.getHours() % 12;
+            if (hours === 0) {
+              hours = 12;
+            }
+            let minutes = date.getMinutes().toString().padStart(2, "0");
+            let suffix = date.getHours() >= 12 ? "PM" : "AM";
+            return `${hours}:${minutes} ${suffix}`;
+          });
+          cpuChart.options.scales.x.ticks.callback = function (val, index) {
+            return index % 4 == 1 ? this.getLabelForValue(val) : "";
+          };
+          cpuChart.options.scales.y = {
+            min: 0,
+            max: 100,
+            grid: {
+              display: true,
+            },
+            ticks: {
+              stepSize: 25,
+              display: false,
+            },
+            border: {
+              display: false,
+            },
+            stacked: true,
+            display: true,
+          };
+          cpuChart.options.scales.x.grid.display = false;
+          cpuChart.update();
+        }
+
+        if (performance.memory != {}) {
+          const ctx = document.getElementById("memory-chart");
+          const memoryChart = new Chart(
+            ctx,
+            JSON.parse(JSON.stringify(config)),
+          );
+          memoryChart.data.datasets = [
+            {
+              label: "Memory Usage (%)",
+              data: performance.memory,
+              backgroundColor: "#4cd453",
+            },
+          ];
+          memoryChart.data.labels = performance.timestamps.map((t) => {
+            const date = parseSqlTimestamp(t);
+            let hours = date.getHours() % 12;
+            if (hours === 0) {
+              hours = 12;
+            }
+            let minutes = date.getMinutes().toString().padStart(2, "0");
+            let suffix = date.getHours() >= 12 ? "PM" : "AM";
+            return `${hours}:${minutes} ${suffix}`;
+          });
+          memoryChart.options.scales.x.ticks.callback = function (val, index) {
+            return index % 4 == 1 ? this.getLabelForValue(val) : "";
+          };
+          memoryChart.options.scales.y = {
+            min: 0,
+            max: 100,
+            grid: {
+              display: true,
+            },
+            ticks: {
+              stepSize: 25,
+              display: false,
+            },
+            border: {
+              display: false,
+            },
+            stacked: true,
+            display: true,
+          };
+          memoryChart.options.scales.x.grid.display = false;
+          memoryChart.update();
         }
 
         // add new error update

@@ -9,6 +9,7 @@ class PanoramaClient {
   queue = [];
   breadcrumbs = []; // later feature
   max_breadcrumbs = 20;
+  max_metrics = 20;
   past_errors = []; // check for very recent duplicate errors
   system = "";
   // console_logs = []; SCRAPPED -> pretty redundant honestly
@@ -17,7 +18,7 @@ class PanoramaClient {
     cpu: [],
     timestamps: [], // when metrics were recorded
     response_times: {}, // record response times for different processes of functions -> user sets this up
-  }
+  };
 
   constructor() {}
 
@@ -126,6 +127,7 @@ class PanoramaClient {
         stack_trace: stacktrace,
         environment: this.system,
         breadcrumbs: this.breadcrumbs.slice(),
+        performance_metrics: this.performance_metrics,
       }),
     });
 
@@ -168,8 +170,53 @@ class PanoramaClient {
   }
 
   _performanceMonitoring() {
+    function getCPUUsage() {
+      const cpus = os.cpus();
+      let idle = 0;
+      let total = 0;
+      cpus.forEach((cpu) => {
+        for (let type of Object.keys(cpu.times)) {
+          total += cpu.times[type];
+        }
+        idle += cpu.times.idle;
+      });
+      return { idle, total };
+    }
+    const start = getCPUUsage();
+
     setInterval(() => {
-    })
+      const end = getCPUUsage();
+
+      const idleDiff = end.idle - start.idle;
+      const totalDiff = end.total - start.total;
+
+      const cpuUsage = 100 - Math.round((100 * idleDiff) / totalDiff);
+
+      const memoryUsage = process.memoryUsage();
+      const memoryPercent = Math.round(
+        (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100,
+      );
+
+      this.performance_metrics.cpu.push(cpuUsage);
+      this.performance_metrics.memory.push(memoryPercent);
+      this.performance_metrics.timestamps.push(new Date().toISOString());
+
+      if (this.max_metrics > 25) {
+        console.warn("Max_metrics value of " + this.max_metrics + " exceeds maximum of 25, resetting to 25");
+        this.max_metrics = 25;
+      }
+      if (this.performance_metrics.cpu.length > this.max_metrics) {
+        for (
+          let i = 0;
+          i < this.performance_metrics.cpu.length - this.max_metrics;
+          i++
+        ) {
+          this.performance_metrics.cpu.shift();
+          this.performance_metrics.memory.shift();
+          this.performance_metrics.timestamps.shift();
+        }
+      }
+    }, 30000); // every 30 seconds for now
   }
 }
 
