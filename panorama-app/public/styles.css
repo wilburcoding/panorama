@@ -1157,8 +1157,122 @@ pre[class*="language-"] {
   font-size: 17px;
   line-height: 17px;
   font-weight: 700;
-  margin-top: 8px;
+  margin-top: 15px;
   margin-bottom: 5px;
-  margin-left: 3px;
-  
+  margin-left: 5px;
+}
+
+#benchmarks-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border-top: solid 2px black;
+  max-height: 40vh;
+  overflow-y: scroll;
+  padding-bottom: 15px;
+}
+
+.benchmark-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+.benchmark-item p {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.benchmark-iinfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.benchmark-status {
+  color: black;
+  padding: 2px;
+  margin-left: 5px;
+  margin-right: 3px;
+  border-radius: 2px;
+}
+
+.benchmark-expected {
+  color: black;
+  padding: 2px;
+  margin-left: 5px;
+  margin-right: 3px;
+  border-radius: 2px;
+}
+
+.benchmark-expected p {
+  font-size: 14px;
+  line-height: 14px;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.benchmark-expected.bad {
+  background-color: #f58c8c;
+}
+
+.benchmark-expected.good {
+  background-color: #7fd58f;
+}
+
+.benchmark-expected.fine {
+  background-color: rgb(191, 191, 191)
+}
+.benchmark-status p {
+  font-size: 14px;
+  line-height: 14px;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.benchmark-status.excellent {
+  background-color: #a0b8eb;
+  color: #0d2965;
+}
+
+.benchmark-status.good {
+  background-color: #7fd58f;
+  color: rgb(19, 79, 30);
+}
+
+.benchmark-status.slow {
+  background-color: #f5f58c;
+  color: #49490f;
+}
+
+.benchmark-status.degraded {
+  background-color: #f5b38c;
+  color: rgb(84, 59, 14);
+}
+
+.benchmark-name {
+  font-size: 16px;
+  line-height: 16px;
+}
+
+.benchmark-speed {
+  font-weight: 700;
+}
+
+#benchmarks-list hr {
+  width: 100%;
+  border: none;
+  border-top: dotted 1.6px black;
+  margin-bottom: 0;
+  background-color: transparent;
+  margin-top: 0;
 }

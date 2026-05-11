@@ -22,6 +22,13 @@ async function main() {
     source: "database",
     message: "Database connection failed"
   })
+
+  client.beginBenchmark("data processing");
+  for (let i =0; i < 100000; i++) {
+    const random = Math.random() * 500 + 219;
+
+  }
+  client.endBenchmark("data processing");
   
   const count = 0;
   count += 1;

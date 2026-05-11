@@ -165,7 +165,15 @@ at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:
         performance: { // sample performance metrics data
           cpu: sample_cpu,
           memory: sample_memory,
-          timestamps: sample_timestamps
+          timestamps: sample_timestamps,
+          benchmarks: {
+            "data processing" : {
+              start: new Date(Date.now() - 5000).toISOString(),
+              end: new Date().toISOString(),
+              duration: 5000,
+              expected_duration: Math.random() * 5000 + 2500
+            }
+          }
         }
       };
       timestamp.setHours(timestamp.getHours() - j * 2 - Math.floor(Math.random() * 5)); 

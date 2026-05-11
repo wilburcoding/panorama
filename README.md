@@ -30,11 +30,16 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
    - [ ] track logs
    - [ ] track metrics
    - [ ] track performance
-     - [x] Backend (SDK + API) functionality
-     - [x] CLient side UI/UX
+     - [x] Metrics
+       - [x] Backend (SDK + API) functionality
+       - [x] CLient side UI/UX
+     - [x] Benchmarking
+       - [x] Backend (SDK + API) functionality
+       - [x] Client side UI/UX 
    - [ ] sample project for testing sdk
-     - [ ] basic usage (initialization, post error)
-     - [ ] breadcrumbs?
+     - [x] basic usage (initialization, post error)
+     - [x] breadcrumbs?
+     - [x] performance metrics
  - [ ] python sdk
  - [ ] web app
    - [x] User signup + sign in base functionality

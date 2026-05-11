@@ -1619,6 +1619,66 @@ $(document).ready(function () {
           memoryChart.update();
         }
 
+        // populate benchmarks
+        console.log("benchmarks");
+        const benchmarks = meta.performance.benchmarks || [];
+        for (let i =0; i < Object.keys(benchmarks).length; i++) {
+          const key = Object.keys(benchmarks)[i];
+          const value = benchmarks[key];
+          let status = "Excellent";
+          if ((value.duration - value.expected_duration) / value.expected_duration > 0.5) {
+            // 50% slower than expected
+            status = "Degraded";
+          } else if ((value.duration - value.expected_duration) / value.expected_duration < -0.5) {
+            // 50% faster than expected
+            status = "Excellent";
+          } else if ((value.duration - value.expected_duration) / value.expected_duration >= 0.2) {
+            // slower than expected
+            status = "Slow";
+          }  else if ((value.duration - value.expected_duration) / value.expected_duration <= 0.2) {
+            // around expected or faster
+            status = "Good";
+          }
+
+          let expected_status = "good";
+          if ((value.duration - value.expected_duration) / value.expected_duration > 0.1) {
+            expected_status = "bad";
+          } else if ((value.duration - value.expected_duration) / value.expected_duration < -0.1) {
+            expected_status = "good";
+          }
+
+          let pdiff =
+            (value.duration - value.expected_duration) /
+            value.expected_duration;
+          console.log(pdiff);
+          let pdiff_text = "";
+          if (pdiff > 0.01) {
+            pdiff_text = "-" + Math.round(pdiff * 100) + "%";
+          } else if (pdiff < -0.01) {
+            pdiff_text = "+" + Math.round(-pdiff * 100) + "%";
+          } else {
+            pdiff_text = "±0";
+          }
+          
+          $("#benchmarks-list").append(`
+          <div class="benchmark-item">
+            <div class="benchmark-iinfo">
+              <p class="benchmark-name">${key}</p>
+              <div class="benchmark-status ${status.toLowerCase()}">
+                <p>${status}</p>
+              </div>
+            </div>
+            <div class="benchmark-iinfo" style="margin-top: 4px">
+              <p class="benchmark-speed">${value.duration} ms</p>
+              <div class="benchmark-expected ${expected_status}">
+                <p>${pdiff_text}</p>
+              </div>
+            </div>
+          </div>
+          <hr>
+          `);
+        }
+
         // add new error update
 
         $("#error-update-add").click(function () {

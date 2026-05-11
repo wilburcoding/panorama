@@ -17,7 +17,7 @@ class PanoramaClient {
     memory: [],
     cpu: [],
     timestamps: [], // when metrics were recorded
-    response_times: {}, // record response times for different processes of functions -> user sets this up
+    benchmarks: {}, // record response times for different processes of functions -> user sets this up
   };
 
   constructor() {}
@@ -73,6 +73,44 @@ class PanoramaClient {
     });
   }
 
+  beginBenchmark({name, expected_duration}) {
+    if (!this.initialized) {
+      console.warn("Client has not been initialized yet");
+      return;
+    }
+
+    if (Object.keys(this.performance_metrics.benchmarks).includes(name)) {
+      console.warn("Benchmark with name " + name + " already exists, overwriting");
+    }
+    this.performance_metrics.benchmarks[name] = {
+      start: Date.now(),
+      end: null,
+      duration: null,
+      expected_duration: expected_duration || null,
+    }
+
+  }
+
+  endBenchmark(name) {
+    if (!this.initialized) {
+      console.warn("Client has not been initialized yet");
+      return;
+    }
+
+    if (!Object.keys(this.performance_metrics.benchmarks).includes(name)) {
+      console.warn("Benchmark with name " + name + " does not exist");
+      return;
+    }
+
+    const benchmark = this.performance_metrics.benchmarks[name];
+    if (benchmark.end !== null) {
+      console.log("Benchmark with name " + name + " already ended, overwriting");
+    }
+    benchmark.end = Date.now();
+    benchmark.duration = benchmark.end - benchmark.start;
+
+  }
+
   async _postError({ error_title, error, stack_trace }) {
     // TODO: get error information and post to backend
 
@@ -112,9 +150,6 @@ class PanoramaClient {
       stack_trace: stack_trace,
       timestamp: Date.now(),
     });
-    console.log("ea");
-    console.log(this.console_logs);
-    console.log(this.id);
 
     const response = await fetch("http://localhost:3000/api/error-events", {
       method: "POST",
