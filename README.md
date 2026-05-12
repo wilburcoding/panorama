@@ -27,9 +27,8 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] track breadcrumbs 
      - [x] avoid recent duplicate errors
        - [x] count recent duplicates
-   - [ ] track logs
-   - [ ] track metrics
-   - [ ] track performance
+   - [x] track metrics
+   - [x] track performance
      - [x] Metrics
        - [x] Backend (SDK + API) functionality
        - [x] CLient side UI/UX
@@ -40,6 +39,9 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] basic usage (initialization, post error)
      - [x] breadcrumbs?
      - [x] performance metrics
+     - [ ] Full rewrite -> make a sample api project with endpoints to test different features
+       - [ ] post errors with breadcrumbs (multiple types)
+       - [ ] benchmark testing
  - [ ] python sdk
  - [ ] web app
    - [x] User signup + sign in base functionality

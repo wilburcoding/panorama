@@ -109,6 +109,8 @@ class PanoramaClient {
     benchmark.end = Date.now();
     benchmark.duration = benchmark.end - benchmark.start;
 
+    return benchmark;
+    
   }
 
   async _postError({ error_title, error, stack_trace }) {

@@ -96,7 +96,6 @@ $(document).ready(function () {
                 <p id="sbp-${project_id}-name">${project.name}</p>
             </button>`);
       $("#sbp-" + project_id).click(function () {
-        console.log("project " + project_id);
         window.location.href =
           "/dashboard.html?projectId=" + project.id + "&projectInfo";
       });
@@ -126,10 +125,8 @@ $(document).ready(function () {
       }
     }
     dids = dids.slice(0, -1);
-    console.log(deployments);
 
     // get error events for each deploymentx
-    console.log(dids);
     const error_events_res = await fetch(
       "/api/error_events?deployment_id=" + dids,
       {
@@ -141,7 +138,7 @@ $(document).ready(function () {
       const event = error_events[i];
       const deployment = deployments.find((d) => d.id === event.deployment_id);
       if (deployment) {
-        console.log(deployment);
+        // console.log(deployment);
         deployment.error_events.push(event);
       }
     }
@@ -526,7 +523,7 @@ $(document).ready(function () {
           })
             .then((resp) => resp.json())
             .then((json) => {
-              console.log(json);
+              // console.log(json);
               if (json.success) {
                 window.location.href =
                   "/dashboard.html?projectId=" +
@@ -542,7 +539,6 @@ $(document).ready(function () {
       if (project_id) {
         $("#sbp-" + project_id).addClass("active");
         // populate project info page
-        console.log("Project ID:  " + project_id);
         $("#dashboard-content").hide();
         $("#settings-content").hide();
         $("#project-content").hide();
@@ -662,7 +658,6 @@ $(document).ready(function () {
             `);
             $("#sproject-" + project.id + "-" + deployment.id).click(
               function () {
-                console.log("deployment " + deployment.id);
                 window.location.href =
                   "/dashboard.html?deploymentInfo&deploymentId=" +
                   deployment.id;
@@ -734,7 +729,6 @@ $(document).ready(function () {
                 },
               ],
             }).then((data) => {
-              console.log(data);
               fetch("/api/deployments", {
                 method: "POST",
                 headers: {
@@ -843,7 +837,7 @@ $(document).ready(function () {
                 },
               ],
             }).then((data) => {
-              console.log(data);
+              // console.log(data);
               fetch("/api/projects/" + project.id, {
                 method: "PUT",
                 headers: {
@@ -897,7 +891,7 @@ $(document).ready(function () {
                 },
               ],
             }).then((data) => {
-              console.log(data);
+              // console.log(data);
               if (data.confirm) {
                 fetch("/api/projects/" + project.id, {
                   method: "DELETE",
@@ -907,7 +901,6 @@ $(document).ready(function () {
                 })
                   .then((resp) => resp.json())
                   .then((json) => {
-                    console.log(json);
                     window.location.href = "/dashboard.html?projectOverview";
                   });
               }
@@ -1138,7 +1131,6 @@ $(document).ready(function () {
             `);
 
             $("#checkbox-" + event.id).click(function (e) {
-              console.log(event.id);
               if (checked_errors.includes(event.id)) {
                 // remove from checked
                 checked_errors = checked_errors.filter((id) => id !== event.id);
@@ -1148,7 +1140,6 @@ $(document).ready(function () {
                 $(this).addClass("checked");
               }
               e.stopPropagation();
-              console.log(checked_errors);
 
               $("#elist-delete").attr("disabled", checked_errors.length === 0);
               $("#elist-update").attr("disabled", checked_errors.length === 0);
@@ -1173,8 +1164,8 @@ $(document).ready(function () {
             current_filtering.forEach((id) => {
               $("#checkbox-" + id).addClass("checked");
             });
-            console.log(current_filtering);
-            console.log(checked_errors);
+            // console.log(current_filtering);
+            // console.log(checked_errors);
             $(this).addClass("checked");
             $("#elist-delete").attr("disabled", false);
             $("#elist-update").attr("disabled", false);
@@ -1256,7 +1247,6 @@ $(document).ready(function () {
               },
             ],
           }).then((data) => {
-            console.log(data);
             fetch("/api/deployments/" + deployment.id, {
               method: "PUT",
               headers: {
@@ -1272,7 +1262,7 @@ $(document).ready(function () {
             })
               .then((resp) => resp.json())
               .then((json) => {
-                console.log(json);
+                // console.log(json);
                 $("#sdeployment-name").text(json.deployment.name);
                 $("#sdeployment-version").text(json.deployment.version);
                 $("#sdeployment-environment").text(
@@ -1311,7 +1301,6 @@ $(document).ready(function () {
               },
             ],
           }).then((data) => {
-            console.log(data);
             if (data.confirm) {
               fetch("/api/deployments/" + deployment.id, {
                 method: "DELETE",
@@ -1321,7 +1310,7 @@ $(document).ready(function () {
               })
                 .then((resp) => resp.json())
                 .then((json) => {
-                  console.log(json);
+                  // console.log(json);
                   window.location.href =
                     "/dashboard.html?projectId=" + project.id + "&projectInfo";
                 });
@@ -1403,7 +1392,6 @@ $(document).ready(function () {
             })
               .then((resp) => resp.json())
               .then((json) => {
-                console.log(json);
                 window.location.reload();
               });
           });
@@ -1478,7 +1466,7 @@ $(document).ready(function () {
         // populate error updates
         $("#error-update-content").html("");
         const updates = JSON.parse(event.updates);
-        console.log(updates);
+        // console.log(updates);
 
         for (let i = updates.length - 1; i >= 0; i--) {
           const update = updates[i];
@@ -1512,7 +1500,6 @@ $(document).ready(function () {
         const breadcrumbs = meta.breadcrumbs || [];
         for (let i = 0; i < breadcrumbs.length; i++) {
           const breadcrumb = breadcrumbs[i];
-          console.log(breadcrumb);
           $("#breadcrumbs-list").append(`
             <div class="breadcrumb-item">
               <p class="breadcrumbs-timestamp">2/5/2026 5:25 PM</p>
@@ -1539,7 +1526,7 @@ $(document).ready(function () {
               backgroundColor: "#8c98ff",
             },
           ];
-          console.log(performance);
+          // console.log(performance);
           cpuChart.data.labels = performance.timestamps.map((t) => {
             const date = parseSqlTimestamp(t);
             let hours = date.getHours() % 12;
@@ -1620,7 +1607,6 @@ $(document).ready(function () {
         }
 
         // populate benchmarks
-        console.log("benchmarks");
         const benchmarks = meta.performance.benchmarks || [];
         for (let i =0; i < Object.keys(benchmarks).length; i++) {
           const key = Object.keys(benchmarks)[i];
@@ -1650,7 +1636,7 @@ $(document).ready(function () {
           let pdiff =
             (value.duration - value.expected_duration) /
             value.expected_duration;
-          console.log(pdiff);
+          // console.log(pdiff);
           let pdiff_text = "";
           if (pdiff > 0.01) {
             pdiff_text = "-" + Math.round(pdiff * 100) + "%";
@@ -1742,7 +1728,6 @@ $(document).ready(function () {
     } else if (params.has("settings")) {
       // show settings
       $("#sidebar-settings").addClass("active");
-      console.log("settings");
       $("#dashboard-content").hide();
       $("#project-content").hide();
       $("#sproject-content").hide();
@@ -1762,7 +1747,6 @@ $(document).ready(function () {
         ${created_at.getMonth() + 1}/${created_at.getDate()}/${created_at.getFullYear()} at ${hours}:${minutes} ${suffix}`);
 
       $("#edit-name-button").click(function () {
-        console.log(user);
         openModal({
           title: "Edit Name",
           fields: [
@@ -1885,8 +1869,6 @@ $(document).ready(function () {
                   };
                 }
                 if (value !== password) {
-                  console.log(value);
-                  console.log(password);
                   return {
                     success: false,
                     message: "Confirm password does not match new password",
@@ -1905,7 +1887,6 @@ $(document).ready(function () {
             },
           ],
         }).then((data) => {
-          console.log(data);
           if (data.confirmation == true) {
             fetch("/api/users/" + user.id + "/update_password", {
               method: "POST",
@@ -1920,7 +1901,7 @@ $(document).ready(function () {
             })
               .then((resp) => resp.json())
               .then((json) => {
-                console.log(json);
+                // console.log(json);
                 if (json.success) {
                   localStorage.removeItem("session_id");
                   window.location.href = "/signin.html";
@@ -1947,10 +1928,9 @@ $(document).ready(function () {
       // populate dashboard
 
       let active_deployment_count = 0;
-      console.log(projects);
       for (let i = 0; i < projects.length; i++) {
         for (let j = 0; j < projects[i].deployments.length; j++) {
-          console.log(projects[i].deployments[j]);
+          // console.log(projects[i].deployments[j]);
           if (projects[i].deployments[j].status === "active") {
             active_deployment_count += 1;
           }
@@ -2008,7 +1988,6 @@ $(document).ready(function () {
             const event_time = parseSqlTimestamp(error_events[k].timestamp);
             const now = new Date();
             const hours_before = (now - event_time) / 1000 / 60 / 60;
-            console.log("Hours before: " + hours_before);
             if (hours_before < 24) {
               datasets[i].data[5 - Math.floor(hours_before / 4)] += 1;
             }
@@ -2027,8 +2006,6 @@ $(document).ready(function () {
         labels.push(((hours + 11) % 12) + 1 + " " + suffix);
       }
       dashboardTimeline.data.labels = labels;
-
-      console.log(timelineData);
 
       //populate problematic deployments table
       let problematic_deployments = [];
@@ -2065,7 +2042,6 @@ $(document).ready(function () {
             e.status !== "resolved"
           ); // 24 hours is the threshhold for now
         });
-        console.log(new_errors);
         $("#wdeployment-container").append(`
             <div class="wdeployment-card">
                 <h1>${deployment.name}</h1>
