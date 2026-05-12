@@ -28,9 +28,6 @@ class PanoramaClient {
       return;
     }
 
-    this._setupHandlers();
-    this._performanceMonitoring();
-
     await fetch("http://localhost:3000/api/deployments/" + id + "/connect", {
       method: "POST",
       headers: {
@@ -54,6 +51,9 @@ class PanoramaClient {
           // get system information
           this.system = `${os.type()} ${os.release()} Node ${process.version}`;
 
+          this._setupHandlers();
+          this._performanceMonitoring();
+
           console.log("Deployment: ", response.deployment);
         } else {
           console.error(
@@ -73,22 +73,23 @@ class PanoramaClient {
     });
   }
 
-  beginBenchmark({name, expected_duration}) {
+  beginBenchmark({ name, expected_duration }) {
     if (!this.initialized) {
       console.warn("Client has not been initialized yet");
       return;
     }
 
     if (Object.keys(this.performance_metrics.benchmarks).includes(name)) {
-      console.warn("Benchmark with name " + name + " already exists, overwriting");
+      console.warn(
+        "Benchmark with name " + name + " already exists, overwriting",
+      );
     }
     this.performance_metrics.benchmarks[name] = {
       start: Date.now(),
       end: null,
       duration: null,
       expected_duration: expected_duration || null,
-    }
-
+    };
   }
 
   endBenchmark(name) {
@@ -104,16 +105,17 @@ class PanoramaClient {
 
     const benchmark = this.performance_metrics.benchmarks[name];
     if (benchmark.end !== null) {
-      console.log("Benchmark with name " + name + " already ended, overwriting");
+      console.log(
+        "Benchmark with name " + name + " already ended, overwriting",
+      );
     }
     benchmark.end = Date.now();
     benchmark.duration = benchmark.end - benchmark.start;
 
     return benchmark;
-    
   }
 
-  async _postError({ error_title, error, stack_trace }) {
+  async _postError({ error_title, stack_trace }) {
     // TODO: get error information and post to backend
 
     let stacktrace = "";
@@ -239,7 +241,11 @@ class PanoramaClient {
       this.performance_metrics.timestamps.push(new Date().toISOString());
 
       if (this.max_metrics > 25) {
-        console.warn("Max_metrics value of " + this.max_metrics + " exceeds maximum of 25, resetting to 25");
+        console.warn(
+          "Max_metrics value of " +
+            this.max_metrics +
+            " exceeds maximum of 25, resetting to 25",
+        );
         this.max_metrics = 25;
       }
       if (this.performance_metrics.cpu.length > this.max_metrics) {

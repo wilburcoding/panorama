@@ -20,7 +20,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] Input sanitazation (i think i spelled it wrong)
      - [x] Handle user account creation
      - [x] Handle user credentials check
- - [ ] javascript sdk -> going to start with a js sdk first
+ - [x] javascript sdk -> going to start with a js sdk first
    - [x] initiate
    - [x] track errors
      - [x] incorporate data straight from node.js error catching
@@ -35,14 +35,26 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] Benchmarking
        - [x] Backend (SDK + API) functionality
        - [x] Client side UI/UX 
-   - [ ] sample project for testing sdk
+   - [x] sample project for testing sdk
      - [x] basic usage (initialization, post error)
      - [x] breadcrumbs?
      - [x] performance metrics
-     - [ ] Full rewrite -> make a sample api project with endpoints to test different features
-       - [ ] post errors with breadcrumbs (multiple types)
-       - [ ] benchmark testing
+     - [x] Full rewrite -> make a sample api project with endpoints to test different features
+       - [x] post errors with breadcrumbs (multiple types)
+       - [x] benchmark testing
  - [ ] python sdk
+   - [ ] initiate
+   - [ ] track errors
+     - [ ] catch all uncaught python errors
+     - [ ] track breadcrumbs
+     - [ ] avoid recent duplicate errors
+       - [ ] count recent duplicates
+   - [ ] track performance metrics
+     - [ ] system metrics
+     - [ ] benchmarks
+   - [ ] sample project for testing sdk
+     - [ ] post errors with breadcrumbs (multiple types)
+     - [ ] benchmark testing
  - [ ] web app
    - [x] User signup + sign in base functionality
      - [x] Check if user is logged in already
