@@ -42,19 +42,19 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [x] Full rewrite -> make a sample api project with endpoints to test different features
        - [x] post errors with breadcrumbs (multiple types)
        - [x] benchmark testing
- - [ ] python sdk
-   - [ ] initiate
-   - [ ] track errors
-     - [ ] catch all uncaught python errors
-     - [ ] track breadcrumbs
-     - [ ] avoid recent duplicate errors
-       - [ ] count recent duplicates
-   - [ ] track performance metrics
-     - [ ] system metrics
-     - [ ] benchmarks
-   - [ ] sample project for testing sdk
-     - [ ] post errors with breadcrumbs (multiple types)
-     - [ ] benchmark testing
+ - [x] python sdk
+   - [x] initiate
+   - [x] track errors
+     - [x] catch all uncaught python errors
+     - [x] track breadcrumbs
+     - [x] avoid recent duplicate errors
+       - [x] count recent duplicates
+   - [x] track performance metrics
+     - [x] system metrics
+     - [x] benchmarks
+   - [x] sample project for testing sdk
+     - [x] post errors with breadcrumbs (multiple types)
+     - [x] benchmark testing
  - [ ] web app
    - [x] User signup + sign in base functionality
      - [x] Check if user is logged in already
@@ -117,6 +117,17 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
    - [ ] Plugin feature for additional stuff
      - [ ] unified logging
      - [ ] cron/uptime monitoring
+   - [ ] Restructuring plan
+     - [ ] Reorganize UI
+       - [ ] Sidebar improvements
+       - [ ] Error events has multiple pages for different features (performance)
+         - [ ] Overview pages should include information on everything
+         - [ ] Reduce clutter
+     - [ ] Restructure how deployments work
+       - [ ] Deployment types
+     - [ ] More interactive elements
+       - [ ] Interactive deployment creation guide
+       - [ ] Interactive account creation guide
 
 
 
@@ -198,6 +209,19 @@ SDK planning
  - Finding duplicate errors:
    - SDK client itself keeps list of last one hour of errors -> should keep individual clients from spamming
    - Checks on actual API side for all individual clients -> this is where the actual similar event counting is going to be
+
+Big Restructuring Plan 
+ - Issues right now
+   - Not a lot of room for additions (Both frontend/backend is completely centered around error events)
+   - Navigation is difficult -> going between error events and deployments is difficult
+   - Not very user friendly -> lacking information + guidance
+   - Doesn't cater to different types of projects (doesn't have options for like backend, frontend, full stack stuff like that) 
+ - Changes planned
+   - Reorganize UI
+     - Projects into different tabs
+   - Side bar improvements
+   - interactive guides in places where needed
+     - based on project type selected
 # NOTES
 
 Used a tiny bit of Claude to work out the database stuff but I think I figured it out
