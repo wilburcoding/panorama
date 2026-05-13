@@ -104,13 +104,19 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Change account name
      - [x] Functionality to switch between pages
        - [ ] Loading animation to prevent weird UI glitches from being seen
-     - [ ] Switch to async/await instead of promises
      - [ ] Back buttons for each page
      - [ ] More security for requests (require session_id)
    - [ ] Toast messages
    - [x] Modal
      - [x] Modal layout and styling
      - [ ] Modal functionality
+   - [ ] In site info
+     - [ ] Deployment guide
+     - [ ] Feature info
+ - [ ] Additional features + Bug fixes
+   - [ ] Plugin feature for additional stuff
+     - [ ] unified logging
+     - [ ] cron/uptime monitoring
 
 
 
