@@ -86,20 +86,6 @@ $(document).ready(function () {
     const timelineChart = new Chart(ctx, config);
     dashboardTimeline = timelineChart;
 
-    // populate sidebar project list
-    for (let i = 0; i < projects.length; i++) {
-      const project = projects[i];
-      const project_id = project.id;
-      $("#sidebar-plist").append(`
-            <button class="sidebar-project" id="sbp-${project_id}">
-                <div class="project-color" id="sbp-${project_id}-color" style="background-color: ${project.color}"></div>
-                <p id="sbp-${project_id}-name">${project.name}</p>
-            </button>`);
-      $("#sbp-" + project_id).click(function () {
-        window.location.href =
-          "/dashboard.html?projectId=" + project.id + "&projectInfo";
-      });
-    }
     // get deployments for each project
     let pids = "";
     for (let i = 0; i < projects.length; i++) {
@@ -126,6 +112,35 @@ $(document).ready(function () {
     }
     dids = dids.slice(0, -1);
 
+    // populate sidebar project list
+    for (let i = 0; i < projects.length; i++) {
+      const project = projects[i];
+      const project_id = project.id;
+      $("#sidebar-plist").append(`
+            <button class="sidebar-project" id="sbp-${project_id}">
+                <div class="project-color" id="sbp-${project_id}-color" style="background-color: ${project.color}"></div>
+                <p id="sbp-${project_id}-name">${project.name}</p>
+            </button>`);
+      for (let j = 0; j < project.deployments.length; j++) {
+        $("#sidebar-plist").append(`
+          <button class="sidebar-project deployment" id="sbp-${project_id}-${project.deployments[j].id}">
+            <i class="ph ph-cloud"></i>
+            <p id="sbp-${project_id}-${project.deployments[j].id}-name">${project.deployments[j].name}</p>
+          </button>
+          <div id="sbp-${project_id}-${project.deployments[j].id}-tabs"></div>
+          `);
+        const deployment = project.deployments[j];
+        const deployment_id = deployment.id;
+        $("#sbp-" + project_id + "-" + deployment_id).click(function () {
+          window.location.href =
+            "/dashboard.html?deploymentId=" + deployment_id + "&deploymentInfo";
+        });
+      }
+      $("#sbp-" + project_id).click(function () {
+        window.location.href =
+          "/dashboard.html?projectId=" + project.id + "&projectInfo";
+      });
+    }
     // get error events for each deploymentx
     const error_events_res = await fetch(
       "/api/error_events?deployment_id=" + dids,
@@ -935,6 +950,44 @@ $(document).ready(function () {
 
       if (deployment) {
         // populate deployment info page
+
+        // populate tabs
+        const icons = [
+          "ph-house",
+          "ph-warning",
+          "ph-speedometer",
+          "ph-cloud-check",
+          "ph-gear",
+        ];
+        const tab_names = [
+          "Overview",
+          "Errors",
+          "Performance",
+          "Uptime",
+          "Settings",
+        ];
+        for (let i = 0; i < tab_names.length; i++) {
+          const tabname = tab_names[i];
+          const icon = icons[i];
+          $("#sbp-" + project.id + "-" + deployment.id + "-tabs").append(`
+          <button class="sidebar-project tab" id="sbp-${project.id}-${deployment.id}-${tabname.toLowerCase()}">
+            <i class="ph ${icon}"></i>
+            <p id="sbp-${project.id}-${deployment.id}-tab-${tabname.toLowerCase()}">${tabname}</p>
+          </button>
+            `);
+          $(
+            "#sbp-" +
+              project.id +
+              "-" +
+              deployment.id +
+              "-" +
+              tabname.toLowerCase(),
+          ).click(function () {
+            window.location.href="/dashboard.html?deploymentId=" + deployment.id + "&deploymentInfo&" + tabname.toLowerCase();
+             
+          });
+        }
+        $("#sbp-" + project.id + "-" + deployment.id).addClass("active");
         $("#sdeployment-name").text(deployment.name);
         $("#sdeployment-version").text(deployment.version);
         $("#sdeployment-environment").text(
@@ -1426,6 +1479,8 @@ $(document).ready(function () {
           p.deployments.find((d) => d.id == deployment.id),
         );
         $("#sbp-" + project.id).addClass("active");
+        $("#sbp-" + project.id + "-" + deployment.id).addClass("active");
+
         const event = deployment.error_events.find((e) => e.id == event_id);
         $("#serror-title").text(event.title);
         $("#serror-status-div").addClass(event.status);
@@ -1608,28 +1663,52 @@ $(document).ready(function () {
 
         // populate benchmarks
         const benchmarks = meta.performance.benchmarks || [];
-        for (let i =0; i < Object.keys(benchmarks).length; i++) {
+        for (let i = 0; i < Object.keys(benchmarks).length; i++) {
           const key = Object.keys(benchmarks)[i];
           const value = benchmarks[key];
           let status = "Excellent";
-          if ((value.duration - value.expected_duration) / value.expected_duration > 0.5) {
+          if (
+            (value.duration - value.expected_duration) /
+              value.expected_duration >
+            0.5
+          ) {
             // 50% slower than expected
             status = "Degraded";
-          } else if ((value.duration - value.expected_duration) / value.expected_duration < -0.5) {
+          } else if (
+            (value.duration - value.expected_duration) /
+              value.expected_duration <
+            -0.5
+          ) {
             // 50% faster than expected
             status = "Excellent";
-          } else if ((value.duration - value.expected_duration) / value.expected_duration >= 0.2) {
+          } else if (
+            (value.duration - value.expected_duration) /
+              value.expected_duration >=
+            0.2
+          ) {
             // slower than expected
             status = "Slow";
-          }  else if ((value.duration - value.expected_duration) / value.expected_duration <= 0.2) {
+          } else if (
+            (value.duration - value.expected_duration) /
+              value.expected_duration <=
+            0.2
+          ) {
             // around expected or faster
             status = "Good";
           }
 
           let expected_status = "good";
-          if ((value.duration - value.expected_duration) / value.expected_duration > 0.1) {
+          if (
+            (value.duration - value.expected_duration) /
+              value.expected_duration >
+            0.1
+          ) {
             expected_status = "bad";
-          } else if ((value.duration - value.expected_duration) / value.expected_duration < -0.1) {
+          } else if (
+            (value.duration - value.expected_duration) /
+              value.expected_duration <
+            -0.1
+          ) {
             expected_status = "good";
           }
 
@@ -1645,7 +1724,7 @@ $(document).ready(function () {
           } else {
             pdiff_text = "±0";
           }
-          
+
           $("#benchmarks-list").append(`
           <div class="benchmark-item">
             <div class="benchmark-iinfo">

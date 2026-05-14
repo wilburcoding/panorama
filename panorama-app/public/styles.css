@@ -316,6 +316,15 @@ a {
   margin-bottom: 0px;
 }
 
+#sidebar button.sidebar-project.deployment {
+  margin-left: 10px !important;
+  width: calc(80% - 10px);
+}
+
+#sidebar button.sidebar-project.tab {
+  margin-left: 20px !important;
+  width: calc(80% - 20px);
+}
 #sidebar-plist {
   display: flex;
   flex-direction: column;
