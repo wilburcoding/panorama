@@ -352,8 +352,12 @@ $(document).ready(function () {
       $("#settings-content").hide();
       $("#sproject-content").hide();
       $("#project-content").show();
-      $("#serror-content").hide();
-      $("#sdeployment-content").hide();
+      $("#serror-overview-content").hide();
+      $("#sdeployment-overview-content").hide();
+      $("#sdeployment-errors-content").hide();
+      $("#sdeployment-performance-content").hide();
+      $("#sdeployment-uptime-content").hide();
+      $("#sdeployment-settings-content").hide();
 
       for (let i = 0; i < projects.length; i++) {
         let project = projects[i];
@@ -558,8 +562,12 @@ $(document).ready(function () {
         $("#settings-content").hide();
         $("#project-content").hide();
         $("#sproject-content").show();
-        $("#sdeployment-content").hide();
-        $("#serror-content").hide();
+        $("#sdeployment-overview-content").hide();
+        $("#sdeployment-errors-content").hide();
+        $("#sdeployment-performance-content").hide();
+        $("#sdeployment-uptime-content").hide();
+        $("#sdeployment-settings-content").hide();
+        $("#serror-overview-content").hide();
 
         // get project info
         const project_res = await fetch(
@@ -935,8 +943,12 @@ $(document).ready(function () {
       $("#settings-content").hide();
       $("#sproject-content").hide();
       $("#project-content").hide();
-      $("#sdeployment-content").show();
-      $("#serror-content").hide();
+      $("#sdeployment-overview-content").hide();
+      $("#sdeployment-errors-content").hide();
+      $("#sdeployment-performance-content").hide();
+      $("#sdeployment-uptime-content").hide();
+      $("#sdeployment-settings-content").hide();
+      $("#serror-overview-content").hide();
 
       const deployment_id = params.get("deploymentId");
       const project = projects.find((p) =>
@@ -983,179 +995,339 @@ $(document).ready(function () {
               "-" +
               tabname.toLowerCase(),
           ).click(function () {
-            window.location.href="/dashboard.html?deploymentId=" + deployment.id + "&deploymentInfo&" + tabname.toLowerCase();
-             
+            window.location.href =
+              "/dashboard.html?deploymentId=" +
+              deployment.id +
+              "&deploymentInfo&currentTab=" +
+              tabname.toLowerCase();
           });
         }
-        $("#sbp-" + project.id + "-" + deployment.id).addClass("active");
-        $("#sdeployment-name").text(deployment.name);
-        $("#sdeployment-version").text(deployment.version);
-        $("#sdeployment-environment").text(
-          deployment.environment.charAt(0).toUpperCase() +
-            deployment.environment.slice(1),
-        );
-        $("#sdeployment-environment-div").addClass(deployment.environment);
 
-        $("#sdeployment-status").text(
-          deployment.status.charAt(0).toUpperCase() +
-            deployment.status.slice(1),
-        );
-        $("#sdeployment-status-div").addClass(deployment.status);
+        // get current tab from url
+        let currentTab = params.get("currentTab");
+        if (currentTab == null) {
+          currentTab = "overview";
+        }
 
-        if (deployment.last_deployed) {
-          const last_deployed = parseSqlTimestamp(deployment.last_deployed);
-          $("#sdeployment-lastdeployed").text(
-            last_deployed.getMonth() +
+        console.log("showing tab: #sdeployment-" + currentTab + "-content");
+        $("#sdeployment-" + currentTab + "-content").show();
+        if (currentTab === "overview") {
+          $("#sbp-" + project.id + "-" + deployment.id).addClass("active");
+
+          // populate basic deployment details (name, version, environment, status, last deployed, created on , parent project, api key)
+
+          $("#sdeployment-name").text(deployment.name);
+          $("#sdeployment-version").text(deployment.version);
+          $("#sdeployment-environment").text(
+            deployment.environment.charAt(0).toUpperCase() +
+              deployment.environment.slice(1),
+          );
+          $("#sdeployment-environment-div").addClass(deployment.environment);
+
+          $("#sdeployment-status").text(
+            deployment.status.charAt(0).toUpperCase() +
+              deployment.status.slice(1),
+          );
+          $("#sdeployment-status-div").addClass(deployment.status);
+
+          if (deployment.last_deployed) {
+            const last_deployed = parseSqlTimestamp(deployment.last_deployed);
+            $("#sdeployment-lastdeployed").text(
+              last_deployed.getMonth() +
+                1 +
+                "/" +
+                last_deployed.getDate() +
+                "/" +
+                last_deployed.getFullYear(),
+            );
+          } else {
+            $("#sdeployment-lastdeployed").text("N/A");
+          }
+
+          const created_at = parseSqlTimestamp(deployment.created_at);
+          let hours = created_at.getHours() % 12;
+          let minutes = created_at.getMinutes().toString().padStart(2, "0");
+          let suffix = created_at.getHours() >= 12 ? "PM" : "AM";
+          $("#sdeployment-createdon").text(
+            created_at.getMonth() +
               1 +
               "/" +
-              last_deployed.getDate() +
+              created_at.getDate() +
               "/" +
-              last_deployed.getFullYear(),
+              created_at.getFullYear() +
+              " at " +
+              hours +
+              ":" +
+              minutes +
+              " " +
+              suffix,
           );
-        } else {
-          $("#sdeployment-lastdeployed").text("N/A");
-        }
 
-        const created_at = parseSqlTimestamp(deployment.created_at);
-        let hours = created_at.getHours() % 12;
-        let minutes = created_at.getMinutes().toString().padStart(2, "0");
-        let suffix = created_at.getHours() >= 12 ? "PM" : "AM";
-        $("#sdeployment-createdon").text(
-          created_at.getMonth() +
-            1 +
-            "/" +
-            created_at.getDate() +
-            "/" +
-            created_at.getFullYear() +
-            " at " +
-            hours +
-            ":" +
-            minutes +
-            " " +
-            suffix,
-        );
+          $("#sdeployment-parentproject").text(project.name);
+          $("#sdeployment-apikey").text(deployment.api_key);
+          $(".apikey-container").click(function () {
+            $(this).toggleClass("show");
+          });
 
-        $("#sdeployment-parentproject").text(project.name);
-        $("#sdeployment-apikey").text(deployment.api_key);
+          // handle editing deployment details
+          $("#sdeployment-edit").click(function () {
+            // editing deployment details
+            openModal({
+              title: "Edit Deployment Details",
+              fields: [
+                {
+                  id: "name",
+                  label: "Deployment Name",
+                  type: "text",
+                  placeholder: "",
+                  value: deployment.name,
+                  validate: (value) =>
+                    value.length > 1
+                      ? { success: true }
+                      : {
+                          success: false,
+                          message:
+                            "Deployment name must be at least 2 characters long",
+                        },
+                },
+                {
+                  id: "version",
+                  label: "Deployment Version",
+                  type: "text",
+                  placeholder: "",
+                  value: deployment.version,
+                  validate: (value) =>
+                    value.length > 1
+                      ? { success: true }
+                      : {
+                          success: false,
+                          message:
+                            "Deployment version must be at least 2 characters long",
+                        },
+                },
+                {
+                  id: "environment",
+                  label: "Deployment Environment",
+                  type: "select",
+                  options: [
+                    { label: "Production", value: "production" },
+                    { label: "Staging", value: "staging" },
+                    { label: "Development", value: "development" },
+                  ],
+                  value: deployment.environment,
+                },
+                {
+                  id: "status",
+                  label: "Deployment Status",
+                  type: "select",
+                  options: [
+                    { label: "Active", value: "active" },
+                    { label: "Inactive", value: "inactive" },
+                  ],
+                },
+                {
+                  id: "regen",
+                  label: "Regenerate API Key (irreversible!)",
+                  type: "checkbox",
+                },
+              ],
+            }).then((data) => {
+              fetch("/api/deployments/" + deployment.id, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  name: data.name,
+                  version: data.version,
+                  environment: data.environment,
+                  status: data.status,
+                  regen: data.regen,
+                }),
+              })
+                .then((resp) => resp.json())
+                .then((json) => {
+                  // console.log(json);
+                  $("#sdeployment-name").text(json.deployment.name);
+                  $("#sdeployment-version").text(json.deployment.version);
+                  $("#sdeployment-environment").text(
+                    json.deployment.environment.charAt(0).toUpperCase() +
+                      json.deployment.environment.slice(1),
+                  );
+                  $("#sdeployment-environment-div").removeClass("production");
+                  $("#sdeployment-environment-div").removeClass("staging");
+                  $("#sdeployment-environment-div").removeClass("development");
+                  $("#sdeployment-environment-div").addClass(
+                    json.deployment.environment,
+                  );
 
-        // event statistics + timeline area
-        $("#sdeployment-totalerrors").text(deployment.error_events.length);
-        const unresolved_errors = deployment.error_events.filter(
-          (e) => e.status !== "resolved",
-        ).length;
-        $("#sdeployment-unresolvederrors").text(unresolved_errors);
+                  $("#sdeployment-status").text(
+                    json.deployment.status.charAt(0).toUpperCase() +
+                      json.deployment.status.slice(1),
+                  );
+                  $("#sdeployment-status-div").removeClass("active");
+                  $("#sdeployment-status-div").removeClass("inactive");
+                  $("#sdeployment-status-div").addClass(json.deployment.status);
+                  $("#sdeployment-apikey").text(json.deployment.api_key);
+                });
+            });
+          });
 
-        let unresolved_timeline = [0, 0, 0, 0, 0, 0];
-        let resolved_timeline = [0, 0, 0, 0, 0, 0];
+          // handle deleting deployment
+          $("#sdeployment-delete").click(function () {
+            openModal({
+              title: "Delete Deployment",
+              fields: [
+                {
+                  id: "confirm",
+                  label:
+                    "Confirm you want to delete this deployment (this action cannot be undone)",
+                  type: "checkbox",
+                },
+              ],
+            }).then((data) => {
+              if (data.confirm) {
+                fetch("/api/deployments/" + deployment.id, {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((resp) => resp.json())
+                  .then((json) => {
+                    // console.log(json);
+                    window.location.href =
+                      "/dashboard.html?projectId=" +
+                      project.id +
+                      "&projectInfo";
+                  });
+              }
+            });
+          });
 
-        let latest_time = null;
-        for (let i = 0; i < deployment.error_events.length; i++) {
-          const event_time = parseSqlTimestamp(
-            deployment.error_events[i].timestamp,
-          );
-          if (latest_time == null) {
-            latest_time = deployment.error_events[i].timestamp;
-          } else if (event_time > parseSqlTimestamp(latest_time)) {
-            latest_time = deployment.error_events[i].timestamp;
-          }
+          // end overview tab popualtion
+        } else if (currentTab === "errors") {
 
-          const now = new Date();
-          const hours_before = (now - event_time) / 1000 / 60 / 60;
-          if (hours_before < 24) {
-            if (deployment.error_events[i].status !== "resolved") {
-              unresolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
-            } else {
-              resolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
+
+          return; // for now before i make the UI
+          // event statistics + timeline area
+          $("#sdeployment-totalerrors").text(deployment.error_events.length);
+          const unresolved_errors = deployment.error_events.filter(
+            (e) => e.status !== "resolved",
+          ).length;
+          $("#sdeployment-unresolvederrors").text(unresolved_errors);
+
+          let unresolved_timeline = [0, 0, 0, 0, 0, 0];
+          let resolved_timeline = [0, 0, 0, 0, 0, 0];
+
+          let latest_time = null;
+          for (let i = 0; i < deployment.error_events.length; i++) {
+            const event_time = parseSqlTimestamp(
+              deployment.error_events[i].timestamp,
+            );
+            if (latest_time == null) {
+              latest_time = deployment.error_events[i].timestamp;
+            } else if (event_time > parseSqlTimestamp(latest_time)) {
+              latest_time = deployment.error_events[i].timestamp;
+            }
+
+            const now = new Date();
+            const hours_before = (now - event_time) / 1000 / 60 / 60;
+            if (hours_before < 24) {
+              if (deployment.error_events[i].status !== "resolved") {
+                unresolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
+              } else {
+                resolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
+              }
             }
           }
-        }
-        $("#sdeployment-lasterror").text(
-          latest_time == null ? "No errors found" : formatTime(latest_time),
-        );
-
-        let labels = [];
-        for (let i = 5; i >= 0; i--) {
-          const time = new Date(Date.now() - i * 4 * 60 * 60 * 1000);
-          const hours = time.getHours();
-          const suffix = hours >= 12 ? "pm" : "am";
-          labels.push(((hours + 11) % 12) + 1 + " " + suffix);
-        }
-
-        // create timeline chart
-        const ctx = document.getElementById("sdeployment-timeline");
-        const timelineChart = new Chart(
-          ctx,
-          JSON.parse(JSON.stringify(config)),
-        );
-        timelineChart.data.datasets = [
-          {
-            label: "Unresolved Errors",
-            data: unresolved_timeline,
-            backgroundColor: "rgb(245, 140, 140)",
-            borderColor: "#000000",
-            borderWidth: 2,
-            borderSkipped: false,
-            borderRadius: 3,
-          },
-          {
-            label: "Resolved Errors",
-            data: resolved_timeline,
-            backgroundColor: "#7fd58f",
-            borderColor: "#000000",
-            borderWidth: 2,
-            borderSkipped: false,
-            borderRadius: 3,
-          },
-        ];
-        timelineChart.data.labels = labels;
-        timelineChart.update();
-
-        // populate error events table
-        function populateErrorTable(options) {
-          // options is text
-          $("#sdeployment-elist").html("");
-          let filtered_events = deployment.error_events;
-
-          if (options.includes("status:unresolved")) {
-            filtered_events = filtered_events.filter(
-              (e) => e.status !== "resolved",
-            );
-            options = options.replace("status:unresolved", "");
-          }
-
-          if (options.includes("status:resolved")) {
-            filtered_events = filtered_events.filter(
-              (e) => e.status === "resolved",
-            );
-            options = options.replace("status:resolved", "");
-          }
-
-          filtered_events = filtered_events.filter((e) =>
-            e.title.toLowerCase().includes(options),
+          $("#sdeployment-lasterror").text(
+            latest_time == null ? "No errors found" : formatTime(latest_time),
           );
 
-          current_filtering = filtered_events.map((e) => e.id);
+          let labels = [];
+          for (let i = 5; i >= 0; i--) {
+            const time = new Date(Date.now() - i * 4 * 60 * 60 * 1000);
+            const hours = time.getHours();
+            const suffix = hours >= 12 ? "pm" : "am";
+            labels.push(((hours + 11) % 12) + 1 + " " + suffix);
+          }
 
-          checked_errors = checked_errors.filter((id) =>
-            current_filtering.includes(id),
+          // create timeline chart
+          const ctx = document.getElementById("sdeployment-timeline");
+          const timelineChart = new Chart(
+            ctx,
+            JSON.parse(JSON.stringify(config)),
           );
-          $("#elist-delete").attr("disabled", checked_errors.length === 0);
-          $("#elist-update").attr("disabled", checked_errors.length === 0);
+          timelineChart.data.datasets = [
+            {
+              label: "Unresolved Errors",
+              data: unresolved_timeline,
+              backgroundColor: "rgb(245, 140, 140)",
+              borderColor: "#000000",
+              borderWidth: 2,
+              borderSkipped: false,
+              borderRadius: 3,
+            },
+            {
+              label: "Resolved Errors",
+              data: resolved_timeline,
+              backgroundColor: "#7fd58f",
+              borderColor: "#000000",
+              borderWidth: 2,
+              borderSkipped: false,
+              borderRadius: 3,
+            },
+          ];
+          timelineChart.data.labels = labels;
+          timelineChart.update();
 
-          for (let i = 0; i < filtered_events.length; i++) {
-            const event = filtered_events[i];
-            const created_at = parseSqlTimestamp(event.timestamp);
-            let hours = created_at.getHours() % 12;
-            let minutes = created_at.getMinutes().toString().padStart(2, "0");
-            let suffix = created_at.getHours() >= 12 ? "PM" : "AM";
-            let last_update = null;
-            const event_updates = JSON.parse(event.updates);
-            if (event_updates.length > 0) {
-              last_update = parseSqlTimestamp(
-                event_updates[event_updates.length - 1].timestamp,
+          // populate error events table
+          function populateErrorTable(options) {
+            // options is text
+            $("#sdeployment-elist").html("");
+            let filtered_events = deployment.error_events;
+
+            if (options.includes("status:unresolved")) {
+              filtered_events = filtered_events.filter(
+                (e) => e.status !== "resolved",
               );
+              options = options.replace("status:unresolved", "");
             }
-            $("#sdeployment-elist").append(`
+
+            if (options.includes("status:resolved")) {
+              filtered_events = filtered_events.filter(
+                (e) => e.status === "resolved",
+              );
+              options = options.replace("status:resolved", "");
+            }
+
+            filtered_events = filtered_events.filter((e) =>
+              e.title.toLowerCase().includes(options),
+            );
+
+            current_filtering = filtered_events.map((e) => e.id);
+
+            checked_errors = checked_errors.filter((id) =>
+              current_filtering.includes(id),
+            );
+            $("#elist-delete").attr("disabled", checked_errors.length === 0);
+            $("#elist-update").attr("disabled", checked_errors.length === 0);
+
+            for (let i = 0; i < filtered_events.length; i++) {
+              const event = filtered_events[i];
+              const created_at = parseSqlTimestamp(event.timestamp);
+              let hours = created_at.getHours() % 12;
+              let minutes = created_at.getMinutes().toString().padStart(2, "0");
+              let suffix = created_at.getHours() >= 12 ? "PM" : "AM";
+              let last_update = null;
+              const event_updates = JSON.parse(event.updates);
+              if (event_updates.length > 0) {
+                last_update = parseSqlTimestamp(
+                  event_updates[event_updates.length - 1].timestamp,
+                );
+              }
+              $("#sdeployment-elist").append(`
               <div class="sdeployment-card" id="errorevent-${event.id}">
 
                 <div class="sdeployment-info-item">
@@ -1183,272 +1355,148 @@ $(document).ready(function () {
               <hr />
             `);
 
-            $("#checkbox-" + event.id).click(function (e) {
-              if (checked_errors.includes(event.id)) {
-                // remove from checked
-                checked_errors = checked_errors.filter((id) => id !== event.id);
-                $(this).removeClass("checked");
-              } else {
-                checked_errors.push(event.id);
-                $(this).addClass("checked");
-              }
-              e.stopPropagation();
+              $("#checkbox-" + event.id).click(function (e) {
+                if (checked_errors.includes(event.id)) {
+                  // remove from checked
+                  checked_errors = checked_errors.filter(
+                    (id) => id !== event.id,
+                  );
+                  $(this).removeClass("checked");
+                } else {
+                  checked_errors.push(event.id);
+                  $(this).addClass("checked");
+                }
+                e.stopPropagation();
 
-              $("#elist-delete").attr("disabled", checked_errors.length === 0);
-              $("#elist-update").attr("disabled", checked_errors.length === 0);
-            });
-
-            $("#errorevent-" + event.id).click(function () {
-              window.location.href =
-                "/dashboard.html?errorEventInfo&eventId=" + event.id;
-            });
-          }
-        }
-        populateErrorTable($("#error-search").val().toLowerCase());
-        $("#error-search").on("input", function () {
-          populateErrorTable($(this).val().toLowerCase());
-        });
-
-        $("#elist-select").click(function () {
-          // check if not all current selected
-          if (checked_errors.length < current_filtering.length) {
-            // select all
-            checked_errors = [...current_filtering];
-            current_filtering.forEach((id) => {
-              $("#checkbox-" + id).addClass("checked");
-            });
-            // console.log(current_filtering);
-            // console.log(checked_errors);
-            $(this).addClass("checked");
-            $("#elist-delete").attr("disabled", false);
-            $("#elist-update").attr("disabled", false);
-          } else {
-            // deselect all
-            checked_errors = [];
-            current_filtering.forEach((id) => {
-              $("#checkbox-" + id).removeClass("checked");
-            });
-            $(this).removeClass("checked");
-            $("#elist-delete").attr("disabled", true);
-            $("#elist-update").attr("disabled", true);
-          }
-        });
-
-        $(".apikey-container").click(function () {
-          $(this).toggleClass("show");
-        });
-
-        $("#sdeployment-edit").click(function () {
-          // editing deployment details
-          openModal({
-            title: "Edit Deployment Details",
-            fields: [
-              {
-                id: "name",
-                label: "Deployment Name",
-                type: "text",
-                placeholder: "",
-                value: deployment.name,
-                validate: (value) =>
-                  value.length > 1
-                    ? { success: true }
-                    : {
-                        success: false,
-                        message:
-                          "Deployment name must be at least 2 characters long",
-                      },
-              },
-              {
-                id: "version",
-                label: "Deployment Version",
-                type: "text",
-                placeholder: "",
-                value: deployment.version,
-                validate: (value) =>
-                  value.length > 1
-                    ? { success: true }
-                    : {
-                        success: false,
-                        message:
-                          "Deployment version must be at least 2 characters long",
-                      },
-              },
-              {
-                id: "environment",
-                label: "Deployment Environment",
-                type: "select",
-                options: [
-                  { label: "Production", value: "production" },
-                  { label: "Staging", value: "staging" },
-                  { label: "Development", value: "development" },
-                ],
-                value: deployment.environment,
-              },
-              {
-                id: "status",
-                label: "Deployment Status",
-                type: "select",
-                options: [
-                  { label: "Active", value: "active" },
-                  { label: "Inactive", value: "inactive" },
-                ],
-              },
-              {
-                id: "regen",
-                label: "Regenerate API Key (irreversible!)",
-                type: "checkbox",
-              },
-            ],
-          }).then((data) => {
-            fetch("/api/deployments/" + deployment.id, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                name: data.name,
-                version: data.version,
-                environment: data.environment,
-                status: data.status,
-                regen: data.regen,
-              }),
-            })
-              .then((resp) => resp.json())
-              .then((json) => {
-                // console.log(json);
-                $("#sdeployment-name").text(json.deployment.name);
-                $("#sdeployment-version").text(json.deployment.version);
-                $("#sdeployment-environment").text(
-                  json.deployment.environment.charAt(0).toUpperCase() +
-                    json.deployment.environment.slice(1),
+                $("#elist-delete").attr(
+                  "disabled",
+                  checked_errors.length === 0,
                 );
-                $("#sdeployment-environment-div").removeClass("production");
-                $("#sdeployment-environment-div").removeClass("staging");
-                $("#sdeployment-environment-div").removeClass("development");
-                $("#sdeployment-environment-div").addClass(
-                  json.deployment.environment,
+                $("#elist-update").attr(
+                  "disabled",
+                  checked_errors.length === 0,
                 );
-
-                $("#sdeployment-status").text(
-                  json.deployment.status.charAt(0).toUpperCase() +
-                    json.deployment.status.slice(1),
-                );
-                $("#sdeployment-status-div").removeClass("active");
-                $("#sdeployment-status-div").removeClass("inactive");
-                $("#sdeployment-status-div").addClass(json.deployment.status);
-                $("#sdeployment-apikey").text(json.deployment.api_key);
               });
-          });
-        });
 
-        // handle deleting deployment
-        $("#sdeployment-delete").click(function () {
-          openModal({
-            title: "Delete Deployment",
-            fields: [
-              {
-                id: "confirm",
-                label:
-                  "Confirm you want to delete this deployment (this action cannot be undone)",
-                type: "checkbox",
-              },
-            ],
-          }).then((data) => {
-            if (data.confirm) {
-              fetch("/api/deployments/" + deployment.id, {
-                method: "DELETE",
+              $("#errorevent-" + event.id).click(function () {
+                window.location.href =
+                  "/dashboard.html?errorEventInfo&eventId=" + event.id;
+              });
+            }
+          }
+
+          populateErrorTable($("#error-search").val().toLowerCase());
+          $("#error-search").on("input", function () {
+            populateErrorTable($(this).val().toLowerCase());
+          });
+
+          $("#elist-select").click(function () {
+            // check if not all current selected
+            if (checked_errors.length < current_filtering.length) {
+              // select all
+              checked_errors = [...current_filtering];
+              current_filtering.forEach((id) => {
+                $("#checkbox-" + id).addClass("checked");
+              });
+              // console.log(current_filtering);
+              // console.log(checked_errors);
+              $(this).addClass("checked");
+              $("#elist-delete").attr("disabled", false);
+              $("#elist-update").attr("disabled", false);
+            } else {
+              // deselect all
+              checked_errors = [];
+              current_filtering.forEach((id) => {
+                $("#checkbox-" + id).removeClass("checked");
+              });
+              $(this).removeClass("checked");
+              $("#elist-delete").attr("disabled", true);
+              $("#elist-update").attr("disabled", true);
+            }
+          });
+
+          // handle deleting error events
+          $("#elist-delete").click(function () {
+            if (checked_errors.length > 0) {
+              fetch("/api/error-events/delete", {
+                method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
+                body: JSON.stringify({
+                  ids: checked_errors,
+                }),
               })
                 .then((resp) => resp.json())
                 .then((json) => {
-                  // console.log(json);
-                  window.location.href =
-                    "/dashboard.html?projectId=" + project.id + "&projectInfo";
+                  if (json.success) {
+                    // update deployments object and repopulate error table
+                    deployment.error_events = deployment.error_events.filter(
+                      (e) => !checked_errors.includes(e.id),
+                    );
+                    populateErrorTable($("#error-search").val().toLowerCase());
+                    $("#elist-select").removeClass("checked");
+                  }
                 });
             }
           });
-        });
-        // handle deleting error events
-        $("#elist-delete").click(function () {
-          if (checked_errors.length > 0) {
-            fetch("/api/error-events/delete", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                ids: checked_errors,
-              }),
-            })
-              .then((resp) => resp.json())
-              .then((json) => {
-                if (json.success) {
-                  // update deployments object and repopulate error table
-                  deployment.error_events = deployment.error_events.filter(
-                    (e) => !checked_errors.includes(e.id),
-                  );
-                  populateErrorTable($("#error-search").val().toLowerCase());
-                  $("#elist-select").removeClass("checked");
-                }
-              });
-          }
-        });
 
-        // handle updating multiple error events
-        $("#elist-update").click(function () {
-          openModal({
-            title: "Add Error Update",
-            fields: [
-              {
-                id: "message",
-                label: "Update Message",
-                type: "textarea",
-                placeholder: "",
-                value: "",
-                validation: (value) => {
-                  if (value.length < 5) {
-                    return {
-                      success: false,
-                      message:
-                        "Update message must be at least 5 characters long",
-                    };
-                  }
+          // handle updating multiple error events
+          $("#elist-update").click(function () {
+            openModal({
+              title: "Add Error Update",
+              fields: [
+                {
+                  id: "message",
+                  label: "Update Message",
+                  type: "textarea",
+                  placeholder: "",
+                  value: "",
+                  validation: (value) => {
+                    if (value.length < 5) {
+                      return {
+                        success: false,
+                        message:
+                          "Update message must be at least 5 characters long",
+                      };
+                    }
+                  },
                 },
-              },
-              {
-                id: "status",
-                label: "New Status",
-                type: "select",
-                options: [
-                  { label: "Unresolved", value: "unresolved" },
-                  { label: "Resolved", value: "resolved" },
-                ],
-                value: event.status,
-              },
-            ],
-          }).then((data) => {
-            fetch("/api/error-events/update", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                update: {
-                  message: data.message,
-                  status: data.status,
-                  email: user.email,
+                {
+                  id: "status",
+                  label: "New Status",
+                  type: "select",
+                  options: [
+                    { label: "Unresolved", value: "unresolved" },
+                    { label: "Resolved", value: "resolved" },
+                  ],
+                  value: event.status,
                 },
-                ids: checked_errors,
-              }),
-            })
-              .then((resp) => resp.json())
-              .then((json) => {
-                window.location.reload();
-              });
+              ],
+            }).then((data) => {
+              fetch("/api/error-events/update", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  update: {
+                    message: data.message,
+                    status: data.status,
+                    email: user.email,
+                  },
+                  ids: checked_errors,
+                }),
+              })
+                .then((resp) => resp.json())
+                .then((json) => {
+                  window.location.reload();
+                });
+            });
           });
-        });
+        }
+
+        // end deployment info population portion of code
       } else {
         // redirect bcs not a valid deployment
         window.location.href = "/dashboard.html";
@@ -1459,8 +1507,12 @@ $(document).ready(function () {
       $("#project-content").hide();
       $("#sproject-content").hide();
       $("#settings-content").hide();
-      $("#sdeployment-content").hide();
-      $("#serror-content").show();
+      $("#sdeployment-overview-content").hide();
+      $("#sdeployment-errors-content").hide();
+      $("#sdeployment-performance-content").hide();
+      $("#sdeployment-uptime-content").hide();
+      $("#sdeployment-settings-content").hide();
+      $("#serror-overview-content").show();
       const event_id = params.get("eventId");
 
       let deployments = projects.map((p) => p.deployments).flat();
@@ -1811,8 +1863,12 @@ $(document).ready(function () {
       $("#project-content").hide();
       $("#sproject-content").hide();
       $("#settings-content").show();
-      $("#sdeployment-content").hide();
-      $("#serror-content").hide();
+      $("#sdeployment-overview-content").hide();
+      $("#sdeployment-errors-content").hide();
+      $("#sdeployment-performance-content").hide();
+      $("#sdeployment-uptime-content").hide();
+      $("#sdeployment-settings-content").hide();
+      $("#serror-overview-content").hide();
 
       $("#settings-fname").text(user.first_name);
       $("#settings-lname").text(user.last_name);
@@ -2001,8 +2057,12 @@ $(document).ready(function () {
       $("#project-content").hide();
       $("#sproject-content").hide();
       $("#settings-content").hide();
-      $("#sdeployment-content").hide();
-      $("#serror-content").hide();
+      $("#serror-overview-content").hide();
+      $("#sdeployment-overview-content").hide();
+      $("#sdeployment-errors-content").hide();
+      $("#sdeployment-performance-content").hide();
+      $("#sdeployment-uptime-content").hide();
+      $("#sdeployment-settings-content").hide();
 
       // populate dashboard
 

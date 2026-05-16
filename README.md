@@ -222,6 +222,37 @@ Big Restructuring Plan
    - Side bar improvements
    - interactive guides in places where needed
      - based on project type selected
+ - New layouts!!
+  - Overview tab of deployments
+    - First row -> basic deployment information
+      - Settings button near it was originally
+    - Second row -> errors list (chart + recent errors list) 
+      - Option to enable + description if not enabled
+    - Third row -> performance overview (cpu + memory usage chart or site loading statistics)
+      - Option to enable + description if not enabled
+      - Backend -> show cpu / memory info
+        - graphs for both
+      - Frontend -> core web vitals data
+        - show statistics (TTFB, FCP, LCP)
+        - response times over time chart
+    - Fourth row -> uptime overview (list of tracking location statuses + last 24 hours statistics, overall statistics next to it)
+      - Option to enable + desription if not enabled
+  - Performance tab of deployments
+    - Based on type of performance tracking (backend or frontend)
+    - Header container with performance basic details
+    - Some statiscis.....? 
+      - Layout TBD
+  - Errors tab of deployments
+    - Header container with error list basic details
+    - first row -> maybe timeline + some statistics
+    - second row -> list of errors (with the options that were there before -> select, delete)
+  - Uptime tab of deployments
+    - header container with uptime basic details
+    - first row -> basic charts + statitsics
+    - second row -> history (maybe like a timeline grid Github style?) 
+    - third row -> list of active monitoring services 
+  - Settings tab of deployments
+    - Similar to settings format
 # NOTES
 
 Used a tiny bit of Claude to work out the database stuff but I think I figured it out

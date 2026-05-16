@@ -254,12 +254,7 @@ a {
   margin-bottom: 0px;
 }
 
-#dashboard-content,
-#settings-content,
-#project-content,
-#sproject-content,
-#sdeployment-content,
-#serror-content {
+.mainp-content {
   width: 80%;
   height: 100%;
   background-color: rgb(253, 250, 242);
@@ -752,6 +747,8 @@ select {
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
+
 
 .error-info-row {
   width: auto;
@@ -1285,3 +1282,16 @@ pre[class*="language-"] {
   background-color: transparent;
   margin-top: 0;
 }
+
+.sdeployment-row {
+  display:flex;
+  flex-direction:row;
+  align-items: center;
+  justify-content: flex-start;
+}
+/* .sdeployment-row div p {
+  font-size: 16px;
+  line-height: 16px;
+  margin-top:2px;
+  margin-bottom:2px;
+} */
