@@ -239,11 +239,16 @@ Big Restructuring Plan
       - Option to enable + desription if not enabled
   - Performance tab of deployments
     - Based on type of performance tracking (backend or frontend)
-    - Header container with performance basic details
-    - Some statiscis.....? 
-      - Layout TBD
+      - Backend performance monitoring
+        - first row -> cpu graph + memory graph
+        - second row -> benchmarks (example: api post latency or duration)
+      - Frontend performance monitoring
+        - Core web vitals data (cards with numbers) overall 
+        - Graphs of important metrics (LCP) over time 
+        - List of pages with worst performance numbers
+      - need to refine some of these metrics to be actually worthwhile
   - Errors tab of deployments
-    - Header container with error list basic details
+    - Header container with error list basic details 
     - first row -> maybe timeline + some statistics
     - second row -> list of errors (with the options that were there before -> select, delete)
   - Uptime tab of deployments

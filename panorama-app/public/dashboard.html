@@ -803,21 +803,28 @@
                     justify-content: flex-start;
                   "
                 >
-                  <h3 style="margin-top: 2px; margin-bottom: 5px">Monitoring List</h3>
-                  <div id="sdeployment-monitoring-list">
-
-                  </div>
+                  <h3 style="margin-top: 2px; margin-bottom: 5px">
+                    Monitoring List
+                  </h3>
+                  <div id="sdeployment-monitoring-list"></div>
                 </div>
-                <div class="dashboard-card"
-                  style="flex: 1; align-items: flex-start; justify-content: flex-start;">
-                  <h3 style="margin-top: 2px; margin-bottom: 5px;">Uptime Statistics</h3>
-                  
+                <div
+                  class="dashboard-card"
+                  style="
+                    flex: 1;
+                    align-items: flex-start;
+                    justify-content: flex-start;
+                  "
+                >
+                  <h3 style="margin-top: 2px; margin-bottom: 5px">
+                    Uptime Statistics
+                  </h3>
                 </div>
               </div>
               <div
                 id="sdeployment-overview-uptime-disabled"
                 class="dashboard-row"
-                style="flex: 1; padding: 0px;display:none"
+                style="flex: 1; padding: 0px; display: none"
               >
                 <div
                   class="dashboard-card"
@@ -827,7 +834,9 @@
                     justify-content: flex-start;
                   "
                 >
-                  <h3 style="margin-top: 2px; margin-bottom: 5px">Uptime Monitoring</h3>
+                  <h3 style="margin-top: 2px; margin-bottom: 5px">
+                    Uptime Monitoring
+                  </h3>
                 </div>
               </div>
             </div>
@@ -913,8 +922,248 @@
           </div>
         </div> -->
       </div>
-      <div id="sdeployment-errors-content" class="mainp-content"></div>
-      <div id="sdeployment-performance-content" class="mainp-content"></div>
+      <div id="sdeployment-errors-content" class="mainp-content">
+        <div
+          class="dashboard-row"
+          style="padding-bottom: 0px; padding-top: 40px"
+        >
+          <h1
+            style="
+              font-size: 35px;
+              color: black;
+              margin-top: 5px;
+              margin-bottom: 10px;
+              line-height: 35px;
+            "
+          >
+            Error Tracking
+          </h1>
+        </div>
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="flex: 1">
+            <!-- <h3 style="margin-top: 2px; margin-bottom: 5px">Errors Timeline</h3> -->
+            <h2>Errors Timeline</h2>
+            <div
+              id="sdeployment-errors-timeline-container"
+              style="flex: 1; width: 100%; height: auto"
+            >
+              <canvas id="sdeployment-errors-timeline-chart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div
+            class="dashboard-card"
+            style="
+              flex: 1;
+              padding-left: 0px;
+              padding-right: 0px;
+              padding-bottom: 0px;
+            "
+          >
+            <h2 style="margin-left: 20px">Recent Errors</h2>
+            <div
+              style="
+                flex: 1;
+                border-top: solid 2px black;
+                overflow-y: scroll;
+                scrollbar-width: 1px;
+              "
+            ></div>
+          </div>
+          <div
+            class="dashboard-card"
+            style="
+              flex: 1;
+              padding-left: 0px;
+              padding-right: 0px;
+              padding-bottom: 0px;
+            "
+          >
+            <h2 style="margin-left: 20px">Recurring Errors</h2>
+            <div
+              style="
+                flex: 1;
+                border-top: solid 2px black;
+                overflow-y: scroll;
+                scrollbar-width: 1px;
+              "
+            ></div>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div
+            class="dashboard-card"
+            style="
+              flex: 1;
+              padding-left: 0;
+              padding-right: 0;
+              padding-bottom: 0;
+            "
+          >
+            <h2 style="margin-bottom: 5px; margin-left: 20px">
+              Error Events List
+            </h2>
+            <div
+              style="
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                margin-top: 10px;
+              "
+            >
+              <div
+                class="checkbox"
+                style="
+                  margin-left: 20px;
+                  margin-right: 10px;
+                  margin-top: 0px;
+                  margin-bottom: 15px;
+                "
+                id="elist-select"
+              >
+                <i class="ph ph-check"></i>
+              </div>
+              <input
+                type="text"
+                value="status:unresolved"
+                id="error-search"
+                placeholder="Search errors..."
+                style="
+                  margin-left: 0px;
+                  margin-left: 5px;
+                  margin-bottom: 15px;
+                  font-size: 20px;
+                "
+              />
+              <button id="elist-delete" title="Delete">
+                <i class="ph ph-trash"> </i>
+              </button>
+              <button id="elist-update" title="Update status">
+                <i class="ph ph-pen"> </i>
+              </button>
+            </div>
+            <div
+              id="sdeployment-elist"
+              style="padding-bottom: 80px; max-height: 30vh"
+            >
+              <div class="sdeployment-card">
+                <div class="sdeployment-info-item">
+                  <div class="checkbox checked">
+                    <i class="ph ph-check"></i>
+                  </div>
+                  <h1>Assignment to constant variable</h1>
+                  <div class="dproject-status unresolved">
+                    <p>Unresolved</p>
+                  </div>
+                </div>
+                <div class="sdeployment-info">
+                  <div class="dproject-info-item">
+                    <i class="ph ph-clock"></i>
+                    <p>Created on 4/1/2025</p>
+                  </div>
+                </div>
+              </div>
+              <hr />
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- backend performance monitoring content -->
+      <div id="sdeployment-performance-content-1" class="mainp-content">
+        <div
+          class="dashboard-row"
+          style="padding-bottom: 0px; padding-top: 40px"
+        >
+          <h1
+            style="
+              font-size: 35px;
+              color: black;
+              margin-top: 5px;
+              margin-bottom: 10px;
+              line-height: 35px;
+            "
+          >
+            Performance Monitoring
+          </h1>
+        </div>
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="flex: 1">
+            <h2>CPU Usage Timeline</h2>
+            <div style="flex: 1; height: auto; width: 100%">
+              <canvas id="sdeployment-cpu-chart"></canvas>
+            </div>
+          </div>
+          <div class="dashboard-card" style="flex: 1">
+            <h2>Memory Usage Timeline</h2>
+            <div style="flex: 1; height: auto; width: 100%">
+              <canvas id="sdeployment-memory-chart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="flex: 1">
+            <h2>Benchmarks</h2>
+          </div>
+        </div>
+      </div>
+      <!-- frontend performance monitoring content -->
+      <div id="sdeployment-performance-content-2" class="mainp-content">
+        <div
+          class="dashboard-row"
+          style="padding-bottom: 0px; padding-top: 40px"
+        >
+          <h1
+            style="
+              font-size: 35px;
+              color: black;
+              margin-top: 5px;
+              margin-bottom: 10px;
+              line-height: 35px;
+            "
+          >
+            Performance Monitoring
+          </h1>
+        </div>
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="flex: 1">
+            <h2>LCP</h2>
+            <h1>5</h1>
+          </div>
+          <div class="dashboard-card" style="flex: 1">
+            <h2>CLS</h2>
+            <h1>0.1</h1>
+          </div>
+          <div class="dashboard-card" style="flex: 1">
+            <h2>INP</h2>
+            <h1>100 ms</h1>
+          </div>
+          <div class="dashboard-card" style="flex: 1">
+            <h2>FCP</h2>
+            <h1>1.5 s</h1>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="flex:1">
+            <h2>LCP Timeline</h2>
+            <div style="flex:1; height: auto; width: 100%">
+              <canvas id="sdeployment-lcp-chart"></canvas>
+            </div>
+          </div>
+          <div class="dashboard-card" style="flex:1">
+            <h2>INP Timeline</h2>
+            <div style="flex:1; height: auto; width: 100%">
+              <canvas id="sdeployment-inp-chart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div class="dashboard-card" style="flex:1">
+            <h2>Benchmarks</h2>
+          </div>
+        </div>
+      </div>
       <div id="sdeployment-uptime-content" class="mainp-content"></div>
       <div id="sdeployment-settings-content" class="mainp-content"></div>
 

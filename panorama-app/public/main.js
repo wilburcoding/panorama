@@ -127,7 +127,7 @@ $(document).ready(function () {
             <i class="ph ph-cloud"></i>
             <p id="sbp-${project_id}-${project.deployments[j].id}-name">${project.deployments[j].name}</p>
           </button>
-          <div id="sbp-${project_id}-${project.deployments[j].id}-tabs"></div>
+          <div id="sbp-${project_id}-${project.deployments[j].id}-tabs" style="width: 100%;"></div>
           `);
         const deployment = project.deployments[j];
         const deployment_id = deployment.id;
@@ -355,7 +355,8 @@ $(document).ready(function () {
       $("#serror-overview-content").hide();
       $("#sdeployment-overview-content").hide();
       $("#sdeployment-errors-content").hide();
-      $("#sdeployment-performance-content").hide();
+      $("#sdeployment-performance-content-1").hide();
+      $("#sdeployment-performance-content-2").hide();
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
 
@@ -564,7 +565,8 @@ $(document).ready(function () {
         $("#sproject-content").show();
         $("#sdeployment-overview-content").hide();
         $("#sdeployment-errors-content").hide();
-        $("#sdeployment-performance-content").hide();
+        $("#sdeployment-performance-content-1").hide();
+        $("#sdeployment-performance-content-2").hide();
         $("#sdeployment-uptime-content").hide();
         $("#sdeployment-settings-content").hide();
         $("#serror-overview-content").hide();
@@ -945,7 +947,8 @@ $(document).ready(function () {
       $("#project-content").hide();
       $("#sdeployment-overview-content").hide();
       $("#sdeployment-errors-content").hide();
-      $("#sdeployment-performance-content").hide();
+      $("#sdeployment-performance-content-1").hide();
+      $("#sdeployment-performance-content-2").hide();
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
       $("#serror-overview-content").hide();
@@ -1008,12 +1011,20 @@ $(document).ready(function () {
         if (currentTab == null) {
           currentTab = "overview";
         }
+        $(
+          "#sbp-" + project.id + "-" + deployment.id + "-" + currentTab,
+        ).addClass("active");
+        $("#sbp-" + project.id + "-" + deployment.id).addClass("active");
 
         console.log("showing tab: #sdeployment-" + currentTab + "-content");
-        $("#sdeployment-" + currentTab + "-content").show();
-        if (currentTab === "overview") {
-          $("#sbp-" + project.id + "-" + deployment.id).addClass("active");
+        if (currentTab !== "performance") {
+          $("#sdeployment-" + currentTab + "-content").show();
+        } else {
+          // for now, show backend performance screen
+          $("#sdeployment-performance-content-2").show();
+        }
 
+        if (currentTab === "overview") {
           // populate basic deployment details (name, version, environment, status, last deployed, created on , parent project, api key)
 
           $("#sdeployment-name").text(deployment.name);
@@ -1207,8 +1218,6 @@ $(document).ready(function () {
 
           // end overview tab popualtion
         } else if (currentTab === "errors") {
-
-
           return; // for now before i make the UI
           // event statistics + timeline area
           $("#sdeployment-totalerrors").text(deployment.error_events.length);
@@ -1509,7 +1518,8 @@ $(document).ready(function () {
       $("#settings-content").hide();
       $("#sdeployment-overview-content").hide();
       $("#sdeployment-errors-content").hide();
-      $("#sdeployment-performance-content").hide();
+      $("#sdeployment-performance-content-1").hide();
+      $("#sdeployment-performance-content-2").hide();
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
       $("#serror-overview-content").show();
@@ -1865,7 +1875,8 @@ $(document).ready(function () {
       $("#settings-content").show();
       $("#sdeployment-overview-content").hide();
       $("#sdeployment-errors-content").hide();
-      $("#sdeployment-performance-content").hide();
+      $("#sdeployment-performance-content-1").hide();
+      $("#sdeployment-performance-content-2").hide();
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
       $("#serror-overview-content").hide();
@@ -2060,7 +2071,8 @@ $(document).ready(function () {
       $("#serror-overview-content").hide();
       $("#sdeployment-overview-content").hide();
       $("#sdeployment-errors-content").hide();
-      $("#sdeployment-performance-content").hide();
+      $("#sdeployment-performance-content-1").hide();
+      $("#sdeployment-performance-content-2").hide();
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
 
