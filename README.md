@@ -124,10 +124,12 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
          - [x] Overview pages should include information on everything
          - [ ] Reduce clutter
      - [ ] Restructure how deployments work
-       - [ ] Deployment types
+       - [ ] Deployment types -> front end or backend
      - [ ] More interactive elements
        - [ ] Interactive deployment creation guide
        - [ ] Interactive account creation guide
+     - [ ] Update database schema
+     - [ ] New sample data
    - [ ] Improved backend monitoring? (record requests data?)
 
 
@@ -223,6 +225,21 @@ Big Restructuring Plan
    - Side bar improvements
    - interactive guides in places where needed
      - based on project type selected
+   - Restructure database
+     - Meta data for deployments -> store performance, uptime data
+       - Performance
+         - Put all the data together and retrieve based on type i guess
+         - Backend -> continuously push cpu/memory data
+           - Benchmarks -> maybe something like "benchmarks":{"sample benchmark":{"time":[], "timestamps":[], "expected":4}}
+         - Frontend -> continusouly record web vitals data
+           - Only keep a record of LCP and INP data
+           - Benchmarks -> similar to backend benchmark tracking
+       - Uptime data
+         - This is done by the backend (where the api is)
+         - Continuously add data in intervals (user picks -> 5 min, 10 min, 15min, 20min, 30min, 1hr)
+         - Also goes in meta for deployments
+       - Error events remains teh exact same
+     - Error events no longer record performance data -> this will be tracked within performance ONLY
  - New layouts!!
   - Overview tab of deployments
     - First row -> basic deployment information

@@ -20,7 +20,7 @@ export function migrate() {
             user_id INTEGER NOT NULL REFERENCES users(id),
             description TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            color TEXT
+            color TEXT  
         )
     `);
   db.exec(`
@@ -32,8 +32,10 @@ export function migrate() {
             name TEXT NOT NULL,
             status TEXT NOT NULL,
             last_deployed DATETIME,
+            type TEXT NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            api_key TEXT NOT NULL
+            api_key TEXT NOT NULL,
+            meta TEXT DEFAULT '{}'
         )`);
   db.exec(`
         CREATE TABLE IF NOT EXISTS error_events (
@@ -94,9 +96,67 @@ export function sample_data() {
       const status = "active";
       const api_key = "sample_api_key_" + i + "_" + j;
       const deployment = "Deployment " + (j + 1 + (i - 1) * 2);
+      const meta = {
+        performance: {
+          backend_monitoring: {
+            cpu_usage: [],
+            memory_usage: [],
+            timestamps: [],
+            benchmarks: [
+              {
+                name: "DB Query Performance",
+                expected_time: 200,
+                times: [],
+                timestamps: [],
+              },
+            ],
+          },
+          frontend_monitoring: {
+            lcp: [],
+            inp: [],
+            cls: 123,
+            fcp: 123,
+            benchmarks: [
+              {
+                name: "API Response Time",
+                expected_time: 200,
+                times: [],
+                timestamps: [],
+              },
+            ],
+          },
+        },
+        uptime: {
+          monitors: [
+            {
+              name: "Homepage",
+              url: "https://www.example.com",
+              statuses: [],
+              timestamps: [],
+              response_times: [],
+            },
+            {
+              name: "API",
+              url: "https://api.example.com/endpoint",
+              statuses: [],
+              timestamps: [],
+              response_times: [],
+            },
+          ],
+        },
+      };
       db.prepare(
-        "INSERT into deployments (project_id, version, environment, status, api_key, name, last_deployed) values (?, ?, ?, ?, ?, ?, ?)",
-      ).run(project_id, version, environment, status, api_key, deployment, null);
+        "INSERT into deployments (project_id, version, environment, status, api_key, name, last_deployed, meta) values (?, ?, ?, ?, ?, ?, ?, ?",
+      ).run(
+        project_id,
+        version,
+        environment,
+        status,
+        api_key,
+        deployment,
+        null,
+        JSON.stringify(meta),
+      );
     }
   }
   console.log("Sample data created");
@@ -105,12 +165,12 @@ export function sample_data() {
 
   for (let i = 0; i < 4; i++) {
     console.log(i);
-    const deployment = db.prepare(
-      "SELECT * FROM deployments WHERE id = ?",
-    ).get(i + 1);
+    const deployment = db
+      .prepare("SELECT * FROM deployments WHERE id = ?")
+      .get(i + 1);
     const deployment_id = deployment.id;
-    console.log("Deployment ID: " + deployment_id)
-    for (let j =0; j < Math.floor(Math.random() * 8 + 2); j++) {
+    console.log("Deployment ID: " + deployment_id);
+    for (let j = 0; j < Math.floor(Math.random() * 8 + 2); j++) {
       console.log("Error event created for deployment " + deployment_id);
       // random error events for each deployment
       const title = "Sample Error " + (j + 1);
@@ -123,19 +183,21 @@ at Module._extensions..js (internal/modules/cjs/loader.js:1027:10)
 at Module.load (internal/modules/cjs/loader.js:863:32)
 at Function.Module._load (internal/modules/cjs/loader.js:708:14)
 at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:12)
-      `
+      `;
       const environment = "Windows 10, Node.js v14.17.0";
       const timestamp = new Date(Date.now());
       let sample_timestamps = [];
       for (let k = 0; k < 20; k++) {
-        sample_timestamps.push(new Date(Date.now() - 30000 * (7 - k)).toISOString());
+        sample_timestamps.push(
+          new Date(Date.now() - 30000 * (7 - k)).toISOString(),
+        );
       }
       let sample_cpu = [];
-      for (let k =0; k < 20; k++) {
+      for (let k = 0; k < 20; k++) {
         sample_cpu.push(Math.floor(Math.random() * 50 + 10));
       }
       let sample_memory = [];
-      for (let k =0; k < 20; k++) {
+      for (let k = 0; k < 20; k++) {
         sample_memory.push(Math.floor(Math.random() * 50 + 20));
       }
 
@@ -162,23 +224,22 @@ at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:
             source: "log",
           },
         ],
-        performance: { // sample performance metrics data
-          cpu: sample_cpu,
-          memory: sample_memory,
-          timestamps: sample_timestamps,
-          benchmarks: {
-            "data processing" : {
-              start: new Date(Date.now() - 5000).toISOString(),
-              end: new Date().toISOString(),
-              duration: 5000,
-              expected_duration: Math.random() * 5000 + 2500
-            }
-          }
-        }
       };
-      timestamp.setHours(timestamp.getHours() - j * 2 - Math.floor(Math.random() * 5)); 
-      db.prepare("INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp, similar_count, meta) values (?, ?, ?, ?, ?, ?, ?, ?)").run(deployment_id, title, status, stack_trace, environment, timestamp.toISOString(), Math.floor(Math.random() * 5), JSON.stringify(meta));
-    
+      timestamp.setHours(
+        timestamp.getHours() - j * 2 - Math.floor(Math.random() * 5),
+      );
+      db.prepare(
+        "INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp, similar_count, meta) values (?, ?, ?, ?, ?, ?, ?, ?)",
+      ).run(
+        deployment_id,
+        title,
+        status,
+        stack_trace,
+        environment,
+        timestamp.toISOString(),
+        Math.floor(Math.random() * 5),
+        JSON.stringify(meta),
+      );
     }
   }
 }

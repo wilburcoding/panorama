@@ -1023,7 +1023,7 @@ $(document).ready(function () {
           $("#sdeployment-" + currentTab + "-content").show();
         } else {
           // for now, show backend performance screen
-          $("#sdeployment-performance-content-1").show();
+          $("#sdeployment-performance-content-2").show();
         }
 
         if (currentTab === "overview") {
