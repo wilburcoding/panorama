@@ -119,15 +119,16 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] cron/uptime monitoring
    - [ ] Restructuring plan
      - [ ] Reorganize UI
-       - [ ] Sidebar improvements
+       - [x] Sidebar improvements
        - [ ] Error events has multiple pages for different features (performance)
-         - [ ] Overview pages should include information on everything
+         - [x] Overview pages should include information on everything
          - [ ] Reduce clutter
      - [ ] Restructure how deployments work
        - [ ] Deployment types
      - [ ] More interactive elements
        - [ ] Interactive deployment creation guide
        - [ ] Interactive account creation guide
+   - [ ] Improved backend monitoring? (record requests data?)
 
 
 

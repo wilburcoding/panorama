@@ -1011,17 +1011,19 @@ $(document).ready(function () {
         if (currentTab == null) {
           currentTab = "overview";
         }
+        if (!["overview", "errors", "performance", "uptime", "settings"].includes(currentTab)) {
+          currentTab = "overview";
+        }
         $(
           "#sbp-" + project.id + "-" + deployment.id + "-" + currentTab,
         ).addClass("active");
         $("#sbp-" + project.id + "-" + deployment.id).addClass("active");
 
-        console.log("showing tab: #sdeployment-" + currentTab + "-content");
         if (currentTab !== "performance") {
           $("#sdeployment-" + currentTab + "-content").show();
         } else {
           // for now, show backend performance screen
-          $("#sdeployment-performance-content-2").show();
+          $("#sdeployment-performance-content-1").show();
         }
 
         if (currentTab === "overview") {
