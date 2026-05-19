@@ -96,12 +96,20 @@ export function sample_data() {
       const status = "active";
       const api_key = "sample_api_key_" + i + "_" + j;
       const deployment = "Deployment " + (j + 1 + (i - 1) * 2);
+      let sample_cpu = [];
+      let sample_memory = [];
+      let sample_timestamps = [];
+      for (let k = 120; k > 0; k--) {
+        sample_cpu.push(Math.floor(Math.random() * 50 + 10));
+        sample_memory.push(Math.floor(Math.random() * 50 + 20));
+        sample_timestamps.push(new Date(Date.now() - 30000 * k).toISOString());
+      }
       const meta = {
         performance: {
           backend_monitoring: {
-            cpu_usage: [],
-            memory_usage: [],
-            timestamps: [],
+            cpu_usage: sample_cpu,
+            memory_usage: sample_memory,
+            timestamps: sample_timestamps,
             benchmarks: [
               {
                 name: "DB Query Performance",
@@ -146,7 +154,7 @@ export function sample_data() {
         },
       };
       db.prepare(
-        "INSERT into deployments (project_id, version, environment, status, api_key, name, last_deployed, meta) values (?, ?, ?, ?, ?, ?, ?, ?",
+        "INSERT into deployments (project_id, version, environment, status, api_key, name, last_deployed, meta, type) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
       ).run(
         project_id,
         version,
@@ -156,6 +164,7 @@ export function sample_data() {
         deployment,
         null,
         JSON.stringify(meta),
+        "backend" // for now, only types are "backend" and "frontend"
       );
     }
   }

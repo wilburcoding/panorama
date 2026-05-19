@@ -1011,7 +1011,11 @@ $(document).ready(function () {
         if (currentTab == null) {
           currentTab = "overview";
         }
-        if (!["overview", "errors", "performance", "uptime", "settings"].includes(currentTab)) {
+        if (
+          !["overview", "errors", "performance", "uptime", "settings"].includes(
+            currentTab,
+          )
+        ) {
           currentTab = "overview";
         }
         $(
@@ -1023,7 +1027,7 @@ $(document).ready(function () {
           $("#sdeployment-" + currentTab + "-content").show();
         } else {
           // for now, show backend performance screen
-          $("#sdeployment-performance-content-2").show();
+          $("#sdeployment-performance-content-1").show();
         }
 
         if (currentTab === "overview") {
@@ -1082,141 +1086,170 @@ $(document).ready(function () {
             $(this).toggleClass("show");
           });
 
-          // handle editing deployment details
-          $("#sdeployment-edit").click(function () {
-            // editing deployment details
-            openModal({
-              title: "Edit Deployment Details",
-              fields: [
-                {
-                  id: "name",
-                  label: "Deployment Name",
-                  type: "text",
-                  placeholder: "",
-                  value: deployment.name,
-                  validate: (value) =>
-                    value.length > 1
-                      ? { success: true }
-                      : {
-                          success: false,
-                          message:
-                            "Deployment name must be at least 2 characters long",
-                        },
-                },
-                {
-                  id: "version",
-                  label: "Deployment Version",
-                  type: "text",
-                  placeholder: "",
-                  value: deployment.version,
-                  validate: (value) =>
-                    value.length > 1
-                      ? { success: true }
-                      : {
-                          success: false,
-                          message:
-                            "Deployment version must be at least 2 characters long",
-                        },
-                },
-                {
-                  id: "environment",
-                  label: "Deployment Environment",
-                  type: "select",
-                  options: [
-                    { label: "Production", value: "production" },
-                    { label: "Staging", value: "staging" },
-                    { label: "Development", value: "development" },
-                  ],
-                  value: deployment.environment,
-                },
-                {
-                  id: "status",
-                  label: "Deployment Status",
-                  type: "select",
-                  options: [
-                    { label: "Active", value: "active" },
-                    { label: "Inactive", value: "inactive" },
-                  ],
-                },
-                {
-                  id: "regen",
-                  label: "Regenerate API Key (irreversible!)",
-                  type: "checkbox",
-                },
-              ],
-            }).then((data) => {
-              fetch("/api/deployments/" + deployment.id, {
-                method: "PUT",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  name: data.name,
-                  version: data.version,
-                  environment: data.environment,
-                  status: data.status,
-                  regen: data.regen,
-                }),
-              })
-                .then((resp) => resp.json())
-                .then((json) => {
-                  // console.log(json);
-                  $("#sdeployment-name").text(json.deployment.name);
-                  $("#sdeployment-version").text(json.deployment.version);
-                  $("#sdeployment-environment").text(
-                    json.deployment.environment.charAt(0).toUpperCase() +
-                      json.deployment.environment.slice(1),
-                  );
-                  $("#sdeployment-environment-div").removeClass("production");
-                  $("#sdeployment-environment-div").removeClass("staging");
-                  $("#sdeployment-environment-div").removeClass("development");
-                  $("#sdeployment-environment-div").addClass(
-                    json.deployment.environment,
-                  );
+          // errors info row
+          const ctx = document.getElementById("sdeployment-etimeline-chart");
+          const timelineChart = new Chart(
+            ctx,
+            JSON.parse(JSON.stringify(config)),
+          );
+          let unresolved_timeline = [0, 0, 0, 0, 0, 0];
+          let resolved_timeline = [0, 0, 0, 0, 0, 0];
+          let labels = [];
+          for (let i = 5; i >= 0; i--) {
+            const time = new Date(Date.now() - i * 4 * 60 * 60 * 1000);
+            const hours = time.getHours();
+            const suffix = hours >= 12 ? "pm" : "am";
+            labels.push(((hours + 11) % 12) + 1 + " " + suffix);
+          }
 
-                  $("#sdeployment-status").text(
-                    json.deployment.status.charAt(0).toUpperCase() +
-                      json.deployment.status.slice(1),
-                  );
-                  $("#sdeployment-status-div").removeClass("active");
-                  $("#sdeployment-status-div").removeClass("inactive");
-                  $("#sdeployment-status-div").addClass(json.deployment.status);
-                  $("#sdeployment-apikey").text(json.deployment.api_key);
-                });
-            });
-          });
-
-          // handle deleting deployment
-          $("#sdeployment-delete").click(function () {
-            openModal({
-              title: "Delete Deployment",
-              fields: [
-                {
-                  id: "confirm",
-                  label:
-                    "Confirm you want to delete this deployment (this action cannot be undone)",
-                  type: "checkbox",
-                },
-              ],
-            }).then((data) => {
-              if (data.confirm) {
-                fetch("/api/deployments/" + deployment.id, {
-                  method: "DELETE",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                })
-                  .then((resp) => resp.json())
-                  .then((json) => {
-                    // console.log(json);
-                    window.location.href =
-                      "/dashboard.html?projectId=" +
-                      project.id +
-                      "&projectInfo";
-                  });
+          for (let i = 0; i < deployment.error_events.length; i++) {
+            const event_time = parseSqlTimestamp(
+              deployment.error_events[i].timestamp,
+            );
+            const now = new Date();
+            const hours_before = (now - event_time) / 1000 / 60 / 60;
+            if (hours_before < 24) {
+              if (deployment.error_events[i].status !== "resolved") {
+                unresolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
+              } else {
+                resolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
               }
-            });
-          });
+            }
+          }
+
+          timelineChart.data.datasets = [
+            {
+              label: "Unresolved Errors",
+              data: unresolved_timeline,
+              backgroundColor: "rgb(245, 140, 140)",
+              borderColor: "#000000",
+              borderWidth: 2,
+              borderSkipped: false,
+              borderRadius: 3,
+            },
+            {
+              label: "Resolved Errors",
+              data: resolved_timeline,
+              backgroundColor: "#7fd58f",
+              borderColor: "#000000",
+              borderWidth: 2,
+              borderSkipped: false,
+              borderRadius: 3,
+            },
+          ];
+          timelineChart.data.labels = labels;
+          timelineChart.update();
+
+          // recent errors table
+          sdeployment_recent_errors = deployment.error_events;
+          sdeployment_recent_errors.sort(
+            (a, b) =>
+              parseSqlTimestamp(b.timestamp) - parseSqlTimestamp(a.timestamp),
+          );
+          sdeployment_recent_errors = sdeployment_recent_errors.slice(0, 5);
+          console.log(sdeployment_recent_errors);
+          for (let i = 0; i < sdeployment_recent_errors.length; i++) {
+            const event = sdeployment_recent_errors[i];
+            const created_at = parseSqlTimestamp(event.timestamp);
+            const formatted_time = formatTime(event.timestamp);
+            $("#sdeployment-rerror-container").append(`
+              <div class="sdeployment-rerror-card">
+                <h1>Something</h1>
+                <h2>5 minutes ago</h2>
+              </div>
+              <hr/> 
+              `);
+          }
+
+          const meta = JSON.parse(deployment.meta);
+          if (meta) {
+            const backend_monitoring = meta.performance.backend_monitoring;
+            console.log(backend_monitoring);
+            const cpu = backend_monitoring.cpu_usage;
+            const memory = backend_monitoring.memory_usage;
+            const timestamps = backend_monitoring.timestamps;
+            // populate charts for cpu and memory usage -> group by minute for at max 2 hours
+            let labels = [];
+            let cpu_data = [];
+            let memory_data = [];
+            for (let i = 120; i >= 0; i--) {
+              const time = new Date(Date.now() - i * 60 * 1000);
+              let hours = time.getHours();
+              if (hours > 12) {
+                hours = hours - 12;
+              }
+              const suffix = time.getHours() >= 12 ? "pm" : "am";
+              labels.push(
+                `${hours}:${time.getMinutes().toString().padStart(2, "0")} ${suffix}`,
+              );
+
+              cpu_data.push(0);
+              memory_data.push(0);
+            }
+
+            for (let i = 0; i < cpu.length; i++) {
+              const time = parseSqlTimestamp(timestamps[i]);
+              const now = new Date();
+              const minutes_before = (now - time) / 1000 / 60;
+              console.log(minutes_before);
+              cpu_data[120 - Math.floor(minutes_before)] = cpu[i];
+              memory_data[120 - Math.floor(minutes_before)] = memory[i];
+            }
+
+            const ctx_cpu = document.getElementById(
+              "sdeployment-overview-cpu-chart",
+            );
+            const cpuChart = new Chart(
+              ctx_cpu,
+              JSON.parse(JSON.stringify(config)),
+            );
+            console.log(cpu_data);
+            cpuChart.config.type = "line";
+            cpuChart.data.datasets = [
+              {
+                label: "CPU Usage",
+                data: cpu_data,
+                backgroundColor: "rgb(245, 140, 140)",
+                borderColor: "#000000",
+                borderWidth: 1,
+                borderSkipped: false,
+                borderRadius: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+              },
+            ];
+            cpuChart.data.labels = labels;
+            cpuChart.options.scales.x.ticks.callback = function (val, index) {
+              return index % 15 == 1 ? this.getLabelForValue(val) : "";
+            };
+            cpuChart.update();
+
+            const ctx_memory = document.getElementById("sdeployment-overview-memory-chart");
+            const memoryChart = new Chart(ctx_memory, JSON.parse(JSON.stringify(config)));
+            memoryChart.config.type = "line";
+            memoryChart.data.datasets = [
+              {
+                label: "Memory Usage",
+                data: memory_data,
+                backgroundColor: "#7fd58f",
+                borderColor: "#000000",
+                borderWidth: 1,
+                borderSkipped: false,
+                borderRadius: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+              },
+            ];
+            memoryChart.data.labels = labels;
+            memoryChart.options.scales.x.ticks.callback = function(val, index) {
+              return index % 15 == 1 ? this.getLabelForValue(val) : "";
+            }
+            memoryChart.update();
+          }
+
+
 
           // end overview tab popualtion
         } else if (currentTab === "errors") {
@@ -1503,6 +1536,146 @@ $(document).ready(function () {
                 .then((json) => {
                   window.location.reload();
                 });
+            });
+          });
+        } else if (currentTab === "performance") {
+        } else if (currentTab === "uptime") {
+        } else if (currentTab === "settings") {
+          // handle editing deployment details
+
+          //TODO -> update deplyoment edit modal
+          $("#sdeployment-edit").click(function () {
+            // editing deployment details
+            openModal({
+              title: "Edit Deployment Details",
+              fields: [
+                {
+                  id: "name",
+                  label: "Deployment Name",
+                  type: "text",
+                  placeholder: "",
+                  value: deployment.name,
+                  validate: (value) =>
+                    value.length > 1
+                      ? { success: true }
+                      : {
+                          success: false,
+                          message:
+                            "Deployment name must be at least 2 characters long",
+                        },
+                },
+                {
+                  id: "version",
+                  label: "Deployment Version",
+                  type: "text",
+                  placeholder: "",
+                  value: deployment.version,
+                  validate: (value) =>
+                    value.length > 1
+                      ? { success: true }
+                      : {
+                          success: false,
+                          message:
+                            "Deployment version must be at least 2 characters long",
+                        },
+                },
+                {
+                  id: "environment",
+                  label: "Deployment Environment",
+                  type: "select",
+                  options: [
+                    { label: "Production", value: "production" },
+                    { label: "Staging", value: "staging" },
+                    { label: "Development", value: "development" },
+                  ],
+                  value: deployment.environment,
+                },
+                {
+                  id: "status",
+                  label: "Deployment Status",
+                  type: "select",
+                  options: [
+                    { label: "Active", value: "active" },
+                    { label: "Inactive", value: "inactive" },
+                  ],
+                },
+                {
+                  id: "regen",
+                  label: "Regenerate API Key (irreversible!)",
+                  type: "checkbox",
+                },
+              ],
+            }).then((data) => {
+              fetch("/api/deployments/" + deployment.id, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  name: data.name,
+                  version: data.version,
+                  environment: data.environment,
+                  status: data.status,
+                  regen: data.regen,
+                }),
+              })
+                .then((resp) => resp.json())
+                .then((json) => {
+                  // console.log(json);
+                  $("#sdeployment-name").text(json.deployment.name);
+                  $("#sdeployment-version").text(json.deployment.version);
+                  $("#sdeployment-environment").text(
+                    json.deployment.environment.charAt(0).toUpperCase() +
+                      json.deployment.environment.slice(1),
+                  );
+                  $("#sdeployment-environment-div").removeClass("production");
+                  $("#sdeployment-environment-div").removeClass("staging");
+                  $("#sdeployment-environment-div").removeClass("development");
+                  $("#sdeployment-environment-div").addClass(
+                    json.deployment.environment,
+                  );
+
+                  $("#sdeployment-status").text(
+                    json.deployment.status.charAt(0).toUpperCase() +
+                      json.deployment.status.slice(1),
+                  );
+                  $("#sdeployment-status-div").removeClass("active");
+                  $("#sdeployment-status-div").removeClass("inactive");
+                  $("#sdeployment-status-div").addClass(json.deployment.status);
+                  $("#sdeployment-apikey").text(json.deployment.api_key);
+                });
+            });
+          });
+
+          // handle deleting deployment
+          $("#sdeployment-delete").click(function () {
+            openModal({
+              title: "Delete Deployment",
+              fields: [
+                {
+                  id: "confirm",
+                  label:
+                    "Confirm you want to delete this deployment (this action cannot be undone)",
+                  type: "checkbox",
+                },
+              ],
+            }).then((data) => {
+              if (data.confirm) {
+                fetch("/api/deployments/" + deployment.id, {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((resp) => resp.json())
+                  .then((json) => {
+                    // console.log(json);
+                    window.location.href =
+                      "/dashboard.html?projectId=" +
+                      project.id +
+                      "&projectInfo";
+                  });
+              }
             });
           });
         }

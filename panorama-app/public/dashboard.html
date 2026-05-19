@@ -681,13 +681,29 @@
                   class="dashboard-card"
                   style="
                     flex: 1;
-                    align-items: flex-start;
-                    justify-content: flex-start;
+                    padding-left: 0px;
+                    padding-right: 0px;
+                    padding-bottom: 0px;
                   "
                 >
-                  <h3 style="margin-top: 2px; margin-bottom: 5px">
+                  <h3 style="margin-top: 2px; margin-bottom: 10px;margin-left: 20px;">
                     Recent Errors
                   </h3>
+                  <div
+                    style="
+                      flex: 1;
+                      border-top: solid 2px black;
+                      overflow-y: scroll;
+                      scrollbar-width: 1px;
+                    "
+                    id="sdeployment-rerror-container"
+                  >
+                    <!-- <div class="sdeployment-rerror-card">
+                      <h1>Something</h1>
+                      <h2>5 minutes ago</h2>
+                    </div>
+                    <hr/> -->
+                  </div>
                 </div>
               </div>
             </div>
