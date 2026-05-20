@@ -1319,17 +1319,82 @@ pre[class*="language-"] {
 }
 
 .sdeployment-rerror-card h2 {
-    font-size: 17px !important;
+  font-size: 17px !important;
   line-height: 17px !important;
   font-weight: 500;
   margin: 0;
 }
 
-#sdeployment-rerror-container hr {
+#sdeployment-rerror-container hr,
+#sdeployment-monitoring-list hr {
   width: 100%;
   border: none;
   border-top: dotted 1.6px black;
   margin-bottom: 0;
   background-color: transparent;
   margin-top: 0;
+}
+
+#sdeployment-monitoring-list {
+  padding-bottom: 20px;
+  overflow-y: scroll;
+  min-height: 20vh;
+  max-height: 20vh;
+}
+
+.monitoring-sline {
+  height: 40px;
+  width: 5px;
+  border-radius: 2px;
+  margin-left: 2px;
+  margin-right: 2px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  transition-duration: 0s;
+}
+
+.simple-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.monitoring-sline.up {
+  background-color: #7fd58f;
+}
+
+.monitoring-sline.down {
+  background-color: #f58c8c;
+}
+
+.monitoring-sline.unknown {
+  background-color: rgb(191, 191, 191);
+}
+
+.monitoring-sline.degraded {
+  background-color: #f5cb8c;
+}
+
+.sdeployment-monitoring-label p {
+  font-size: 15px;
+  margin-top: 4px;
+  margin-bottom: 0px;
+}
+
+.uptime-statistic p{
+  font-size: 18px;
+  font-weight: 400;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-right: 4px;
+
+
+}
+
+.uptime-statistic h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }

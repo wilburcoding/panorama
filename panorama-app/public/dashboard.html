@@ -686,7 +686,13 @@
                     padding-bottom: 0px;
                   "
                 >
-                  <h3 style="margin-top: 2px; margin-bottom: 10px;margin-left: 20px;">
+                  <h3
+                    style="
+                      margin-top: 2px;
+                      margin-bottom: 10px;
+                      margin-left: 20px;
+                    "
+                  >
                     Recent Errors
                   </h3>
                   <div
@@ -815,26 +821,99 @@
                   class="dashboard-card"
                   style="
                     flex: 1;
-                    align-items: flex-start;
-                    justify-content: flex-start;
+                    padding-left: 0px;
+                    padding-right: 0px;
+                    padding-bottom: 0px;
                   "
                 >
-                  <h3 style="margin-top: 2px; margin-bottom: 5px">
+                  <h3
+                    style="
+                      margin-top: 2px;
+                      margin-bottom: 10px;
+                      margin-left: 20px;
+                    "
+                  >
                     Monitoring List
                   </h3>
-                  <div id="sdeployment-monitoring-list"></div>
+                  <div
+                    id="sdeployment-monitoring-list"
+                    style="
+                      flex: 1;
+                      border-top: solid 2px black;
+                      overflow-y: scroll;
+                      scrollbar-width: 1px;
+                    "
+                  >
+                    <!-- <div class="sdeployment-rerror-card">
+                      <div class="sdeployment-monitoring-label">
+                        <h1>Homepage</h1>
+                        <p>http://localhost:3000/index.html</p>
+                      </div>
+                      <div>
+                        <div
+                          style="
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+                            justify-content: flex-start;
+                          "
+                          id="sdeployment-monitoring-container"
+                        >
+                        </div>
+                        <div class="simple-row sdeployment-monitoring-label">
+                          <p>1 day ago</p>
+                          <p>Now</p>
+                        </div>
+                      </div>
+                    </div>
+                    <hr /> -->
+                  </div>
                 </div>
                 <div
                   class="dashboard-card"
                   style="
                     flex: 1;
-                    align-items: flex-start;
-                    justify-content: flex-start;
+                    padding-left: 0px;
+                    padding-right: 0px;
+                    padding-bottom: 0px;
                   "
                 >
-                  <h3 style="margin-top: 2px; margin-bottom: 5px">
+                  <h3
+                    style="
+                      margin-top: 2px;
+                      margin-bottom: 10px;
+                      margin-left: 20px;
+                    "
+                  >
                     Uptime Statistics
                   </h3>
+                  <div
+                    style="
+                      flex: 1;
+                      border-top: solid 2px black;
+                      overflow-y: scroll;
+                      scrollbar-width: 1px;
+                      padding-left: 10px;
+                      padding-right: 6px;
+                    "
+                  >
+                    <div class="simple-row uptime-statistic">
+                      <h3>Overall Uptime (last 24 hours)</h3>
+                      <p id="sdeployment-overview-ouptime">5</p>
+                    </div>
+                    <div class="simple-row uptime-statistic">
+                      <h3>Current Status</h3>
+                      <p id="sdeployment-overview-cstatus">5</p>
+                    </div>
+                    <div class="simple-row uptime-statistic">
+                      <h3>Average Response Time</h3>
+                      <p id="sdeployment-overview-artime">5</p>
+                    </div>
+                    <div class="simple-row uptime-statistic">
+                      <h3>Worst Response Time</h3>
+                      <p id="sdeployment-overview-wrtime">5</p>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div

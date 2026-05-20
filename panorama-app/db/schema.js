@@ -104,6 +104,26 @@ export function sample_data() {
         sample_memory.push(Math.floor(Math.random() * 50 + 20));
         sample_timestamps.push(new Date(Date.now() - 30000 * k).toISOString());
       }
+
+      let sample_statuses = [];
+      let sample_statuses2 = [];
+      for (let k = 0; k < 20; k++) {
+        sample_statuses.push(Math.random() > 0.05);
+        sample_statuses2.push(Math.random() > 0.3);
+      }
+      let sample_response_times = [];
+      let sample_response_times2 = [];
+      for (let k = 0; k < 20; k++) {
+        sample_response_times.push(Math.floor(Math.random() * 100 + 10));
+        sample_response_times2.push(Math.floor(Math.random() * 150 + 20));
+      }
+
+      let timestamps = [];// uptime monitoring -> assuming 10 minute intervals
+      for (let k = 20; k > 0; k--) {
+        timestamps.push(new Date(Date.now() - 60 * 1000 * 10 * k).toISOString());
+      }
+
+      let sample_stat
       const meta = {
         performance: {
           backend_monitoring: {
@@ -139,16 +159,16 @@ export function sample_data() {
             {
               name: "Homepage",
               url: "https://www.example.com",
-              statuses: [],
-              timestamps: [],
-              response_times: [],
+              statuses: sample_statuses,
+              timestamps: timestamps,
+              response_times: sample_response_times,
             },
             {
               name: "API",
               url: "https://api.example.com/endpoint",
-              statuses: [],
-              timestamps: [],
-              response_times: [],
+              statuses: sample_statuses2,
+              timestamps:timestamps,
+              response_times: sample_response_times2,
             },
           ],
         },

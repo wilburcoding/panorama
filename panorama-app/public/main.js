@@ -1164,7 +1164,6 @@ $(document).ready(function () {
           const meta = JSON.parse(deployment.meta);
           if (meta) {
             const backend_monitoring = meta.performance.backend_monitoring;
-            console.log(backend_monitoring);
             const cpu = backend_monitoring.cpu_usage;
             const memory = backend_monitoring.memory_usage;
             const timestamps = backend_monitoring.timestamps;
@@ -1191,7 +1190,6 @@ $(document).ready(function () {
               const time = parseSqlTimestamp(timestamps[i]);
               const now = new Date();
               const minutes_before = (now - time) / 1000 / 60;
-              console.log(minutes_before);
               cpu_data[120 - Math.floor(minutes_before)] = cpu[i];
               memory_data[120 - Math.floor(minutes_before)] = memory[i];
             }
@@ -1203,7 +1201,6 @@ $(document).ready(function () {
               ctx_cpu,
               JSON.parse(JSON.stringify(config)),
             );
-            console.log(cpu_data);
             cpuChart.config.type = "line";
             cpuChart.data.datasets = [
               {
@@ -1217,6 +1214,7 @@ $(document).ready(function () {
                 fill: true,
                 tension: 0.4,
                 pointRadius: 0,
+                hitRadius: 20,
               },
             ];
             cpuChart.data.labels = labels;
@@ -1225,8 +1223,13 @@ $(document).ready(function () {
             };
             cpuChart.update();
 
-            const ctx_memory = document.getElementById("sdeployment-overview-memory-chart");
-            const memoryChart = new Chart(ctx_memory, JSON.parse(JSON.stringify(config)));
+            const ctx_memory = document.getElementById(
+              "sdeployment-overview-memory-chart",
+            );
+            const memoryChart = new Chart(
+              ctx_memory,
+              JSON.parse(JSON.stringify(config)),
+            );
             memoryChart.config.type = "line";
             memoryChart.data.datasets = [
               {
@@ -1240,15 +1243,169 @@ $(document).ready(function () {
                 fill: true,
                 tension: 0.4,
                 pointRadius: 0,
+                hitRadius: 20,
               },
             ];
             memoryChart.data.labels = labels;
-            memoryChart.options.scales.x.ticks.callback = function(val, index) {
+            memoryChart.options.scales.x.ticks.callback = function (
+              val,
+              index,
+            ) {
               return index % 15 == 1 ? this.getLabelForValue(val) : "";
-            }
+            };
             memoryChart.update();
           }
 
+          // uptime monitoring information
+          const uptime_meta = meta.uptime;
+          for (let i = 0; i < uptime_meta.monitors.length; i++) {
+            const monitor = uptime_meta.monitors[i];
+            let data = [];
+            for (let i = 0; i < 24; i++) {
+              // one hour intervals
+              data.push([]);
+            }
+            for (let i = 0; i < monitor.statuses.length; i++) {
+              const time = parseSqlTimestamp(monitor.timestamps[i]);
+              const now = new Date();
+              const hours_before = (now - time) / 1000 / 60 / 60;
+              if (hours_before < 24) {
+                data[23 - Math.floor(hours_before)].push(
+                  monitor.statuses[i] ? 1 : 2,
+                );
+              }
+            }
+            let str = "";
+            for (let i = 0; i < data.length; i++) {
+              if (data[i].length == 0) {
+                str += `<div class="monitoring-sline unknown"></div>`;
+              } else {
+                let sum = 0;
+                for (let j = 0; j < data[i].length; j++) {
+                  sum += data[i][j];
+                }
+                const avg = sum / data[i].length;
+                console.log(avg);
+                if (avg < 1.35) {
+                  str += `<div class="monitoring-sline up"></div>`;
+                } else if (avg < 1.65) {
+                  str += `<div class="monitoring-sline degraded"></div>`;
+                } else {
+                  str+= `<div class="monitoring-sline down"></div>`;
+                }
+              }
+            }
+            $("#sdeployment-monitoring-list").append(`
+              <div class="sdeployment-rerror-card">
+                <div class="sdeployment-monitoring-label">
+                  <h1>${monitor.name}</h1>
+                  <p>${monitor.url}</p>
+                </div>
+                <div>
+                  <div
+                    style="
+                      display: flex;
+                      flex-direction: row;
+                      align-items: center;
+                      justify-content: flex-start;
+                    "
+                    id="sdeployment-monitoring-container"
+                  >
+                  ${str}
+                  </div>
+                  <div class="simple-row sdeployment-monitoring-label">
+                    <p>1 day ago</p>
+                    <p>Now</p>
+                  </div>
+                </div>
+              </div>
+              <hr />
+              `);
+          }
+
+          // populate uptime overview statistics data
+          let ouptime_sum = 0;
+          let ouptime_count = 0;
+          for (let i =0; i < uptime_meta.monitors.length; i++) {
+            const monitor = uptime_meta.monitors[i];
+            for (let j =0; j < monitor.statuses.length; j++) {
+              if (monitor.statuses[j]) {
+                ouptime_sum+=1;
+              }
+              ouptime_count +=1;
+            }
+          }
+          if (ouptime_count > 0) {
+            $("#sdeployment-overview-ouptime").text(((ouptime_sum / ouptime_count) * 100).toFixed(2) + "%");
+          } else {
+            $("#sdeployment-overview-ouptime").text("N/A");
+          }
+
+          let cuptime_sum = 0;
+          let cuptime_count = 0;
+          for (let i =0; i < uptime_meta.monitors.length; i++) {
+            const monitor = uptime_meta.monitors[i];
+            for (let j =0; j < monitor.statuses.length; j++) {
+              const time = parseSqlTimestamp(monitor.timestamps[j]);
+              const now = new Date();
+              const hours_before = (now - time) / 1000 / 60 / 60;
+              if (hours_before < 1) {
+                if (monitor.statuses[j]) {
+                  cuptime_sum +=1;
+                }
+                cuptime_count += 1;
+              }
+            }
+          }
+          if (cuptime_count > 0) {
+            $("#sdeployment-overview-cstatus").text(((cuptime_sum / cuptime_count) * 100).toFixed(2) + "% online");
+          } else {
+            $("#sdeployment-overview-cstatus").text("N/A");
+          }
+
+          let artime_sum = 0;
+          let artime_count = 0;
+          for (let i =0; i < uptime_meta.monitors.length; i++) {
+            const monitor = uptime_meta.monitors[i];
+            for (let j =0; j < monitor.statuses.length; j++) {
+              const time = parseSqlTimestamp(monitor.timestamps[j]);
+              const now = new Date();
+              const hours_before = (now - time) / 1000 / 60 / 60;
+              if (hours_before < 1) {
+                if (monitor.statuses[j]) {
+                  artime_sum += monitor.response_times[j];
+                }
+                artime_count +=1;
+              }
+            }
+          }
+
+          if (artime_count > 0) {
+            $("#sdeployment-overview-artime").text((artime_sum / artime_count).toFixed(2) + " ms");
+          } else {
+            $("#sdeployment-overview-artime").text("N/A")
+          }
+
+          let worst_rtime = 0;
+          for (let i =0 ; i < uptime_meta.monitors.length; i++) {
+            const monitor = uptime_meta.monitors[i];
+            for (let j =0; j < monitor.statuses.length; j++) {
+              const time = parseSqlTimestamp(monitor.timestamps[j]);
+              const now = new Date();
+              const hours_before = (now - time) / 1000 / 60/ 60;
+              if (hours_before < 1) {
+                if (monitor.response_times[j] > worst_rtime) {
+                  worst_rtime = monitor.response_times[j];
+                }
+              }
+            }
+          }
+
+          if (worst_rtime > 0) {
+            $("#sdeployment-overview-wrtime").text(worst_rtime.toFixed(2) + " ms");
+          } else {
+            $("#sdeployment-overview-wrtime").text("N/A");
+          }
 
 
           // end overview tab popualtion
