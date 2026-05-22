@@ -1026,8 +1026,14 @@ $(document).ready(function () {
         if (currentTab !== "performance") {
           $("#sdeployment-" + currentTab + "-content").show();
         } else {
-          // for now, show backend performance screen
-          $("#sdeployment-performance-content-1").show();
+          if (deployment.type === "backend") {
+            $("#sdeployment-performance-content-1").show();
+            $("#sdeployment-performance-content-2").hide();
+            
+          } else {
+            $("#sdeployment-performance-content-2").show();
+            $("#sdeployment-performance-content-1").hide();
+          }
         }
 
         if (currentTab === "overview") {
@@ -1186,7 +1192,10 @@ $(document).ready(function () {
               memory_data.push(0);
             }
 
-            for (let i = 0; i < cpu.length; i++) {
+            for (let i = 0; i < 120; i++) {
+              if (i >= timestamps.length) {
+                break;
+              }
               const time = parseSqlTimestamp(timestamps[i]);
               const now = new Date();
               const minutes_before = (now - time) / 1000 / 60;
@@ -1442,7 +1451,7 @@ $(document).ready(function () {
               now.getFullYear(),
               now.getMonth(),
               now.getDate(),
-              24
+              24,
             );
 
             const hours_before = (time - event_time) / 1000 / 60 / 60;
@@ -1801,6 +1810,106 @@ $(document).ready(function () {
             });
           });
         } else if (currentTab === "performance") {
+          if (deployment.type == "backend") {
+            // show backend performance monitoring data
+            console.log(deployment);
+            const meta = JSON.parse(deployment.meta);
+            const backend_monitoring = meta.performance.backend_monitoring;
+            const cpu = backend_monitoring.cpu_usage;
+            const memory = backend_monitoring.memory_usage;
+            const timestamps = backend_monitoring.timestamps;
+            // populate charts for cpu and memory usage -> group by minute for at max 2 hours
+            let labels = [];
+            let cpu_data = [];
+            let memory_data = [];
+            for (let i = 240; i >= 0; i--) {
+              const time = new Date(Date.now() - i * 60 * 1000);
+              let hours = time.getHours();
+              if (hours > 12) {
+                hours = hours - 12;
+              }
+              const suffix = time.getHours() >= 12 ? "pm" : "am";
+              labels.push(
+                `${hours}:${time.getMinutes().toString().padStart(2, "0")} ${suffix}`,
+              );
+
+              cpu_data.push(0);
+              memory_data.push(0);
+            }
+
+            for (let i = 0; i < 240; i++) {
+              const time = parseSqlTimestamp(timestamps[i]);
+              const now = new Date();
+              const minutes_before = (now - time) / 1000 / 60;
+              cpu_data[240 - Math.floor(minutes_before)] = cpu[i];
+              memory_data[240 - Math.floor(minutes_before)] = memory[i];
+            }
+
+            const ctx_cpu = document.getElementById(
+              "sdeployment-cpu-chart",
+            );
+            const cpuChart = new Chart(
+              ctx_cpu,
+              JSON.parse(JSON.stringify(config)),
+            );
+            cpuChart.config.type = "line";
+            cpuChart.data.datasets = [
+              {
+                label: "CPU Usage",
+                data: cpu_data,
+                backgroundColor: "rgb(245, 140, 140)",
+                borderColor: "#000000",
+                borderWidth: 1,
+                borderSkipped: false,
+                borderRadius: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                hitRadius: 20,
+              },
+            ];
+            cpuChart.data.labels = labels;
+            cpuChart.options.scales.x.ticks.callback = function (val, index) {
+              return index % 15 == 1 ? this.getLabelForValue(val) : "";
+            };
+            cpuChart.update();
+
+            const ctx_memory = document.getElementById(
+              "sdeployment-memory-chart",
+            );
+            const memoryChart = new Chart(
+              ctx_memory,
+              JSON.parse(JSON.stringify(config)),
+            );
+            memoryChart.config.type = "line";
+            memoryChart.data.datasets = [
+              {
+                label: "Memory Usage",
+                data: memory_data,
+                backgroundColor: "#7fd58f",
+                borderColor: "#000000",
+                borderWidth: 1,
+                borderSkipped: false,
+                borderRadius: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                hitRadius: 20,
+              },
+            ];
+            memoryChart.data.labels = labels;
+            memoryChart.options.scales.x.ticks.callback = function (
+              val,
+              index,
+            ) {
+              return index % 15 == 1 ? this.getLabelForValue(val) : "";
+            };
+
+            memoryChart.update();
+
+          } else {
+            // show frontend performance monitoring data
+          }
         } else if (currentTab === "uptime") {
         } else if (currentTab === "settings") {
           // handle editing deployment details

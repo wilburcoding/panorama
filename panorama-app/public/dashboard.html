@@ -1065,7 +1065,6 @@
                 scrollbar-width: 1px;
               "
               id="serror-rcontainer"
-
             ></div>
           </div>
           <div
@@ -1193,6 +1192,8 @@
               <canvas id="sdeployment-cpu-chart"></canvas>
             </div>
           </div>
+        </div>
+        <div class="dashboard-row">
           <div class="dashboard-card" style="flex: 1">
             <h2>Memory Usage Timeline</h2>
             <div style="flex: 1; height: auto; width: 100%">
@@ -1201,8 +1202,80 @@
           </div>
         </div>
         <div class="dashboard-row">
-          <div class="dashboard-card" style="flex: 1">
-            <h2>Benchmarks</h2>
+          <div
+            class="dashboard-card"
+            style="
+              flex: 1;
+              padding-left: 0;
+              padding-bottom: 0;
+              padding-right: 0;
+            "
+          >
+            <h2 style="margin-left: 20px">Benchmarks</h2>
+            <div
+              style="
+                flex: 1;
+                border-top: solid 2px black;
+                overflow-y: scroll;
+                scrollbar-width: 1px;
+              "
+              id="sdeployment-benchmarks"
+            >
+              <div class="benchmark-item">
+                <div class="pbenchmark-item1">
+                  <h3
+                    class="benchmark-name"
+                    style="margin-bottom: 5px; font-size: 20px"
+                  >
+                    Name of Benchmark
+                  </h3>
+                  <div class="simple-row" style="margin-bottom: 7px">
+                    <p>Status:</p>
+                    <div class="benchmark-status excellent">
+                      <p>Excellent</p>
+                    </div>
+                  </div>
+                  <div
+                    class="pbenchmark-item2-subitem"
+                    style="margin-left: 0px"
+                  >
+                    <div class="statistic-row">
+                      <div class="statistic">
+                        <h3>Average Time</h3>
+                        <p>55 ms</p>
+                      </div>
+                      <div class="statistic">
+                        <h3>Worst Time</h3>
+                        <p>120 ms</p>
+                      </div>
+                      <div class="statistic">
+                        <h3>Best Time</h3>
+                        <p>120 ms</p>
+                      </div>
+                    </div>
+                    <div class="statistic-row">
+                      <div class="statistic">
+                        <h3>Last Measurement</h3>
+                        <p>5:30 PM 5/1/2026</p>
+                      </div>
+                      <div class="statistic">
+                        <h3>Measurements (last 24 hours)</h3>
+                        <p>12</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="pbenchmark-item1" style="border: solid 1px black">
+                  <div
+                    class="pbenchmark-item2-subitem"
+                    style="height: 20vh; width: 100%"
+                  >
+                    <canvas id="pbenchmark-chart-1"></canvas>
+                  </div>
+                </div>
+              </div>
+              <hr />
+            </div>
           </div>
         </div>
       </div>

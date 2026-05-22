@@ -99,7 +99,7 @@ export function sample_data() {
       let sample_cpu = [];
       let sample_memory = [];
       let sample_timestamps = [];
-      for (let k = 120; k > 0; k--) {
+      for (let k = 240; k > 0; k--) {
         sample_cpu.push(Math.floor(Math.random() * 50 + 10));
         sample_memory.push(Math.floor(Math.random() * 50 + 20));
         sample_timestamps.push(new Date(Date.now() - 30000 * k).toISOString());
@@ -134,8 +134,8 @@ export function sample_data() {
               {
                 name: "DB Query Performance",
                 expected_time: 200,
-                times: [],
-                timestamps: [],
+                times: [], 
+                timestamps: [], // last 30 times are recorded 
               },
             ],
           },

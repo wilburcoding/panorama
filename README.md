@@ -123,6 +123,8 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [ ] Error events has multiple pages for different features (performance)
          - [x] Overview pages should include information on everything
          - [x] Errors page for more detailed info
+         - [ ] Performance monitoring page
+         - [ ] Uptime tracking page
          - [ ] Reduce clutter
      - [ ] Restructure how deployments work
        - [ ] Deployment types -> front end or backend
@@ -261,6 +263,9 @@ Big Restructuring Plan
       - Backend performance monitoring
         - first row -> cpu graph + memory graph
         - second row -> benchmarks (example: api post latency or duration)
+          - show name + expected time
+          - chart of benchmark data over time
+          - overview box with some overall statistics
       - Frontend performance monitoring
         - Core web vitals data (cards with numbers) overall 
         - Graphs of important metrics (LCP) over time 

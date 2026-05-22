@@ -1190,6 +1190,52 @@ pre[class*="language-"] {
   padding: 10px;
 }
 
+.pbenchmark-item1 {
+  display: flex;
+  flex-direction: column;
+  margin-left: 5px;
+  margin-right: 5px;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.pbenchmark-item1 h3 {
+  font-size: 20px;
+  line-height: 20px;
+  font-weight: 700;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.pbenchmark-item2 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.statistic-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 7px;
+  margin-bottom: 7px;
+}
+
+.statistic {
+  min-width: 200px;
+}
+.statistic h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
 .benchmark-item p {
   margin-top: 2px;
   margin-bottom: 2px;
@@ -1305,7 +1351,9 @@ pre[class*="language-"] {
   justify-content: space-between;
 }
 
-#sdeployment-rerror-container, #serror-rcontainer, #serror-rccontainer {
+#sdeployment-rerror-container,
+#serror-rcontainer,
+#serror-rccontainer {
   padding-bottom: 20px;
   overflow-y: scroll;
   min-height: 20vh;
@@ -1327,7 +1375,10 @@ pre[class*="language-"] {
 }
 
 #sdeployment-rerror-container hr,
-#sdeployment-monitoring-list hr, #serror-rcontainer hr, #serror-rccontainer hr{
+#sdeployment-monitoring-list hr,
+#serror-rcontainer hr,
+#serror-rccontainer hr,
+#sdeployment-benchmarks hr {
   width: 100%;
   border: none;
   border-top: dotted 1.6px black;
@@ -1383,14 +1434,12 @@ pre[class*="language-"] {
   margin-bottom: 0px;
 }
 
-.uptime-statistic p{
+.uptime-statistic p {
   font-size: 18px;
   font-weight: 400;
   margin-top: 5px;
   margin-bottom: 5px;
   margin-right: 4px;
-
-
 }
 
 .uptime-statistic h3 {
