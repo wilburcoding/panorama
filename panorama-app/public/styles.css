@@ -1305,10 +1305,11 @@ pre[class*="language-"] {
   justify-content: space-between;
 }
 
-#sdeployment-rerror-container {
+#sdeployment-rerror-container, #serror-rcontainer, #serror-rccontainer {
   padding-bottom: 20px;
   overflow-y: scroll;
-  height: 20vh;
+  min-height: 20vh;
+  max-height: 20vh;
 }
 
 .sdeployment-rerror-card h1 {
@@ -1326,7 +1327,7 @@ pre[class*="language-"] {
 }
 
 #sdeployment-rerror-container hr,
-#sdeployment-monitoring-list hr {
+#sdeployment-monitoring-list hr, #serror-rcontainer hr, #serror-rccontainer hr{
   width: 100%;
   border: none;
   border-top: dotted 1.6px black;

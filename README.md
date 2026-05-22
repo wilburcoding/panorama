@@ -122,6 +122,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Sidebar improvements
        - [ ] Error events has multiple pages for different features (performance)
          - [x] Overview pages should include information on everything
+         - [x] Errors page for more detailed info
          - [ ] Reduce clutter
      - [ ] Restructure how deployments work
        - [ ] Deployment types -> front end or backend

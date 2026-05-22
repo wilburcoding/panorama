@@ -1291,7 +1291,7 @@ $(document).ready(function () {
                 } else if (avg < 1.65) {
                   str += `<div class="monitoring-sline degraded"></div>`;
                 } else {
-                  str+= `<div class="monitoring-sline down"></div>`;
+                  str += `<div class="monitoring-sline down"></div>`;
                 }
               }
             }
@@ -1326,48 +1326,52 @@ $(document).ready(function () {
           // populate uptime overview statistics data
           let ouptime_sum = 0;
           let ouptime_count = 0;
-          for (let i =0; i < uptime_meta.monitors.length; i++) {
+          for (let i = 0; i < uptime_meta.monitors.length; i++) {
             const monitor = uptime_meta.monitors[i];
-            for (let j =0; j < monitor.statuses.length; j++) {
+            for (let j = 0; j < monitor.statuses.length; j++) {
               if (monitor.statuses[j]) {
-                ouptime_sum+=1;
+                ouptime_sum += 1;
               }
-              ouptime_count +=1;
+              ouptime_count += 1;
             }
           }
           if (ouptime_count > 0) {
-            $("#sdeployment-overview-ouptime").text(((ouptime_sum / ouptime_count) * 100).toFixed(2) + "%");
+            $("#sdeployment-overview-ouptime").text(
+              ((ouptime_sum / ouptime_count) * 100).toFixed(2) + "%",
+            );
           } else {
             $("#sdeployment-overview-ouptime").text("N/A");
           }
 
           let cuptime_sum = 0;
           let cuptime_count = 0;
-          for (let i =0; i < uptime_meta.monitors.length; i++) {
+          for (let i = 0; i < uptime_meta.monitors.length; i++) {
             const monitor = uptime_meta.monitors[i];
-            for (let j =0; j < monitor.statuses.length; j++) {
+            for (let j = 0; j < monitor.statuses.length; j++) {
               const time = parseSqlTimestamp(monitor.timestamps[j]);
               const now = new Date();
               const hours_before = (now - time) / 1000 / 60 / 60;
               if (hours_before < 1) {
                 if (monitor.statuses[j]) {
-                  cuptime_sum +=1;
+                  cuptime_sum += 1;
                 }
                 cuptime_count += 1;
               }
             }
           }
           if (cuptime_count > 0) {
-            $("#sdeployment-overview-cstatus").text(((cuptime_sum / cuptime_count) * 100).toFixed(2) + "% online");
+            $("#sdeployment-overview-cstatus").text(
+              ((cuptime_sum / cuptime_count) * 100).toFixed(2) + "% online",
+            );
           } else {
             $("#sdeployment-overview-cstatus").text("N/A");
           }
 
           let artime_sum = 0;
           let artime_count = 0;
-          for (let i =0; i < uptime_meta.monitors.length; i++) {
+          for (let i = 0; i < uptime_meta.monitors.length; i++) {
             const monitor = uptime_meta.monitors[i];
-            for (let j =0; j < monitor.statuses.length; j++) {
+            for (let j = 0; j < monitor.statuses.length; j++) {
               const time = parseSqlTimestamp(monitor.timestamps[j]);
               const now = new Date();
               const hours_before = (now - time) / 1000 / 60 / 60;
@@ -1375,24 +1379,26 @@ $(document).ready(function () {
                 if (monitor.statuses[j]) {
                   artime_sum += monitor.response_times[j];
                 }
-                artime_count +=1;
+                artime_count += 1;
               }
             }
           }
 
           if (artime_count > 0) {
-            $("#sdeployment-overview-artime").text((artime_sum / artime_count).toFixed(2) + " ms");
+            $("#sdeployment-overview-artime").text(
+              (artime_sum / artime_count).toFixed(2) + " ms",
+            );
           } else {
-            $("#sdeployment-overview-artime").text("N/A")
+            $("#sdeployment-overview-artime").text("N/A");
           }
 
           let worst_rtime = 0;
-          for (let i =0 ; i < uptime_meta.monitors.length; i++) {
+          for (let i = 0; i < uptime_meta.monitors.length; i++) {
             const monitor = uptime_meta.monitors[i];
-            for (let j =0; j < monitor.statuses.length; j++) {
+            for (let j = 0; j < monitor.statuses.length; j++) {
               const time = parseSqlTimestamp(monitor.timestamps[j]);
               const now = new Date();
-              const hours_before = (now - time) / 1000 / 60/ 60;
+              const hours_before = (now - time) / 1000 / 60 / 60;
               if (hours_before < 1) {
                 if (monitor.response_times[j] > worst_rtime) {
                   worst_rtime = monitor.response_times[j];
@@ -1402,64 +1408,107 @@ $(document).ready(function () {
           }
 
           if (worst_rtime > 0) {
-            $("#sdeployment-overview-wrtime").text(worst_rtime.toFixed(2) + " ms");
+            $("#sdeployment-overview-wrtime").text(
+              worst_rtime.toFixed(2) + " ms",
+            );
           } else {
             $("#sdeployment-overview-wrtime").text("N/A");
           }
 
-
           // end overview tab popualtion
         } else if (currentTab === "errors") {
-          return; // for now before i make the UI
+          // return; // for now before i make the UI
           // event statistics + timeline area
-          $("#sdeployment-totalerrors").text(deployment.error_events.length);
-          const unresolved_errors = deployment.error_events.filter(
-            (e) => e.status !== "resolved",
-          ).length;
-          $("#sdeployment-unresolvederrors").text(unresolved_errors);
+          // $("#sdeployment-totalerrors").text(deployment.error_events.length);
+          // const unresolved_errors = deployment.error_events.filter(
+          //   (e) => e.status !== "resolved",
+          // ).length;
+          // $("#sdeployment-unresolvederrors").text(unresolved_errors);
 
-          let unresolved_timeline = [0, 0, 0, 0, 0, 0];
-          let resolved_timeline = [0, 0, 0, 0, 0, 0];
+          let unresolved_timeline = [];
+          let resolved_timeline = [];
+          for (let i = 0; i < 18; i++) {
+            unresolved_timeline.push(0);
+            resolved_timeline.push(0);
+          }
 
           let latest_time = null;
           for (let i = 0; i < deployment.error_events.length; i++) {
             const event_time = parseSqlTimestamp(
               deployment.error_events[i].timestamp,
             );
-            if (latest_time == null) {
-              latest_time = deployment.error_events[i].timestamp;
-            } else if (event_time > parseSqlTimestamp(latest_time)) {
-              latest_time = deployment.error_events[i].timestamp;
-            }
-
             const now = new Date();
-            const hours_before = (now - event_time) / 1000 / 60 / 60;
-            if (hours_before < 24) {
-              if (deployment.error_events[i].status !== "resolved") {
-                unresolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
+            const time = new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate(),
+              24
+            );
+
+            const hours_before = (time - event_time) / 1000 / 60 / 60;
+            console.log(deployment.error_events[i].title);
+            console.log(hours_before);
+            if (hours_before < 72) {
+              if (deployment.error_events[i].status == "unresolved") {
+                unresolved_timeline[17 - Math.floor(hours_before / 4)] += 1;
               } else {
-                resolved_timeline[5 - Math.floor(hours_before / 4)] += 1;
+                resolved_timeline[17 - Math.floor(hours_before / 4)] += 1;
               }
             }
           }
-          $("#sdeployment-lasterror").text(
-            latest_time == null ? "No errors found" : formatTime(latest_time),
-          );
 
           let labels = [];
-          for (let i = 5; i >= 0; i--) {
-            const time = new Date(Date.now() - i * 4 * 60 * 60 * 1000);
+          for (let i = 17; i >= 0; i--) {
+            const now = new Date();
+            const time = new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate(),
+              24 - i * 4,
+            );
             const hours = time.getHours();
             const suffix = hours >= 12 ? "pm" : "am";
+            // if (hours < 4) {
+            //   labels.push(((hours + 11) % 12) + 1 + " " + suffix);
+            // } else {
+            //   labels.push("");
+            // }
             labels.push(((hours + 11) % 12) + 1 + " " + suffix);
           }
 
           // create timeline chart
-          const ctx = document.getElementById("sdeployment-timeline");
-          const timelineChart = new Chart(
-            ctx,
-            JSON.parse(JSON.stringify(config)),
+
+          const dayBoundaryPlugin = {
+            id: "dayBoundary",
+            beforeDraw: (chart) => {
+              const { ctx, chartArea, scales } = chart;
+              let midnightIndices = [5, 11, 17];
+
+              ctx.save();
+              midnightIndices.forEach((idx) => {
+                const x = scales.x.getPixelForValue(idx);
+                ctx.strokeStyle = "rgba(0,0,0,0.2)";
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(x, chartArea.top);
+                ctx.lineTo(x, chartArea.bottom);
+                ctx.stroke();
+              });
+              ctx.restore();
+            },
+          };
+
+          const ctx = document.getElementById(
+            "sdeployment-errors-timeline-chart",
           );
+          const timelineChart = new Chart(ctx, {
+            ...JSON.parse(JSON.stringify(config)),
+            plugins: [dayBoundaryPlugin],
+          });
+          console.log(unresolved_timeline);
+          console.log(resolved_timeline);
+          timelineChart.config.plugins = [dayBoundaryPlugin];
           timelineChart.data.datasets = [
             {
               label: "Unresolved Errors",
@@ -1586,6 +1635,45 @@ $(document).ready(function () {
             }
           }
 
+          // recent errors list
+          let recent_events = deployment.error_events.sort(
+            (a, b) =>
+              parseSqlTimestamp(b.timestamp) - parseSqlTimestamp(a.timestamp),
+          );
+          recent_events = recent_events.slice(0, 5);
+          for (let i = 0; i < recent_events.length; i++) {
+            const event = recent_events[i];
+            const created_at = parseSqlTimestamp(event.timestamp);
+            const formatted_time = formatTime(event.timestamp);
+            $("#serror-rcontainer").append(`
+              <div class="sdeployment-rerror-card">
+                <h1>${event.title}</h1>
+                <h2>${formatted_time}</h2>
+              </div>
+              <hr/> 
+              `);
+          }
+
+          // recurring errors list
+          let recurring_events = deployment.error_events.sort(
+            (a, b) => b.similar_count - a.similar_count,
+          );
+          recurring_events = recurring_events.filter(
+            (e) => e.similar_count > 1,
+          );
+          recurring_events = recurring_events.slice(0, 5);
+          for (let i = 0; i < recurring_events.length; i++) {
+            const event = recurring_events[i];
+            const count = event.similar_count;
+            $("#serror-rccontainer").append(`
+              <div class="sdeployment-rerror-card">
+                <h1>${event.title}</h1>
+                <h2>${count} occurrences</h2>
+              </div>
+              <hr/> 
+              `);
+          }
+
           populateErrorTable($("#error-search").val().toLowerCase());
           $("#error-search").on("input", function () {
             populateErrorTable($(this).val().toLowerCase());
@@ -1619,26 +1707,43 @@ $(document).ready(function () {
           // handle deleting error events
           $("#elist-delete").click(function () {
             if (checked_errors.length > 0) {
-              fetch("/api/error-events/delete", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  ids: checked_errors,
-                }),
-              })
-                .then((resp) => resp.json())
-                .then((json) => {
-                  if (json.success) {
-                    // update deployments object and repopulate error table
-                    deployment.error_events = deployment.error_events.filter(
-                      (e) => !checked_errors.includes(e.id),
-                    );
-                    populateErrorTable($("#error-search").val().toLowerCase());
-                    $("#elist-select").removeClass("checked");
-                  }
-                });
+              openModal({
+                title: "Delete Error Events",
+                fields: [
+                  {
+                    id: "confirm",
+                    label:
+                      "Confirm you want to delete this deployment (this action cannot be undone)",
+                    type: "checkbox",
+                  },
+                ],
+              }).then((data) => {
+                if (data.confirm) {
+                  fetch("/api/error-events/delete", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      ids: checked_errors,
+                    }),
+                  })
+                    .then((resp) => resp.json())
+                    .then((json) => {
+                      if (json.success) {
+                        // update deployments object and repopulate error table
+                        deployment.error_events =
+                          deployment.error_events.filter(
+                            (e) => !checked_errors.includes(e.id),
+                          );
+                        populateErrorTable(
+                          $("#error-search").val().toLowerCase(),
+                        );
+                        $("#elist-select").removeClass("checked");
+                      }
+                    });
+                }
+              });
             }
           });
 
