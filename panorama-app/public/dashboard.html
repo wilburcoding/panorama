@@ -1218,63 +1218,64 @@
                 border-top: solid 2px black;
                 overflow-y: scroll;
                 scrollbar-width: 1px;
+                padding-bottom: 30px;
               "
               id="sdeployment-benchmarks"
             >
-              <div class="benchmark-item">
-                <div class="pbenchmark-item1">
-                  <h3
-                    class="benchmark-name"
-                    style="margin-bottom: 5px; font-size: 20px"
-                  >
-                    Name of Benchmark
-                  </h3>
-                  <div class="simple-row" style="margin-bottom: 7px">
-                    <p>Status:</p>
-                    <div class="benchmark-status excellent">
-                      <p>Excellent</p>
+              <!-- <div class="benchmark-item">
+                  <div class="pbenchmark-item1">
+                    <h3
+                      class="benchmark-name"
+                      style="margin-bottom: 5px; font-size: 20px"
+                    >
+                      Name of Benchmark
+                    </h3>
+                    <div class="simple-row" style="margin-bottom: 7px">
+                      <p>Status:</p>
+                      <div class="benchmark-status excellent">
+                        <p>Excellent</p>
+                      </div>
+                    </div>
+                    <div
+                      class="pbenchmark-item2-subitem"
+                      style="margin-left: 0px"
+                    >
+                      <div class="statistic-row">
+                        <div class="statistic">
+                          <h3>Average Time</h3>
+                          <p>55 ms</p>
+                        </div>
+                        <div class="statistic">
+                          <h3>Worst Time</h3>
+                          <p>120 ms</p>
+                        </div>
+                        <div class="statistic">
+                          <h3>Best Time</h3>
+                          <p>120 ms</p>
+                        </div>
+                      </div>
+                      <div class="statistic-row">
+                        <div class="statistic">
+                          <h3>Last Measurement</h3>
+                          <p>5:30 PM 5/1/2026</p>
+                        </div>
+                        <div class="statistic">
+                          <h3>Measurements (last 24 hours)</h3>
+                          <p>12</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div
-                    class="pbenchmark-item2-subitem"
-                    style="margin-left: 0px"
-                  >
-                    <div class="statistic-row">
-                      <div class="statistic">
-                        <h3>Average Time</h3>
-                        <p>55 ms</p>
-                      </div>
-                      <div class="statistic">
-                        <h3>Worst Time</h3>
-                        <p>120 ms</p>
-                      </div>
-                      <div class="statistic">
-                        <h3>Best Time</h3>
-                        <p>120 ms</p>
-                      </div>
-                    </div>
-                    <div class="statistic-row">
-                      <div class="statistic">
-                        <h3>Last Measurement</h3>
-                        <p>5:30 PM 5/1/2026</p>
-                      </div>
-                      <div class="statistic">
-                        <h3>Measurements (last 24 hours)</h3>
-                        <p>12</p>
-                      </div>
+                  <div class="pbenchmark-item1" style="border: solid 1px black">
+                    <div
+                      class="pbenchmark-item2-subitem"
+                      style="height: 20vh; width: 100%"
+                    >
+                      <canvas id="pbenchmark-chart-1"></canvas>
                     </div>
                   </div>
                 </div>
-                <div class="pbenchmark-item1" style="border: solid 1px black">
-                  <div
-                    class="pbenchmark-item2-subitem"
-                    style="height: 20vh; width: 100%"
-                  >
-                    <canvas id="pbenchmark-chart-1"></canvas>
-                  </div>
-                </div>
-              </div>
-              <hr />
+                <hr /> -->
             </div>
           </div>
         </div>
@@ -1612,5 +1613,8 @@
     crossorigin="anonymous"
   ></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/3.0.1/chartjs-plugin-annotation.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
   <script src="./main.js"></script>
 </html>

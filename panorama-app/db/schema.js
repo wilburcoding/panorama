@@ -118,12 +118,28 @@ export function sample_data() {
         sample_response_times2.push(Math.floor(Math.random() * 150 + 20));
       }
 
-      let timestamps = [];// uptime monitoring -> assuming 10 minute intervals
+      let timestamps = []; // uptime monitoring -> assuming 10 minute intervals
       for (let k = 20; k > 0; k--) {
-        timestamps.push(new Date(Date.now() - 60 * 1000 * 10 * k).toISOString());
+        timestamps.push(
+          new Date(Date.now() - 60 * 1000 * 10 * k).toISOString(),
+        );
       }
 
-      let sample_stat
+      let benchmark_timestamps = [];
+      for (let k = 0; k < 30; k++) {
+        benchmark_timestamps.push(
+          new Date(Date.now() - 60000 * 30 * k).toISOString(),
+        ); // 30x at 30 minute intervals
+      }
+
+      let benchmark_times_1 = [];
+      let benchmark_times_2 = [];
+      for (let k = 0; k < 30; k++) {
+        benchmark_times_1.push(Math.floor(Math.random() * 100 + 10)); // random times between 10 ms and 110 ms
+        benchmark_times_2.push(Math.floor(Math.random() * 100 + 10)); // random times between 10 ms and 110 ms
+      }
+
+      let sample_stat;
       const meta = {
         performance: {
           backend_monitoring: {
@@ -133,10 +149,16 @@ export function sample_data() {
             benchmarks: [
               {
                 name: "DB Query Performance",
-                expected_time: 200,
-                times: [], 
-                timestamps: [], // last 30 times are recorded 
+                expected_time: 70,
+                times: benchmark_times_1,
+                timestamps: benchmark_timestamps, // last 30 times are recorded
               },
+              {
+                name: "API Response Time",
+                expected_time: 70,
+                times: benchmark_times_2,
+                timestamps: benchmark_timestamps
+              }
             ],
           },
           frontend_monitoring: {
@@ -146,10 +168,10 @@ export function sample_data() {
             fcp: 123,
             benchmarks: [
               {
-                name: "API Response Time",
+                name: "API Request Time",
                 expected_time: 200,
-                times: [],
-                timestamps: [],
+                times: benchmark_times_1,
+                timestamps: benchmark_timestamps, // last 30 times are recorded
               },
             ],
           },
@@ -167,7 +189,7 @@ export function sample_data() {
               name: "API",
               url: "https://api.example.com/endpoint",
               statuses: sample_statuses2,
-              timestamps:timestamps,
+              timestamps: timestamps,
               response_times: sample_response_times2,
             },
           ],
@@ -184,7 +206,7 @@ export function sample_data() {
         deployment,
         null,
         JSON.stringify(meta),
-        "backend" // for now, only types are "backend" and "frontend"
+        "backend", // for now, only types are "backend" and "frontend"
       );
     }
   }
