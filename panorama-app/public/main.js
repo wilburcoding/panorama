@@ -1026,6 +1026,7 @@ $(document).ready(function () {
         if (currentTab !== "performance") {
           $("#sdeployment-" + currentTab + "-content").show();
         } else {
+          console.log(deployment.type);
           if (deployment.type === "backend") {
             $("#sdeployment-performance-content-1").show();
             $("#sdeployment-performance-content-2").hide();
@@ -1087,6 +1088,9 @@ $(document).ready(function () {
 
           $("#sdeployment-parentproject").text(project.name);
           $("#sdeployment-apikey").text(deployment.api_key);
+          $("#sdeployment-type").text(
+            deployment.type.charAt(0).toUpperCase() + deployment.type.slice(1),
+          );
           $(".apikey-container").click(function () {
             $(this).toggleClass("show");
           });
@@ -1152,7 +1156,6 @@ $(document).ready(function () {
               parseSqlTimestamp(b.timestamp) - parseSqlTimestamp(a.timestamp),
           );
           sdeployment_recent_errors = sdeployment_recent_errors.slice(0, 5);
-          console.log(sdeployment_recent_errors);
           for (let i = 0; i < sdeployment_recent_errors.length; i++) {
             const event = sdeployment_recent_errors[i];
             const created_at = parseSqlTimestamp(event.timestamp);
@@ -1454,8 +1457,7 @@ $(document).ready(function () {
             );
 
             const hours_before = (time - event_time) / 1000 / 60 / 60;
-            console.log(deployment.error_events[i].title);
-            console.log(hours_before);
+
             if (hours_before < 72) {
               if (deployment.error_events[i].status == "unresolved") {
                 unresolved_timeline[17 - Math.floor(hours_before / 4)] += 1;
@@ -1867,7 +1869,7 @@ $(document).ready(function () {
             ];
             cpuChart.data.labels = labels;
             cpuChart.options.scales.x.ticks.callback = function (val, index) {
-              return index % 15 == 1 ? this.getLabelForValue(val) : "";
+              return index % 15 == 7 ? this.getLabelForValue(val) : "";
             };
             cpuChart.update();
 
@@ -1899,7 +1901,7 @@ $(document).ready(function () {
               val,
               index,
             ) {
-              return index % 15 == 1 ? this.getLabelForValue(val) : "";
+              return index % 15 == 7 ? this.getLabelForValue(val) : "";
             };
 
             memoryChart.update();
@@ -2022,7 +2024,6 @@ $(document).ready(function () {
                 const time = parseSqlTimestamp(benchmark.timestamps[i]);
                 const now = new Date();
                 const hours_before = (now - time) / 1000 / 60 / 60;
-                console.log(72 - hours_before);
                 if (hours_before < 72) {
                   data.push({
                     x: parseSqlTimestamp(benchmark.timestamps[i]),
@@ -2077,15 +2078,16 @@ $(document).ready(function () {
                     return date.getMonth() + 1 + "/" + date.getDate();
                   }
                   return null;
-                }
+                },
               };
               let annotations = {};
-              const statuses = ["Excellent", "Good", "Slow" ,"Degraded"];
+              const statuses = ["Excellent", "Good", "Slow", "Degraded"];
               const multipliers = [0.5, 0.2, -0.2, -0.5];
               const colors = ["#a0b8eb", "#7fd58f", "#f4d03f", "#f5b38c"];
-              for (let j =0; j < statuses.length; j++) {
-                const threshold = benchmark.expected_time * (1 + multipliers[j]);
-                annotations["line" + j] = { 
+              for (let j = 0; j < statuses.length; j++) {
+                const threshold =
+                  benchmark.expected_time * (1 + multipliers[j]);
+                annotations["line" + j] = {
                   type: "line",
                   yMin: threshold,
                   yMax: threshold,
@@ -2094,16 +2096,177 @@ $(document).ready(function () {
                   borderDash: [7, 4],
                   label: {
                     display: false,
-                  }
-                }
+                  },
+                };
               }
               benchmarkChart.options.plugins.annotation = {
-                annotations: annotations
-              }
+                annotations: annotations,
+              };
+              benchmarkChart.options.y = {
+                suggestedMax: worst_time * 1.15,
+              };
               benchmarkChart.update();
             }
           } else {
             // show frontend performance monitoring data
+            const frontend_monitoring = JSON.parse(deployment.meta).performance
+              .frontend_monitoring;
+            console.log(frontend_monitoring);
+            let ttfb_sum = 0;
+            for (let i = 0; i < frontend_monitoring.ttfb.length; i++) {
+              ttfb_sum += frontend_monitoring.ttfb[i];
+            }
+            const ttfb_avg = ttfb_sum / frontend_monitoring.ttfb.length;
+            $("#sdeployment-ttfb").text(Math.round(ttfb_avg) + " ms");
+
+            let fcp_sum = 0;
+            for (let i = 0; i < frontend_monitoring.fcp.length; i++) {
+              fcp_sum += frontend_monitoring.fcp[i];
+            }
+            const fcp_avg = fcp_sum / frontend_monitoring.fcp.length;
+            $("#sdeployment-fcp").text(Math.round(fcp_avg) + " ms");
+
+            let lcp_sum = 0;
+            for (let i = 0; i < frontend_monitoring.lcp.length; i++) {
+              lcp_sum += frontend_monitoring.lcp[i];
+            }
+            const lcp_avg = lcp_sum / frontend_monitoring.lcp.length;
+            $("#sdeployment-lcp").text(Math.round(lcp_avg) + " ms");
+
+            let inp_sum = 0;
+            for (let i = 0; i < frontend_monitoring.inp.length; i++) {
+              inp_sum += frontend_monitoring.inp[i];
+            }
+            const inp_avg = inp_sum / frontend_monitoring.inp.length;
+            $("#sdeployment-inp").text(Math.round(inp_avg) + " ms");
+
+            // the various timelines -> using scatter plot
+            const metrics = ["ttfb", "fcp", "lcp", "inp"];
+            const thresholds = {
+              // labels: good, degraded, slow, excellenet
+              ttfb: {
+                Excellent: 500,
+                Good: 800,
+                Slow: 1300,
+                Degraded: 1800,
+              },
+              fcp: {
+                Excellent: 1000,
+                Good: 1900,
+                Slow: 2500,
+                Degraded: 3200,
+              },
+              lcp: {
+                Excellent: 2000,
+                Good: 2800,
+                Slow: 3800,
+                Degraded: 4800,
+              },
+              inp: {
+                Excellent: 150,
+                Good: 270,
+                Slow: 450,
+                Degraded: 600,
+              },
+            };
+            for (let i = 0; i < metrics.length; i++) {
+              const metric = metrics[i];
+              let data = [];
+              for (let j = 0; j < frontend_monitoring[metric].length; j++) {
+                const time = parseSqlTimestamp(
+                  frontend_monitoring.timestamps[j],
+                );
+                data.push({
+                  x: time,
+                  y: frontend_monitoring[metric][j],
+                });
+              }
+              const ctx = document.getElementById(
+                `sdeployment-${metric}-chart`,
+              );
+              const chart = new Chart(ctx, JSON.parse(JSON.stringify(config)));
+              chart.config.type = "scatter";
+              chart.data.datasets = [
+                {
+                  label: metric.toUpperCase(),
+                  data: data,
+                  backgroundColor: "rgb(147, 140, 245)",
+                  borderColor: "#000000",
+                  borderWidth: 1,
+                  borderSkipped: false,
+                  borderRadius: 3,
+                },
+              ];
+              chart.options.scales.x = {
+                type: "time",
+                time: {
+                  unit: "hour",
+                  displayFormats: {
+                    hour: "h:mm a",
+                  },
+                },
+                min: (() => {
+                  const d = new Date();
+                  d.setHours(d.getHours() - 72);
+                  return d;
+                })(),
+                max: new Date(),
+              };
+
+              chart.options.scales.x.ticks = {
+                maxRotation: 0,
+                minRotation: 0,
+                autoSkip: false,
+                callback: (value) => {
+                  const date = new Date(value);
+                  let label = "";
+                  if (date.getHours() === 0 && date.getMinutes() === 0) {
+                    return date.getMonth() + 1 + "/" + date.getDate();
+                  }
+                  return null;
+                },
+              };
+
+              let max_value = 0;
+              for (let j = 0; j < frontend_monitoring[metric].length; j++) {
+                if (frontend_monitoring[metric][j] > max_value) {
+                  max_value = frontend_monitoring[metric][j];
+                }
+              }
+              let max = max_value * 1.15;
+              if (max < thresholds[metric].Degraded * 1.15) {
+                max = thresholds[metric].Degraded * 1.15
+              } 
+              chart.options.scales.y.suggestedMax = max;
+              chart.options.scales.y.ticks.stepSize = Math.round(max_value / 5);
+              chart.options.scales.y.ticks.display = false;
+
+              let annotations = {};
+              let colors = {
+                Excellent: "#a0b8eb",
+                Good: "#7fd58f",
+                Slow: "#f4d03f",
+                Degraded: "#f5b38c",
+              };
+              for (let j = 0; j < Object.keys(thresholds[metric]).length; j++) {
+                const threshold = Object.keys(thresholds[metric])[j];
+                annotations["line" + j] = {
+                  type: "line",
+                  yMin: thresholds[metric][threshold],
+                  yMax: thresholds[metric][threshold],
+                  borderColor: colors[threshold],
+                  borderWidth: 2,
+                  borderDash: [7, 4],
+                  label: {
+                    display: false,
+                  },
+                };
+              }
+              chart.options.plugins.annotation = {
+                annotations: annotations,
+              };
+              chart.update();
+            }
           }
         } else if (currentTab === "uptime") {
         } else if (currentTab === "settings") {
@@ -2209,6 +2372,10 @@ $(document).ready(function () {
                   $("#sdeployment-status-div").removeClass("inactive");
                   $("#sdeployment-status-div").addClass(json.deployment.status);
                   $("#sdeployment-apikey").text(json.deployment.api_key);
+                  $("#sdeployment-type").text(
+                    json.deployment.type.charAt(0).toUpperCase() +
+                      json.deployment.type.slice(1),
+                  );
                 });
             });
           });
