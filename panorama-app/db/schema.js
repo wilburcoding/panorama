@@ -141,7 +141,6 @@ export function sample_data() {
         benchmark_times_2.push(Math.floor(Math.random() * 100 + 10)); // random times between 10 ms and 110 ms
         benchmark_times_3.push(Math.floor(Math.random() * 80 + 10));
         benchmark_times_4.push(Math.floor(Math.random() * 50 + 20));
-      
       }
 
       let sample_stat;
@@ -151,14 +150,14 @@ export function sample_data() {
       let sample_ttfb = [];
       let sample_fcp = [];
       let web_vitals_timestamps = [];
-      for (let k =0; k < 40; k++) {
+      for (let k = 0; k < 40; k++) {
         web_vitals_timestamps.push(
-          new Date(Date.now() - 60000 * 15 * k).toISOString()
+          new Date(Date.now() - 60000 * 15 * k).toISOString(),
         );
-        // 40x at 15 minute intervals 
+        // 40x at 15 minute intervals
       }
-      
-      for (let k =0; k < 40 ;k++) {
+
+      for (let k = 0; k < 40; k++) {
         sample_lcp.push(Math.floor(Math.random() * 2000 + 500));
         sample_inp.push(Math.floor(Math.random() * 300 + 50));
         sample_fcp.push(Math.floor(Math.random() * 2000 + 300));
@@ -170,20 +169,6 @@ export function sample_data() {
             cpu_usage: sample_cpu,
             memory_usage: sample_memory,
             timestamps: sample_timestamps,
-            benchmarks: [
-              {
-                name: "DB Query Performance",
-                expected_time: 70,
-                times: benchmark_times_1,
-                timestamps: benchmark_timestamps, // last 30 times are recorded
-              },
-              {
-                name: "API Response Time",
-                expected_time: 70,
-                times: benchmark_times_2,
-                timestamps: benchmark_timestamps
-              }
-            ],
           },
           frontend_monitoring: {
             lcp: sample_lcp,
@@ -191,21 +176,21 @@ export function sample_data() {
             ttfb: sample_ttfb,
             fcp: sample_fcp,
             timestamps: web_vitals_timestamps,
-            benchmarks: [
-              {
-                name: "API Request Time",
-                expected_time: 50,
-                times: benchmark_times_3,
-                timestamps: benchmark_timestamps, // last 30 times are recorded
-              },
-              {
-                name: "Library X Load Time",
-                expected_time: 45,
-                times: benchmark_times_4,
-                timestamps: benchmark_timestamps
-              }
-            ],
           },
+          benchmarks: [
+            {
+              name: "DB Query Performance",
+              expected_time: 70,
+              times: benchmark_times_1,
+              timestamps: benchmark_timestamps, // last 30 times are recorded
+            },
+            {
+              name: "API Response Time",
+              expected_time: 70,
+              times: benchmark_times_2,
+              timestamps: benchmark_timestamps,
+            },
+          ],
         },
         uptime: {
           monitors: [
@@ -237,7 +222,7 @@ export function sample_data() {
         deployment,
         null,
         JSON.stringify(meta),
-        Math.random() < 0.5 ? "backend" : "frontend" , // for now, only types are "backend" and "frontend"
+        Math.random() < 0.5 ? "backend" : "frontend", // for now, only types are "backend" and "frontend"
       );
     }
   }

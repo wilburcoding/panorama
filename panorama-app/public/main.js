@@ -1811,10 +1811,10 @@ $(document).ready(function () {
             });
           });
         } else if (currentTab === "performance") {
+          const meta = JSON.parse(deployment.meta);
           if (deployment.type == "backend") {
             // show backend performance monitoring data
             console.log(deployment);
-            const meta = JSON.parse(deployment.meta);
             const backend_monitoring = meta.performance.backend_monitoring;
             const cpu = backend_monitoring.cpu_usage;
             const memory = backend_monitoring.memory_usage;
@@ -1905,208 +1905,6 @@ $(document).ready(function () {
             };
 
             memoryChart.update();
-
-            // benchmarks statistics
-            const benchmarks = meta.performance.backend_monitoring.benchmarks;
-            console.log(benchmarks);
-            for (let i = 0; i < benchmarks.length; i++) {
-              const benchmark = benchmarks[i];
-              let status = "";
-              let duration = benchmark.times[benchmark.times.length - 1];
-              if (
-                (duration - benchmark.expected_time) / benchmark.expected_time >
-                0.5
-              ) {
-                status = "Degraded";
-              } else if (
-                (duration - benchmark.expected_time) / benchmark.expected_time <
-                -0.5
-              ) {
-                status = "Excellent";
-              } else if (
-                (duration - benchmark.expected_time) /
-                  benchmark.expected_time >=
-                0.2
-              ) {
-                status = "Slow";
-              } else if (
-                (duration - benchmark.expected_time) /
-                  benchmark.expected_time <=
-                0.2
-              ) {
-                status = "Good";
-              }
-
-              // calculate the various stats
-              let times_sum = 0;
-              let worst_time = 0;
-              let best_time = 9999999;
-              let recent_count = 0;
-
-              for (let j = 0; j < benchmark.times.length; j++) {
-                times_sum += benchmark.times[j];
-                if (benchmark.times[j] > worst_time) {
-                  worst_time = benchmark.times[j];
-                }
-                if (benchmark.times[j] < best_time) {
-                  best_time = benchmark.times[j];
-                }
-                const time = parseSqlTimestamp(benchmark.timestamps[j]);
-                const now = new Date();
-                const hours_before = (now - time) / 1000 / 60 / 60;
-                if (hours_before < 24) {
-                  recent_count += 1;
-                }
-              }
-              const average_time = Math.round(
-                times_sum / benchmark.times.length,
-              );
-
-              $("#sdeployment-benchmarks").append(`
-                <div class="benchmark-item">
-                <div class="pbenchmark-item1">
-                  <h3
-                    class="benchmark-name"
-                    style="margin-bottom: 5px; font-size: 20px"
-                  >
-                    ${benchmark.name}
-                  </h3>
-                  <div class="simple-row" style="margin-bottom: 7px">
-                    <p>Status:</p>
-                    <div class="benchmark-status ${status.toLowerCase()}">
-                      <p>${status}</p>
-                    </div>
-                  </div>
-                  <div
-                    class="pbenchmark-item2-subitem"
-                    style="margin-left: 0px"
-                  >
-                    <div class="statistic-row">
-                      <div class="statistic">
-                        <h3>Average Time</h3>
-                        <p>${average_time} ms</p>
-                      </div>
-                      <div class="statistic">
-                        <h3>Worst Time</h3>
-                        <p>${worst_time} ms</p>
-                      </div>
-                      <div class="statistic">
-                        <h3>Best Time</h3>
-                        <p>${best_time} ms</p>
-                      </div>
-                    </div>
-                    <div class="statistic-row">
-                      <div class="statistic">
-                        <h3>Last Measurement</h3>
-                        <p>${formatTime(benchmark.timestamps[benchmark.timestamps.length - 1])}</p>
-                      </div>
-                      <div class="statistic">
-                        <h3>Measurements (last 24 hours)</h3>
-                        <p>${recent_count}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="pbenchmark-item1" style="border: solid 1px black; width: 50%;padding-top: 4px;padding-bottom: 4px;">
-                  <div
-                    class="pbenchmark-ccontainer"
-                    style="height: 20vh; width: 100%;"
-                  >
-                    <canvas id="pbenchmark-chart-${i}"></canvas>
-                  </div>
-                </div>
-              </div>
-              <hr />
-              `);
-              // plot benchmark graph of measurements using a scatter plot -> last 3 days only
-              let data = [];
-              for (let i = 0; i < benchmark.times.length; i++) {
-                const time = parseSqlTimestamp(benchmark.timestamps[i]);
-                const now = new Date();
-                const hours_before = (now - time) / 1000 / 60 / 60;
-                if (hours_before < 72) {
-                  data.push({
-                    x: parseSqlTimestamp(benchmark.timestamps[i]),
-                    y: benchmark.times[i],
-                  });
-                }
-              }
-              const ctx_benchmark = document.getElementById(
-                "pbenchmark-chart-" + i,
-              );
-              const benchmarkChart = new Chart(
-                ctx_benchmark,
-                JSON.parse(JSON.stringify(config)),
-              );
-              benchmarkChart.config.type = "scatter";
-              benchmarkChart.data.datasets = [
-                {
-                  label: "Measurement Time",
-                  data: data,
-                  backgroundColor: "rgb(147, 140, 245)",
-                  borderColor: "#000000",
-                  borderWidth: 1,
-                  borderSkipped: false,
-                  borderRadius: 3,
-                },
-              ];
-
-              benchmarkChart.options.scales.x = {
-                type: "time",
-                time: {
-                  unit: "hour",
-                  displayFormats: {
-                    hour: "h:mm a",
-                  },
-                },
-                min: (() => {
-                  const d = new Date();
-                  d.setHours(d.getHours() - 72);
-                  return d;
-                })(),
-                max: new Date(),
-              };
-
-              benchmarkChart.options.scales.x.ticks = {
-                maxRotation: 0,
-                minRotation: 0,
-                autoSkip: false,
-                callback: (value) => {
-                  const date = new Date(value);
-                  let label = "";
-                  if (date.getHours() === 0 && date.getMinutes() === 0) {
-                    return date.getMonth() + 1 + "/" + date.getDate();
-                  }
-                  return null;
-                },
-              };
-              let annotations = {};
-              const statuses = ["Excellent", "Good", "Slow", "Degraded"];
-              const multipliers = [0.5, 0.2, -0.2, -0.5];
-              const colors = ["#a0b8eb", "#7fd58f", "#f4d03f", "#f5b38c"];
-              for (let j = 0; j < statuses.length; j++) {
-                const threshold =
-                  benchmark.expected_time * (1 + multipliers[j]);
-                annotations["line" + j] = {
-                  type: "line",
-                  yMin: threshold,
-                  yMax: threshold,
-                  borderColor: colors[j],
-                  borderWidth: 2,
-                  borderDash: [7, 4],
-                  label: {
-                    display: false,
-                  },
-                };
-              }
-              benchmarkChart.options.plugins.annotation = {
-                annotations: annotations,
-              };
-              benchmarkChart.options.y = {
-                suggestedMax: worst_time * 1.15,
-              };
-              benchmarkChart.update();
-            }
           } else {
             // show frontend performance monitoring data
             const frontend_monitoring = JSON.parse(deployment.meta).performance
@@ -2235,8 +2033,8 @@ $(document).ready(function () {
               }
               let max = max_value * 1.15;
               if (max < thresholds[metric].Degraded * 1.15) {
-                max = thresholds[metric].Degraded * 1.15
-              } 
+                max = thresholds[metric].Degraded * 1.15;
+              }
               chart.options.scales.y.suggestedMax = max;
               chart.options.scales.y.ticks.stepSize = Math.round(max_value / 5);
               chart.options.scales.y.ticks.display = false;
@@ -2267,6 +2065,205 @@ $(document).ready(function () {
               };
               chart.update();
             }
+          }
+          // benchmarks statistics
+          const benchmarks = meta.performance.benchmarks;
+          console.log(benchmarks);
+          for (let i = 0; i < benchmarks.length; i++) {
+            const benchmark = benchmarks[i];
+            let status = "";
+            let duration = benchmark.times[benchmark.times.length - 1];
+            if (
+              (duration - benchmark.expected_time) / benchmark.expected_time >
+              0.5
+            ) {
+              status = "Degraded";
+            } else if (
+              (duration - benchmark.expected_time) / benchmark.expected_time <
+              -0.5
+            ) {
+              status = "Excellent";
+            } else if (
+              (duration - benchmark.expected_time) / benchmark.expected_time >=
+              0.2
+            ) {
+              status = "Slow";
+            } else if (
+              (duration - benchmark.expected_time) / benchmark.expected_time <=
+              0.2
+            ) {
+              status = "Good";
+            }
+
+            // calculate the various stats
+            let times_sum = 0;
+            let worst_time = 0;
+            let best_time = 9999999;
+            let recent_count = 0;
+
+            for (let j = 0; j < benchmark.times.length; j++) {
+              times_sum += benchmark.times[j];
+              if (benchmark.times[j] > worst_time) {
+                worst_time = benchmark.times[j];
+              }
+              if (benchmark.times[j] < best_time) {
+                best_time = benchmark.times[j];
+              }
+              const time = parseSqlTimestamp(benchmark.timestamps[j]);
+              const now = new Date();
+              const hours_before = (now - time) / 1000 / 60 / 60;
+              if (hours_before < 24) {
+                recent_count += 1;
+              }
+            }
+            const average_time = Math.round(times_sum / benchmark.times.length);
+            let benchmarks_container = "#sdeployment-benchmarks-1";
+            if (deployment.type == "frontend") {
+              benchmarks_container = "#sdeployment-benchmarks-2";
+            }
+            $(benchmarks_container).append(`
+                <div class="benchmark-item">
+                <div class="pbenchmark-item1">
+                  <h3
+                    class="benchmark-name"
+                    style="margin-bottom: 5px; font-size: 20px"
+                  >
+                    ${benchmark.name}
+                  </h3>
+                  <div class="simple-row" style="margin-bottom: 7px">
+                    <p>Status:</p>
+                    <div class="benchmark-status ${status.toLowerCase()}">
+                      <p>${status}</p>
+                    </div>
+                  </div>
+                  <div
+                    class="pbenchmark-item2-subitem"
+                    style="margin-left: 0px"
+                  >
+                    <div class="statistic-row">
+                      <div class="statistic">
+                        <h3>Average Time</h3>
+                        <p>${average_time} ms</p>
+                      </div>
+                      <div class="statistic">
+                        <h3>Worst Time</h3>
+                        <p>${worst_time} ms</p>
+                      </div>
+                      <div class="statistic">
+                        <h3>Best Time</h3>
+                        <p>${best_time} ms</p>
+                      </div>
+                    </div>
+                    <div class="statistic-row">
+                      <div class="statistic">
+                        <h3>Last Measurement</h3>
+                        <p>${formatTime(benchmark.timestamps[benchmark.timestamps.length - 1])}</p>
+                      </div>
+                      <div class="statistic">
+                        <h3>Measurements (last 24 hours)</h3>
+                        <p>${recent_count}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="pbenchmark-item1" style="border: solid 1px black; width: 50%;padding-top: 4px;padding-bottom: 4px;">
+                  <div
+                    class="pbenchmark-ccontainer"
+                    style="height: 20vh; width: 100%;"
+                  >
+                    <canvas id="pbenchmark-chart-${i}"></canvas>
+                  </div>
+                </div>
+              </div>
+              <hr />
+              `);
+            // plot benchmark graph of measurements using a scatter plot -> last 3 days only
+            let data = [];
+            for (let i = 0; i < benchmark.times.length; i++) {
+              const time = parseSqlTimestamp(benchmark.timestamps[i]);
+              const now = new Date();
+              const hours_before = (now - time) / 1000 / 60 / 60;
+              if (hours_before < 72) {
+                data.push({
+                  x: parseSqlTimestamp(benchmark.timestamps[i]),
+                  y: benchmark.times[i],
+                });
+              }
+            }
+            const ctx_benchmark = document.getElementById(
+              "pbenchmark-chart-" + i,
+            );
+            const benchmarkChart = new Chart(
+              ctx_benchmark,
+              JSON.parse(JSON.stringify(config)),
+            );
+            benchmarkChart.config.type = "scatter";
+            benchmarkChart.data.datasets = [
+              {
+                label: "Measurement Time",
+                data: data,
+                backgroundColor: "rgb(147, 140, 245)",
+                borderColor: "#000000",
+                borderWidth: 1,
+                borderSkipped: false,
+                borderRadius: 3,
+              },
+            ];
+
+            benchmarkChart.options.scales.x = {
+              type: "time",
+              time: {
+                unit: "hour",
+                displayFormats: {
+                  hour: "h:mm a",
+                },
+              },
+              min: (() => {
+                const d = new Date();
+                d.setHours(d.getHours() - 72);
+                return d;
+              })(),
+              max: new Date(),
+            };
+
+            benchmarkChart.options.scales.x.ticks = {
+              maxRotation: 0,
+              minRotation: 0,
+              autoSkip: false,
+              callback: (value) => {
+                const date = new Date(value);
+                let label = "";
+                if (date.getHours() === 0 && date.getMinutes() === 0) {
+                  return date.getMonth() + 1 + "/" + date.getDate();
+                }
+                return null;
+              },
+            };
+            let annotations = {};
+            const statuses = ["Excellent", "Good", "Slow", "Degraded"];
+            const multipliers = [0.5, 0.2, -0.2, -0.5];
+            const colors = ["#a0b8eb", "#7fd58f", "#f4d03f", "#f5b38c"];
+            for (let j = 0; j < statuses.length; j++) {
+              const threshold = benchmark.expected_time * (1 + multipliers[j]);
+              annotations["line" + j] = {
+                type: "line",
+                yMin: threshold,
+                yMax: threshold,
+                borderColor: colors[j],
+                borderWidth: 2,
+                borderDash: [7, 4],
+                label: {
+                  display: false,
+                },
+              };
+            }
+            benchmarkChart.options.plugins.annotation = {
+              annotations: annotations,
+            };
+            benchmarkChart.options.y = {
+              suggestedMax: worst_time * 1.15,
+            };
+            benchmarkChart.update();
           }
         } else if (currentTab === "uptime") {
         } else if (currentTab === "settings") {
