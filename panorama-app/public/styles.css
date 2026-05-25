@@ -954,7 +954,7 @@ textarea {
 }
 
 #elist-delete,
-#elist-update {
+#elist-update, #mlist-delete {
   margin-top: 0px;
   margin-bottom: 0px;
   padding: 8px;
@@ -966,20 +966,20 @@ textarea {
 }
 
 #elist-delete i,
-#elist-update i {
+#elist-update i, #mlist-delete i {
   margin: 0px;
   padding: 0px;
   color: black;
 }
 
 #elist-delete:hover,
-#elist-update:hover {
+#elist-update:hover, #mlist-delete:hover {
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0px 0px #000000;
 }
 
 #elist-delete:disabled,
-#elist-update:disabled {
+#elist-update:disabled, #mlist-delete:disabled {
   opacity: 0.5;
   transform: none;
   pointer-events: none;
@@ -1449,14 +1449,113 @@ pre[class*="language-"] {
   margin-bottom: 10px;
 }
 
-
-.frontend-statistic h2, .uptime-statistic2 h2 {
+.frontend-statistic h2,
+.uptime-statistic2 h2 {
   margin-bottom: 14px;
   margin-top: 3px;
 }
-.frontend-statistic h3, .uptime-statistic2 h3 {
+.frontend-statistic h3,
+.uptime-statistic2 h3 {
   font-size: 50px;
   line-height: 50px;
   margin-top: 4px;
-  margin-bottom :4px; 
+  margin-bottom: 4px;
+}
+
+.sdeployment-monitor {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+}
+
+.sdeployment-monitor p {
+  font-size: 16px;
+  line-height: 16px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.sdeployment-monitor h3 {
+  font-size: 20px;
+  line-height: 20px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.monitor-indicator {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  margin: 0 10px;
+}
+
+@keyframes pulse_up {
+  0% {
+    box-shadow: 0 0 0 0 rgba(127, 213, 143, 0.9);
+    opacity: 1;
+  }
+
+  100% {
+    box-shadow: 0 0 0 10px rgba(127, 213, 143, 0);
+    opacity: 1;
+  }
+}
+
+.monitor-indicator.up {
+  background-color: #7fd58f;
+  animation: pulse_up 1.6s infinite ease-in-out;
+}
+
+@keyframes pulse_down {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 140, 140, 0.9);
+    opacity: 1;
+  }
+
+  100% {
+    box-shadow: 0 0 0 10px rgba(245, 140, 140, 0);
+    opacity: 1;
+  }
+}
+
+.monitor-indicator.down {
+  background-color: rgb(245, 140, 140);
+  animation: pulse_down 1.6s infinite ease-in-out;
+}
+
+.monitor-status {
+  padding: 3px;
+  border-radius: 2px;
+  width: fit-content;
+}
+
+.monitor-status p {
+  font-size: 14px !important;
+  color: black;
+  line-height: 14px !important;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+.monitor-status.active {
+  background-color: #7fd58f;
+}
+.monitor-status.inactive {
+  background-color: rgb(186, 186, 186);
+}
+
+.monitor-row {
+  display:flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+#monitor-response-chart {
+  height: 40px; 
 }

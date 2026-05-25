@@ -1369,7 +1369,7 @@
               "
               id="sdeployment-benchmarks-2"
             ></div>
-          </div>  
+          </div>
         </div>
       </div>
       <div id="sdeployment-uptime-content" class="mainp-content">
@@ -1411,8 +1411,10 @@
             </div>
           </div>
           <div class="dashboard-card" style="flex: 1">
-            <h2 style="margin-bottom: 2px;">Average Response Time Timeline</h2>
-            <p style="margin-top:2px;margin-bottom: 2px;">Overall Average: <span id="sdeployment-responsetime-avg"></span>ms</p>
+            <h2 style="margin-bottom: 2px">Average Response Time Timeline</h2>
+            <p style="margin-top: 2px; margin-bottom: 2px">
+              Overall Average: <span id="sdeployment-responsetime-avg"></span>ms
+            </p>
             <div style="flex: 1; height: auto; width: 100%">
               <canvas id="sdeployment-responsetime-chart"></canvas>
             </div>
@@ -1454,7 +1456,7 @@
               </div>
               <input
                 type="text"
-                value="status:unresolved"
+                value="status:active"
                 id="error-search"
                 placeholder="Search errors..."
                 style="
@@ -1472,20 +1474,73 @@
               id="sdeployment-elist"
               style="padding-bottom: 80px; max-height: 30vh"
             >
-              <div class="sdeployment-card">
-                <div class="sdeployment-info-item">
-                  <div class="checkbox checked">
-                    <i class="ph ph-check"></i>
-                  </div>
-                  <h1>Assignment to constant variable</h1>
-                  <div class="dproject-status unresolved">
-                    <p>Unresolved</p>
+              <div class="sdeployment-monitor">
+                <div class="monitor-row">
+                  <div class="monitor-indicator down"></div>
+                  <h3>Monitor #1</h3>
+                  <div class="monitor-status active">
+                    <p>Active</p>
                   </div>
                 </div>
-                <div class="sdeployment-info">
-                  <div class="dproject-info-item">
-                    <i class="ph ph-clock"></i>
-                    <p>Created on 4/1/2025</p>
+                <div class="monitor-row" style="gap: 0px">
+                  <div>
+                    <canvas id="monitor-response-chart"></canvas>
+                  </div>
+                  <div>
+                    <div class="simple-row">
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                      <div class="monitoring-sline unknown"></div>
+                    </div>
+                    <div class="simple-row sdeployment-monitoring-label">
+                      <p>1 day ago</p>
+                      <p>Now</p>
+                    </div>
                   </div>
                 </div>
               </div>

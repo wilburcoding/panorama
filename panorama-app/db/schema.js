@@ -107,19 +107,19 @@ export function sample_data() {
 
       let sample_statuses = [];
       let sample_statuses2 = [];
-      for (let k = 0; k < 20; k++) {
+      for (let k = 0; k < 300; k++) {
         sample_statuses.push(Math.random() > 0.05);
         sample_statuses2.push(Math.random() > 0.3);
       }
       let sample_response_times = [];
       let sample_response_times2 = [];
-      for (let k = 0; k < 20; k++) {
+      for (let k = 0; k < 300; k++) {
         sample_response_times.push(Math.floor(Math.random() * 100 + 10));
         sample_response_times2.push(Math.floor(Math.random() * 150 + 20));
       }
 
-      let timestamps = []; // uptime monitoring -> assuming 10 minute intervals
-      for (let k = 20; k > 0; k--) {
+      let timestamps = []; // uptime monitoring -> assuming 10 minute intervals, max 300 records (50 hours of data)
+      for (let k = 300; k > 0; k--) {
         timestamps.push(
           new Date(Date.now() - 60 * 1000 * 10 * k).toISOString(),
         );

@@ -1281,6 +1281,7 @@ $(document).ready(function () {
               const now = new Date();
               const hours_before = (now - time) / 1000 / 60 / 60;
               if (hours_before < 24) {
+                console.log(monitor.statuses[i]);
                 data[23 - Math.floor(hours_before)].push(
                   monitor.statuses[i] ? 1 : 2,
                 );
@@ -1306,6 +1307,7 @@ $(document).ready(function () {
                 }
               }
             }
+            console.log(monitor)
             $("#sdeployment-monitoring-list").append(`
               <div class="sdeployment-rerror-card">
                 <div class="sdeployment-monitoring-label">

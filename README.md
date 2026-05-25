@@ -290,6 +290,7 @@ Big Restructuring Plan
     - second row -> history (maybe like a timeline grid Github style?) 
       - timeline chart -> overall uptime timeline with percentages of monitors online for each period
     - third row -> list of active monitoring services 
+      - should show name, current status, uptime chart, response time chart, whether the monitor is active or not
       - options to select and delete as well as option to create new monitor
   - Settings tab of deployments
     - Similar to settings format
