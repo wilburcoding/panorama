@@ -123,7 +123,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [ ] Error events has multiple pages for different features (performance)
          - [x] Overview pages should include information on everything
          - [x] Errors page for more detailed info
-         - [ ] Performance monitoring page
+         - [x] Performance monitoring page
          - [ ] Uptime tracking page
          - [ ] Reduce clutter
      - [ ] Restructure how deployments work
@@ -131,8 +131,15 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] More interactive elements
        - [ ] Interactive deployment creation guide
        - [ ] Interactive account creation guide
-     - [ ] Update database schema
+     - [x] Update database schema
      - [ ] New sample data
+   - [ ] Reorganize API
+     - [ ] Remove unused endpoints
+     - [ ] New endpoints for new types of monitoring
+       - [ ] Posting performance data (frontend)
+       - [ ] Posting performance data (backend)
+       - [ ] Posting + deleting + editing monitors 
+       - [ ] Posting + deleting + editing benchmarks
    - [ ] Improved backend monitoring? (record requests data?)
 
 
@@ -271,6 +278,8 @@ Big Restructuring Plan
         - Graphs of important metrics (LCP) over time 
         - List of pages with worst performance numbers
       - need to refine some of these metrics to be actually worthwhile
+      - benchmarks are created by users in the dashboard
+        - options to select, edit, and delete benchmarks 
   - Errors tab of deployments
     - Header container with error list basic details 
     - first row -> maybe timeline + some statistics
@@ -279,7 +288,9 @@ Big Restructuring Plan
     - header container with uptime basic details
     - first row -> basic charts + statitsics
     - second row -> history (maybe like a timeline grid Github style?) 
+      - timeline chart -> overall uptime timeline with percentages of monitors online for each period
     - third row -> list of active monitoring services 
+      - options to select and delete as well as option to create new monitor
   - Settings tab of deployments
     - Similar to settings format
 # NOTES
@@ -289,8 +300,10 @@ Used a tiny bit of Claude to work out the database stuff but I think I figured i
 Timeline:
 - [x] API
 - [x] dashboard
-- [ ] SDK
+- [x] SDK
 - [x] dashboard functionality
-- [ ] testing
+- [x] testing
 
 Color for database schema should be in HEX
+
+Chart.js doesn't handle multiple datasets very well for scatter charts. Avoid for now.

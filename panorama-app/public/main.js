@@ -2266,6 +2266,275 @@ $(document).ready(function () {
             benchmarkChart.update();
           }
         } else if (currentTab === "uptime") {
+          // handle uptime monitoring stats
+          const meta = JSON.parse(deployment.meta);
+          const uptime_monitoring = meta.uptime;
+          let total_monitors = 0;
+          let down_monitors = 0;
+          let uptime_sum = 0;
+          let uptime_count = 0;
+
+          for (let i = 0; i < uptime_monitoring.monitors.length; i++) {
+            const monitor = uptime_monitoring.monitors[i];
+            if (monitor.active) {
+              total_monitors += 1;
+            } else {
+              break;
+            }
+
+            for (let j = 0; j < monitor.statuses.length; j++) {
+              const time = parseSqlTimestamp(monitor.timestamps[j]);
+              const now = new Date();
+              const hours_before = (now - time) / 1000 / 60 / 60;
+              if (hours_before < 24) {
+                if (monitor.statuses[j]) {
+                  uptime_sum += 1;
+                }
+                uptime_count += 1;
+              }
+            }
+            if (monitor.status === "down") {
+              down_monitors += 1;
+            }
+          }
+          let uptime_percentage = "N/A";
+          if (uptime_count > 0) {
+            uptime_percentage =
+              Math.round((uptime_sum / uptime_count) * 100) + "%";
+          }
+          $("#sdeployment-uptime-amonitors").text(total_monitors);
+          $("#sdeployment-uptime-ouptime").text(uptime_percentage);
+          $("#sdeployment-uptime-dmonitors").text(down_monitors);
+
+          // uptime timeline and response time scatter chart
+          let overall_sums = [];
+          let overall_counts = [];
+          let overall_percentages = [];
+          let labels = [];
+          for (let i = 0; i < 72; i++) {
+            const time = new Date(Date.now() - (72 - i) * 60 * 60 * 1000);
+            let hours = time.getHours();
+            if (hours > 12) {
+              hours = hours - 12;
+            }
+            if (hours === 0) {
+              hours = 12;
+            }
+
+            let suffix = time.getHours() >= 12 ? "PM" : "AM";
+            labels.push(
+              `${time.getMonth() + 1}/${time.getDate()} ${hours} ${suffix}`,
+            );
+            overall_sums.push(0);
+            overall_counts.push(0);
+          }
+
+          for (let i = 0; i < uptime_monitoring.monitors.length; i++) {
+            for (
+              let j = 0;
+              j < uptime_monitoring.monitors[i].statuses.length;
+              j++
+            ) {
+              const time = parseSqlTimestamp(
+                uptime_monitoring.monitors[i].timestamps[j],
+              );
+              const now = new Date();
+              const hours_before = (now - time) / 1000 / 60 / 60;
+              if (hours_before < 72) {
+                const index = 72 - Math.floor(hours_before);
+                if (uptime_monitoring.monitors[i].statuses[j]) {
+                  overall_sums[index] += 1;
+                }
+                overall_counts[index] += 1;
+              }
+            }
+          }
+          for (let i = 0; i < overall_sums.length; i++) {
+            if (overall_counts[i] > 0) {
+              overall_percentages.push(
+                (overall_sums[i] / overall_counts[i]) * 100,
+              );
+            } else {
+              overall_percentages.push(0);
+            }
+          }
+
+          const ctx = document.getElementById("sdeployment-ouptime-chart");
+          const uptimeChart = new Chart(
+            ctx,
+            JSON.parse(JSON.stringify(config)),
+          );
+          uptimeChart.config.type = "line";
+          uptimeChart.data.datasets = [
+            {
+              label: "Uptime Percentage",
+              data: overall_percentages,
+              backgroundColor: "#7fd58f",
+              borderColor: "#000000",
+              borderWidth: 1,
+              borderSkipped: false,
+              borderRadius: 3,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 0,
+              hitRadius: 20,
+            },
+          ];
+          uptimeChart.data.labels = labels;
+          uptimeChart.options.scales.x.ticks.callback = function (val, index) {
+            const now = new Date();
+            const date = new Date(
+              now.getTime() - (72 - index) * 60 * 60 * 1000,
+            );
+            if (date.getHours() === 0) {
+              return date.getMonth() + 1 + "/" + date.getDate();
+            }
+            return null;
+          };
+          let annotations = {};
+          for (let i = 0; i < 72; i++) {
+            const now = new Date();
+            const date = new Date(now.getTime() - (72 - i) * 60 * 60 * 1000);
+            if (date.getHours() === 0) {
+              annotations["line" + i] = {
+                type: "line",
+                scaleID: "x",
+                value: i,
+                borderColor: "rgba(0,0,0,0.5)",
+                borderWidth: 1,
+                borderDash: [5, 5],
+                label: {
+                  display: false,
+                },
+              };
+            }
+          }
+          uptimeChart.options.plugins.annotation = {
+            annotations: annotations,
+          };
+          uptimeChart.update();
+
+          let response_time_datasets = []; // scatter plot
+          let annotations2 = {};
+            let data = [];
+
+          for (let i = 0; i < uptime_monitoring.monitors.length; i++) {
+            const monitor = uptime_monitoring.monitors[i];
+            if (!monitor.active) {
+              continue;
+            }
+            for (let j = 0; j < monitor.response_times.length; j++) {
+              const time = parseSqlTimestamp(monitor.timestamps[j]);
+
+              data.push({
+                x: time,
+                y: parseInt(monitor.response_times[j]),
+              });
+            }
+          }
+            response_time_datasets.push(data);
+
+          // console.log(response_time_datasets);
+
+          const ctx_response = document.getElementById(
+            "sdeployment-responsetime-chart",
+          );
+          const responseChart = new Chart(
+            ctx_response,
+            JSON.parse(JSON.stringify(config)),
+          );
+          let datasets = [];
+          let colors = [
+            "rgb(147, 140, 245)",
+            "rgb(140, 201, 245)",
+            "rgb(140, 245, 187)",
+            "rgb(192, 245, 140)",
+            "rgb(245, 243, 140)",
+            "rgb(245, 214, 140)",
+            "rgb(245, 185, 140)",
+            "rgb(245, 140, 140)",
+            "rgb(245, 140, 207)",
+            "rgb(203, 140, 245)",
+          ]; // max 10 monitors 
+          for (let i = 0; i < 1; i++) {
+            // calc average value and plot as annotation
+            let total_response_time = 0;
+            for (let j = 0; j < response_time_datasets[i].length; j++) {
+              total_response_time += response_time_datasets[i][j].y;
+            }
+            const avg = Math.round(
+              total_response_time / response_time_datasets[i].length,
+            );
+            $("#sdeployment-responsetime-avg").text(avg);
+            annotations2["line" + i] = {
+              type: "line",
+              scaleID: "y",
+              value: avg,
+              borderColor: colors[i % colors.length],
+              borderWidth: 2,
+              borderDash: [7, 4],
+              label: {
+                display: false,
+              }
+
+            };
+            datasets.push({
+              label: "Response Time",
+              data: response_time_datasets[i],
+              backgroundColor: colors[i % colors.length],
+              borderColor: "#000000",
+              borderWidth: 1,
+              borderSkipped: false,
+              borderRadius: 3,
+            });
+          }
+
+          responseChart.config.type = "scatter";
+          responseChart.data.datasets = datasets;
+          responseChart.options.scales.x = {
+            type: "time",
+            time: {
+              unit: "hour",
+              displayFormats: {
+                hour: "h:mm a",
+              },
+            },
+            min: (() => {
+              const d = new Date();
+              d.setHours(d.getHours() - 72);
+              return d;
+            })(),
+            max: new Date(),
+          };
+
+          responseChart.options.scales.x.ticks = {
+            maxRotation: 0,
+            minRotation: 0,
+            autoSkip: false,
+            callback: (value) => {
+              const date = new Date(value);
+              let label = "";
+              if (date.getHours() === 0 && date.getMinutes() === 0) {
+                return date.getMonth() + 1 + "/" + date.getDate();
+              }
+              return null;
+            },
+          };
+
+          responseChart.options.plugins.annotation = {
+            annotations: annotations2,
+          };
+          responseChart.options.scales.y.min = undefined;
+          responseChart.options.scales.y.max = undefined;
+
+          // for debugging
+          // responseChart.options.scales.x.min = '2026-05-25T09:45:00.000Z';
+          // responseChart.options.scales.x.max = '2026-05-25T13:15:00.000Z';
+
+          responseChart.update();
+          
+          console.log("y max:", responseChart.scales.y.max);
+          console.log("y min:", responseChart.scales.y.min);
         } else if (currentTab === "settings") {
           // handle editing deployment details
 

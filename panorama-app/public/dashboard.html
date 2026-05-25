@@ -1390,29 +1390,29 @@
           </h1>
         </div>
         <div class="dashboard-row">
-          <div class="dashboard-card" style="flex: 1">
+          <div class="dashboard-card uptime-statistic2" style="flex: 1">
             <h2>Active Monitors</h2>
-            <h1>5</h1>
+            <h3 id="sdeployment-uptime-amonitors">5</h3>
           </div>
-          <div class="dashboard-card" style="flex: 1">
-            <h2>Overall Uptime</h2>
-            <h1>99.9%</h1>
+          <div class="dashboard-card uptime-statistic2" style="flex: 1">
+            <h2>Overall Uptime (24 hrs)</h2>
+            <h3 id="sdeployment-uptime-ouptime">99.9%</h3>
           </div>
-          <div class="dashboard-card" style="flex: 1">
+          <div class="dashboard-card uptime-statistic2" style="flex: 1">
             <h2>Monitors Down</h2>
-            <h1>2</h1>
+            <h3 id="sdeployment-uptime-dmonitors">2</h3>
           </div>
         </div>
         <div class="dashboard-row">
           <div class="dashboard-card" style="flex: 1">
-            <h2>Uptime Timeline</h2>
+            <h2>Overall Uptime Timeline</h2>
             <div style="flex: 1; height: auto; width: 100%">
-              <canvas id="sdeployment-uptime-chart"></canvas>
+              <canvas id="sdeployment-ouptime-chart"></canvas>
             </div>
-            "
           </div>
           <div class="dashboard-card" style="flex: 1">
-            <h2>Average Response Time Timeline</h2>
+            <h2 style="margin-bottom: 2px;">Average Response Time Timeline</h2>
+            <p style="margin-top:2px;margin-bottom: 2px;">Overall Average: <span id="sdeployment-responsetime-avg"></span>ms</p>
             <div style="flex: 1; height: auto; width: 100%">
               <canvas id="sdeployment-responsetime-chart"></canvas>
             </div>
@@ -1429,7 +1429,7 @@
             "
           >
             <h2 style="margin-bottom: 5px; margin-left: 20px">
-              Error Events List
+              Monitoring List
             </h2>
             <div
               style="
@@ -1448,7 +1448,7 @@
                   margin-top: 0px;
                   margin-bottom: 15px;
                 "
-                id="elist-select"
+                id="mlist-select"
               >
                 <i class="ph ph-check"></i>
               </div>
@@ -1464,11 +1464,8 @@
                   font-size: 20px;
                 "
               />
-              <button id="elist-delete" title="Delete">
+              <button id="mlist-delete" title="Delete">
                 <i class="ph ph-trash"> </i>
-              </button>
-              <button id="elist-update" title="Update status">
-                <i class="ph ph-pen"> </i>
               </button>
             </div>
             <div

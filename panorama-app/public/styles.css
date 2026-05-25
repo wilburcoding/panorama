@@ -1450,11 +1450,11 @@ pre[class*="language-"] {
 }
 
 
-.frontend-statistic h2 {
+.frontend-statistic h2, .uptime-statistic2 h2 {
   margin-bottom: 14px;
   margin-top: 3px;
 }
-.frontend-statistic h3 {
+.frontend-statistic h3, .uptime-statistic2 h3 {
   font-size: 50px;
   line-height: 50px;
   margin-top: 4px;

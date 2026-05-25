@@ -198,7 +198,9 @@ export function sample_data() {
               name: "Homepage",
               url: "https://www.example.com",
               statuses: sample_statuses,
+              status: "up", // current status -> separate from the last recorded status
               timestamps: timestamps,
+              active: true,
               response_times: sample_response_times,
             },
             {
@@ -206,6 +208,8 @@ export function sample_data() {
               url: "https://api.example.com/endpoint",
               statuses: sample_statuses2,
               timestamps: timestamps,
+              status: "down",
+              active: true,
               response_times: sample_response_times2,
             },
           ],
