@@ -359,6 +359,8 @@ $(document).ready(function () {
       $("#sdeployment-performance-content-2").hide();
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
+      $("#smonitor-content").hide();
+
 
       for (let i = 0; i < projects.length; i++) {
         let project = projects[i];
@@ -553,6 +555,45 @@ $(document).ready(function () {
             });
         });
       });
+    } else if (params.has("monitorInfo")) {
+      // individual monitor details page - TODO
+      const monitor_id = params.get("monitorId");
+      const deployment_id = params.get("deploymentId");
+      
+      if (monitor_id && deployment_id) {
+        $("#dashboard-content").hide();
+        $("#settings-content").hide();
+        $("#project-content").hide();
+        $("#sproject-content").hide();
+        $("#sdeployment-overview-content").hide();
+        $("#sdeployment-errors-content").hide();
+        $("#sdeployment-performance-content-1").hide();
+        $("#sdeployment-performance-content-2").hide();
+        $("#sdeployment-uptime-content").hide();
+        $("#sdeployment-settings-content").hide();
+        $("#serror-overview-content").hide();
+        $("#smonitor-content").show();
+
+        // get monitor info
+        const deployment = deployments.find((d) => d.id == deployment_id);
+        if (deployment) {
+          const monitor = deployment.uptime.monitors.find((m)=> m.id == monitor_id);
+          if (monitor) {
+            // populate
+          } else {
+            // redirect bcs no monitor foudn
+            window.location.href="/dashboard.html";
+          }
+        } else {
+          // redirect bcs no deployment found
+          window.location.href="/dashboard.html";
+        }
+
+      } else {
+        // redirect bcs no monitor id or no deployment id
+        window.location.href = "/dashboard.html";
+      }
+
     } else if (params.has("projectInfo")) {
       // individual project info page
       const project_id = params.get("projectId");
@@ -570,6 +611,7 @@ $(document).ready(function () {
         $("#sdeployment-uptime-content").hide();
         $("#sdeployment-settings-content").hide();
         $("#serror-overview-content").hide();
+        $("#smonitor-content").hide();
 
         // get project info
         const project_res = await fetch(
@@ -952,6 +994,8 @@ $(document).ready(function () {
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
       $("#serror-overview-content").hide();
+              $("#smonitor-content").hide();
+
 
       const deployment_id = params.get("deploymentId");
       const project = projects.find((p) =>
@@ -2615,7 +2659,7 @@ $(document).ready(function () {
               $("#sdeployment-mlist").append(`
                 <div class="sdeployment-monitor" id="monitor-${monitor.id}">
                 <div class="monitor-row">
-                  <div style="margin-left: 6px;margin-right:0px;" class="checkbox ${checked_monitors.includes(monitor.id) ? "checked": ""}" id="mcheckbox-${monitor.id}">
+                  <div style="margin-left: 6px;margin-right:0px;" class="checkbox ${checked_monitors.includes(monitor.id) ? "checked" : ""}" id="mcheckbox-${monitor.id}">
                     <i class="ph ph-check"></i>
                   </div>
                   <div class="monitor-indicator ${indicator}"></div>
@@ -2639,9 +2683,11 @@ $(document).ready(function () {
               <hr />
               `);
 
-              $("#mcheckbox-" + monitor.id).click(function() {
+              $("#mcheckbox-" + monitor.id).click(function () {
                 if (checked_monitors.includes(monitor.id)) {
-                  checked_monitors = checked_monitors.filter((id) => id !== monitor.id);
+                  checked_monitors = checked_monitors.filter(
+                    (id) => id !== monitor.id,
+                  );
                   $(this).removeClass("checked");
                 } else {
                   checked_monitors.push(event.id);
@@ -2649,10 +2695,13 @@ $(document).ready(function () {
                 }
                 e.stopPropagation();
 
-                $("#mlist-delete").attr("disabled", checked_monitors.length === 0);
-              })
+                $("#mlist-delete").attr(
+                  "disabled",
+                  checked_monitors.length === 0,
+                );
+              });
 
-              
+              // onclick -> open page with monitor details - TODO
 
               // populate response time chart -> scatter chart -> scrap chart bcs it dosen't fit
               // let response_data = [];
@@ -2663,7 +2712,7 @@ $(document).ready(function () {
               //     y: parseInt(monitor.response_times[j])
               //   })
               // }
-              
+
               // console.log(response_data);
               // const ctx_response = document.getElementById(`monitor-response-chart-${monitor.id}`);
               // const responseChart = new Chart(ctx_response, JSON.parse(JSON.stringify(config)));
@@ -2704,45 +2753,42 @@ $(document).ready(function () {
               //     const date = new Date(value);
               //     let label = "";
               //     if (date.getHours() === 0 && date.getMinutes() === 0) {
-              //       return date.getMonth() + 1 + "/" + date.getDate(); 
-              //     } 
+              //       return date.getMonth() + 1 + "/" + date.getDate();
+              //     }
               //     return null;
               //   }
               // }
 
               // responseChart.options.scales.y.ticks.display = false;
               // responseChart.update();
-
             }
           }
 
           populateMonitoringTable($("#mlist-search").val().toLowerCase());
-          $("#mlist-search").on("input", function() {
+          $("#mlist-search").on("input", function () {
             populateMonitoringTable($("#mlist-search").val().toLowerCase());
-          })
+          });
 
-          $("#mlist-select").click(function() {
+          $("#mlist-select").click(function () {
             if (checked_monitors.length < current_filtering.length) {
               checked_monitors = [...current_filtering];
               current_filtering.forEach((id) => {
-                $("#mcheckbox-" + id).addClass("checked")
-              })
+                $("#mcheckbox-" + id).addClass("checked");
+              });
               $(this).addClass("checked");
-              $("#mlist-delete").attr('disabled', false);
+              $("#mlist-delete").attr("disabled", false);
             } else {
               checked_monitors = [];
               current_filtering.forEach((id) => {
                 $("#mcheckbox-" + id).removeClass("checked");
-              })
+              });
               $(this).removeClass("checked");
               $("#mlist-delete").attr("disabled", true);
             }
-          })
+          });
 
           // TODO: handle deleting monitors
-          $("#mlist-delete").click(function() {
-
-          })
+          $("#mlist-delete").click(function () {});
         } else if (currentTab === "settings") {
           // handle editing deployment details
 
@@ -2905,6 +2951,8 @@ $(document).ready(function () {
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
       $("#serror-overview-content").show();
+              $("#smonitor-content").hide();
+
       const event_id = params.get("eventId");
 
       let deployments = projects.map((p) => p.deployments).flat();
@@ -3262,6 +3310,8 @@ $(document).ready(function () {
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
       $("#serror-overview-content").hide();
+              $("#smonitor-content").hide();
+
 
       $("#settings-fname").text(user.first_name);
       $("#settings-lname").text(user.last_name);
@@ -3457,6 +3507,8 @@ $(document).ready(function () {
       $("#sdeployment-performance-content-2").hide();
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
+              $("#smonitor-content").hide();
+
 
       // populate dashboard
 

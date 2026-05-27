@@ -20,6 +20,10 @@ function generateApiKey() {
   );
 }
 
+function generateID(length = 8) {
+  return Math.random().toString(36).substring(2, 2 + length);
+}
+
 async function hashPassword(password) {
   return await bcrypt.hashSync(password, saltRounds);
 }
@@ -515,3 +519,71 @@ app.post("/api/users/:id/update_password", express.json(), async (req, res) => {
   updated_user.password_hash = undefined;
   res.json({ success: true, user: updated_user });
 });
+
+// handle monitors -> posting, deleting, editing
+app.post("/api/deployments/:id/monitors", express.json(), (req, res) => {
+  const { id } = req.params;
+  
+  // get deployment info
+  const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(id);
+  if (!deployment) {
+    res.status(404).json({success: false, message: "Deployment not found"});
+    return;
+  }
+
+  const { name, url } = req.body;
+  let meta = JSON.parse(deployment.meta);
+  if (!meta.uptime.monitors) {
+    meta.uptime.monitors = [];
+  }
+  const monitor_id = generateID();
+  meta.uptime.monitors.push({
+    id: monitor_id,
+    name: name,
+    url: url,
+    active: false,
+    response_times: [],
+    timestamps: [],
+    status: "down",
+    statuses: [],
+  })
+  const updated_deployment = db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), id);
+  res.json({success: true, deployment: updated_deployment});
+})
+
+
+app.delete("/api/deployments/:deployment_id/monitors/:monitor_id", (req, res) => {
+  const { deployment_id, monitor_id } = req.params;
+  const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(deployment_id);
+  if (!deployment) {
+    res.status(404).json({success: false, message: "Deployment not found"});
+    return;
+  }
+  let meta = JSON.parse(deployment.meta);
+  meta.uptime.monitors = meta.uptime.monitors.filter((monitor) => monitor.id !== monitor_id);
+  const updated_deployment = db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), deployment_id);
+  res.json({ success: true, deployment: updated_deployment});
+
+})
+
+app.put("/api/deployments/:deployment_id/monitors/:monitor_id", express.json(), (req, res) => {
+  const { deployment_id, monitor_id} = req.params;
+  const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(deployment_id);
+  if (!deployment) {
+    res.status(404).json({success: false, message: "Deployment not found"});
+    return;
+  }
+  let meta = JSON.parse(deployment.meta);
+  const monitor = meta.uptime.monitors.find((monitor) => monitor.id === monitor_id);
+  if (!monitor) {
+    res.status(404).json({success: false, message: "Monitor not found"});
+    return;
+  }
+  const { name, url, active } = req.body;
+  monitor.name = name;
+  monitor.url = url;
+  monitor.active = active; 
+  const updated_deployment = db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), deployment_id);
+  res.json({ succcess: true, deployment: updated_deployment});
+})
+

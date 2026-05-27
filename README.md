@@ -124,7 +124,10 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
          - [x] Overview pages should include information on everything
          - [x] Errors page for more detailed info
          - [x] Performance monitoring page
-         - [ ] Uptime tracking page
+         - [x] Uptime tracking page
+           - [ ] Individual monitor page
+             - [ ] Page UI
+             - [ ] Page functionality
          - [ ] Reduce clutter
      - [ ] Restructure how deployments work
        - [ ] Deployment types -> front end or backend
@@ -138,7 +141,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] New endpoints for new types of monitoring
        - [ ] Posting performance data (frontend)
        - [ ] Posting performance data (backend)
-       - [ ] Posting + deleting + editing monitors 
+       - [x] Posting + deleting + editing monitors 
        - [ ] Posting + deleting + editing benchmarks
    - [ ] Improved backend monitoring? (record requests data?)
 
@@ -292,6 +295,11 @@ Big Restructuring Plan
     - third row -> list of active monitoring services 
       - should show name, current status, uptime chart, response time chart, whether the monitor is active or not
       - options to select and delete as well as option to create new monitor
+    - Individual monitor page
+      - show basic details (status, name, url)
+      - response time chart
+      - overall uptime history
+        - similar to chart on monitors list page 
   - Settings tab of deployments
     - Similar to settings format
 # NOTES
