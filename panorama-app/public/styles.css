@@ -430,7 +430,7 @@ a {
 #wdeployment-container hr,
 #dashboard-plist hr,
 #sproject-dlist hr,
-#sdeployment-elist hr {
+#sdeployment-elist hr, #sdeployment-mlist hr {
   width: 100%;
   border: none;
   border-top: dotted 1.6px black;
@@ -445,7 +445,7 @@ a {
 
 #dashboard-plist,
 #sproject-dlist,
-#sdeployment-elist {
+#sdeployment-elist, #sdeployment-mlist {
   flex: 1;
   border-top: solid 2px black;
   overflow-y: scroll;
@@ -1489,6 +1489,7 @@ pre[class*="language-"] {
   height: 15px;
   border-radius: 50%;
   margin: 0 10px;
+  margin-right: 5px;
 }
 
 @keyframes pulse_up {
@@ -1558,4 +1559,8 @@ pre[class*="language-"] {
 
 #monitor-response-chart {
   height: 40px; 
+}
+
+.monitor-rchart-container {
+  height: 50px;
 }

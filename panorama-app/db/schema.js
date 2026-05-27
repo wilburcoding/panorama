@@ -201,6 +201,7 @@ export function sample_data() {
               status: "up", // current status -> separate from the last recorded status
               timestamps: timestamps,
               active: true,
+              id: "monitor_1",
               response_times: sample_response_times,
             },
             {
@@ -210,6 +211,7 @@ export function sample_data() {
               timestamps: timestamps,
               status: "down",
               active: true,
+              id: "monitor_2",
               response_times: sample_response_times2,
             },
           ],

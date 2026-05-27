@@ -1307,7 +1307,7 @@ $(document).ready(function () {
                 }
               }
             }
-            console.log(monitor)
+            console.log(monitor);
             $("#sdeployment-monitoring-list").append(`
               <div class="sdeployment-rerror-card">
                 <div class="sdeployment-monitoring-label">
@@ -2418,7 +2418,7 @@ $(document).ready(function () {
 
           let response_time_datasets = []; // scatter plot
           let annotations2 = {};
-            let data = [];
+          let data = [];
 
           for (let i = 0; i < uptime_monitoring.monitors.length; i++) {
             const monitor = uptime_monitoring.monitors[i];
@@ -2434,7 +2434,7 @@ $(document).ready(function () {
               });
             }
           }
-            response_time_datasets.push(data);
+          response_time_datasets.push(data);
 
           // console.log(response_time_datasets);
 
@@ -2457,7 +2457,7 @@ $(document).ready(function () {
             "rgb(245, 140, 140)",
             "rgb(245, 140, 207)",
             "rgb(203, 140, 245)",
-          ]; // max 10 monitors 
+          ]; // max 10 monitors
           for (let i = 0; i < 1; i++) {
             // calc average value and plot as annotation
             let total_response_time = 0;
@@ -2477,8 +2477,7 @@ $(document).ready(function () {
               borderDash: [7, 4],
               label: {
                 display: false,
-              }
-
+              },
             };
             datasets.push({
               label: "Response Time",
@@ -2534,9 +2533,216 @@ $(document).ready(function () {
           // responseChart.options.scales.x.max = '2026-05-25T13:15:00.000Z';
 
           responseChart.update();
-          
-          console.log("y max:", responseChart.scales.y.max);
-          console.log("y min:", responseChart.scales.y.min);
+          let current_filtering = [];
+          let checked_monitors = [];
+
+          // Functionality for monitoring list table
+          function populateMonitoringTable(filter) {
+            const container = $("#sdeployment-mlist");
+            container.empty();
+            let monitors = meta.uptime.monitors;
+            if (filter.includes("status:active")) {
+              console.log("active monitors");
+              console.log(monitors);
+              monitors = monitors.filter((m) => m.active);
+              console.log(monitors);
+              filter = filter.replace("status:active", "");
+            }
+
+            if (filter.includes("status:inactive")) {
+              monitors = monitors.filter((m) => !m.active);
+              filter = filter.replace("status:inactive", "");
+            }
+
+            monitors = monitors.filter((m) =>
+              m.name.toLowerCase().includes(filter.toLowerCase()),
+            );
+
+            current_filtering = monitors.map((m) => m.id);
+            checked_monitors = checked_monitors.filter((id) =>
+              current_filtering.includes(id),
+            );
+
+            $("#mlist-delete").attr("disabled", checked_monitors.length === 0);
+            for (let i = 0; i < monitors.length; i++) {
+              const monitor = monitors[i];
+              let indicator = "unknown";
+              if (monitor.active) {
+                if (monitor.status === "up") {
+                  indicator = "up";
+                } else {
+                  indicator = "down";
+                }
+              }
+
+              let uptime_chart = "";
+              let data_sums = []; // shows two days
+              let data_counts = [];
+              for (let j = 0; j < 48; j++) {
+                data_sums.push(0);
+                data_counts.push(0);
+              }
+
+              for (let j = 0; j < monitor.statuses.length; j++) {
+                const time = parseSqlTimestamp(monitor.timestamps[j]);
+                const now = new Date();
+                const hours_before = (now - time) / 1000 / 60 / 60;
+                if (hours_before < 48) {
+                  const index = 48 - Math.floor(hours_before);
+                  if (monitor.statuses[j]) {
+                    data_sums[index] += 1;
+                  }
+                  data_counts[index] += 1;
+                }
+              }
+              for (let j = 0; j < 48; j++) {
+                let status = "up";
+                if (data_counts[j] > 0) {
+                  const avg = Math.round(data_sums[j] / data_counts[j]);
+                  if (avg > 0.7) {
+                    status = "up";
+                  } else if (avg > 0.3) {
+                    status = "degraded";
+                  } else {
+                    status = "down";
+                  }
+                } else {
+                  status = "unknown";
+                }
+                uptime_chart += `<div class="monitoring-sline ${status}"></div>`;
+              }
+
+              $("#sdeployment-mlist").append(`
+                <div class="sdeployment-monitor" id="monitor-${monitor.id}">
+                <div class="monitor-row">
+                  <div style="margin-left: 6px;margin-right:0px;" class="checkbox ${checked_monitors.includes(monitor.id) ? "checked": ""}" id="mcheckbox-${monitor.id}">
+                    <i class="ph ph-check"></i>
+                  </div>
+                  <div class="monitor-indicator ${indicator}"></div>
+                  <h3>${monitor.name}</h3>
+                  <div class="monitor-status ${monitor.active ? "active" : "inactive"}">
+                    <p>${monitor.active ? "Active" : "Inactive"}</p>
+                  </div>
+                </div>
+                <div class="monitor-row" style="gap: 0px">
+                  <div>
+                    <div class="simple-row">
+                      ${uptime_chart}
+                    </div>
+                    <div class="simple-row sdeployment-monitoring-label">
+                      <p>1 day ago</p>
+                      <p>Now</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <hr />
+              `);
+
+              $("#mcheckbox-" + monitor.id).click(function() {
+                if (checked_monitors.includes(monitor.id)) {
+                  checked_monitors = checked_monitors.filter((id) => id !== monitor.id);
+                  $(this).removeClass("checked");
+                } else {
+                  checked_monitors.push(event.id);
+                  $(this).addClass("checked");
+                }
+                e.stopPropagation();
+
+                $("#mlist-delete").attr("disabled", checked_monitors.length === 0);
+              })
+
+              
+
+              // populate response time chart -> scatter chart -> scrap chart bcs it dosen't fit
+              // let response_data = [];
+              // for (let j =0; j < monitor.response_times.length; j++) {
+              //   const time = parseSqlTimestamp(monitor.timestamps[j]);
+              //   response_data.push({
+              //     x: time,
+              //     y: parseInt(monitor.response_times[j])
+              //   })
+              // }
+              
+              // console.log(response_data);
+              // const ctx_response = document.getElementById(`monitor-response-chart-${monitor.id}`);
+              // const responseChart = new Chart(ctx_response, JSON.parse(JSON.stringify(config)));
+              // responseChart.config.type = "scatter";
+              // responseChart.data.datasets = [
+              //   {
+              //     label: "Response Time",
+              //     data: response_data,
+              //     backgroundColor: "rgb(147, 140, 245)",
+              //     borderColor: "#000000",
+              //     borderWidth: 1,
+              //     borderSkipped: false,
+              //     borderRadius: 3,
+              //   }
+              // ];
+
+              // responseChart.options.scales.x = {
+              //   type: "time",
+              //   time: {
+              //     unit: "hour",
+              //     displayFormats: {
+              //       hour: "h:mm a"
+              //     }
+              //   },
+              //   min: (() => {
+              //     const d = new Date();
+              //     d.setHours(d.getHours() - 24);
+              //     return d;
+              //   })(),
+              //   max: new Date(),
+              // };
+
+              // responseChart.options.scales.x.ticks = {
+              //   maxRotation: 0,
+              //   minRotation: 0,
+              //   autoSkip: false,
+              //   callback: (value) => {
+              //     const date = new Date(value);
+              //     let label = "";
+              //     if (date.getHours() === 0 && date.getMinutes() === 0) {
+              //       return date.getMonth() + 1 + "/" + date.getDate(); 
+              //     } 
+              //     return null;
+              //   }
+              // }
+
+              // responseChart.options.scales.y.ticks.display = false;
+              // responseChart.update();
+
+            }
+          }
+
+          populateMonitoringTable($("#mlist-search").val().toLowerCase());
+          $("#mlist-search").on("input", function() {
+            populateMonitoringTable($("#mlist-search").val().toLowerCase());
+          })
+
+          $("#mlist-select").click(function() {
+            if (checked_monitors.length < current_filtering.length) {
+              checked_monitors = [...current_filtering];
+              current_filtering.forEach((id) => {
+                $("#mcheckbox-" + id).addClass("checked")
+              })
+              $(this).addClass("checked");
+              $("#mlist-delete").attr('disabled', false);
+            } else {
+              checked_monitors = [];
+              current_filtering.forEach((id) => {
+                $("#mcheckbox-" + id).removeClass("checked");
+              })
+              $(this).removeClass("checked");
+              $("#mlist-delete").attr("disabled", true);
+            }
+          })
+
+          // TODO: handle deleting monitors
+          $("#mlist-delete").click(function() {
+
+          })
         } else if (currentTab === "settings") {
           // handle editing deployment details
 
