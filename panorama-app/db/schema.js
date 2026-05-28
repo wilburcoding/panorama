@@ -157,6 +157,12 @@ export function sample_data() {
         // 40x at 15 minute intervals
       }
 
+      let sample_daily1 = [];
+      let sample_daily2 = [];
+      for (let k = 0; k < 90; k++) {
+        sample_daily1.push(Math.random());
+        sample_daily2.push(Math.random());
+      }
       for (let k = 0; k < 40; k++) {
         sample_lcp.push(Math.floor(Math.random() * 2000 + 500));
         sample_inp.push(Math.floor(Math.random() * 300 + 50));
@@ -198,6 +204,7 @@ export function sample_data() {
               name: "Homepage",
               url: "https://www.example.com",
               statuses: sample_statuses,
+              daily_timeline: sample_daily1, // also record statuses from the last 90 days
               status: "up", // current status -> separate from the last recorded status
               timestamps: timestamps,
               active: true,
@@ -208,6 +215,7 @@ export function sample_data() {
               name: "API",
               url: "https://api.example.com/endpoint",
               statuses: sample_statuses2,
+              daily_timeline: sample_daily2,
               timestamps: timestamps,
               status: "down",
               active: true,

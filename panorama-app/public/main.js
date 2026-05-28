@@ -361,7 +361,6 @@ $(document).ready(function () {
       $("#sdeployment-settings-content").hide();
       $("#smonitor-content").hide();
 
-
       for (let i = 0; i < projects.length; i++) {
         let project = projects[i];
         const create_date = parseSqlTimestamp(project.created_at);
@@ -559,8 +558,9 @@ $(document).ready(function () {
       // individual monitor details page - TODO
       const monitor_id = params.get("monitorId");
       const deployment_id = params.get("deploymentId");
-      
-      if (monitor_id && deployment_id) {
+      const project_id = params.get("projectId");
+
+      if (monitor_id && deployment_id && project_id) {
         $("#dashboard-content").hide();
         $("#settings-content").hide();
         $("#project-content").hide();
@@ -575,25 +575,193 @@ $(document).ready(function () {
         $("#smonitor-content").show();
 
         // get monitor info
-        const deployment = deployments.find((d) => d.id == deployment_id);
-        if (deployment) {
-          const monitor = deployment.uptime.monitors.find((m)=> m.id == monitor_id);
-          if (monitor) {
-            // populate
-          } else {
-            // redirect bcs no monitor foudn
-            window.location.href="/dashboard.html";
-          }
-        } else {
-          // redirect bcs no deployment found
-          window.location.href="/dashboard.html";
+
+        const project = projects.find((p) => p.id == project_id);
+        if (!project) {
+          window.location.href = "/dashboard.html";
         }
+
+        const deployment = project.deployments.find(
+          (d) => d.id == deployment_id,
+        );
+        if (!deployment) {
+          window.location.href = "/dashboard.html";
+        }
+
+        const meta = JSON.parse(deployment.meta);
+        const monitor = meta.uptime.monitors.find((m) => m.id == monitor_id);
+        if (!monitor) {
+          window.location.href = "/dashboard.html";
+        }
+
+        // populate monitor info page
+        $("#monitor-url").text(monitor.url);
+        $("#monitor-status").text(monitor.active ? "Active" : "Inactive");
+        $("#monitor-parent").text(deployment.name);
+        $("#monitor-id").text(monitor.id);
+        if (monitor.timestamps.length > 0) {
+          const last_check = parseSqlTimestamp(
+            monitor.timestamps[monitor.timestamps.length - 1],
+          );
+          let hours = last_check.getHours() % 12;
+          if (hours === 0) {
+            hours = 12;
+          }
+          let suffix = last_check.getHours() >= 12 ? "PM" : "AM";
+          let minutes = last_check.getMinutes().toString().padStart(2, "0");
+          $("#monitor-lastcheck").text(`
+            ${last_check.getMonth() + 1}/${last_check.getDate()}/${last_check.getFullYear()} at ${hours}:${minutes} ${suffix}
+          `);
+        }
+        $("#monitor-name").text(monitor.name);
+
+        let response_data = [];
+        for (let i = 0; i < monitor.timestamps.length; i++) {
+          response_data.push({
+            x: parseSqlTimestamp(monitor.timestamps[i]),
+            y: monitor.response_times[i],
+          });
+        }
+        const ctx = document.getElementById("monitor-response-chart");
+        const responseChart = new Chart(
+          ctx,
+          JSON.parse(JSON.stringify(config)),
+        );
+        responseChart.config.type = "scatter";
+        responseChart.data.datasets = [
+          {
+            label: "Response Time (ms)",
+            data: response_data,
+            backgroundColor: "rgb(147, 140, 245)",
+            borderColor: "#000000",
+            borderWidth: 1,
+            borderSkipped: false,
+            borderRadius: 3,
+          },
+        ];
+
+        responseChart.options.scales.x = {
+          type: "time",
+          time: {
+            unit: "hour",
+            displayFormats: {
+              hour: "h:mm a",
+            }
+          },
+          min: (() => {
+            const d = new Date();
+            d.setHours(d.getHours() - 72);
+            return d;
+          })(),
+          max: new Date()
+        };
+
+        responseChart.options.scales.x.ticks = {
+          maxRotation: 0,
+          minRotation: 0,
+          autoSkip: false,
+          callback: (value) => {
+            const date = new Date(value);
+            let label = "";
+            if (date.getHours() === 0 && date.getMinutes() === 0) {
+              return date.getMonth() + 1 + "/" + date.getDate();
+            }
+            return null;
+          },
+        };
+
+        let response_sum = 0;
+        for (let i =0; i < response_data.length; i++) {
+          response_sum += response_data[i].y;
+        }
+        let annotations = {};
+        const avg = response_sum == 0 ? 0 : response_sum / response_data.length;
+        console.log(avg);
+        if (avg > 0) {
+          annotations["avgline"] = {
+            type: "line",
+            scaleID:"y",
+            value: avg,
+            borderColor: "rgb(147, 140, 245)",
+            borderWidth: 2,
+            borderDash: [6, 6],
+            label: {
+              display: true,
+              content: "Average: " + avg.toFixed(2) + " ms",
+              position: "start",
+              backgroundColor: "rgba(56, 56, 56, 0.7)",
+              color: "#ffffff",
+              font: {
+                size: 12,
+              }
+            }
+
+          }
+        }
+        responseChart.options.plugins.annotation = {
+          annotations: annotations,
+        };
+        responseChart.update();
+
+        // uptime chart -> usling sline
+        let uptime_sum = [];
+        let uptime_count = [];
+        for (let i =0; i < 72; i++) {
+          uptime_sum.push(0);
+          uptime_count.push(0);
+
+        }
+        for (let i =0; i < monitor.statuses.length; i++) {
+          const status = monitor.statuses[i];
+          const time = parseSqlTimestamp(monitor.timestamps[i]);
+          const hours_before = (new Date() - time) / 1000 / 60/60;
+          if (hours_before < 72) {
+            if (status) {
+              uptime_sum[Math.floor(72 - hours_before)] += 1;
+            }
+            uptime_count[Math.floor(72 - hours_before)] += 1;
+
+          }
+        }
+
+        let str = "";
+        for (let i = 0; i < uptime_sum.length; i++) {
+          if (uptime_count[i] === 0) {
+            str+=`<div class="monitoring-sline unknown"></div>`;
+          } else {
+            const percent = uptime_sum[i] / uptime_count[i];
+            if (percent > 0.65) {
+              str+=`<div class="monitoring-sline up"></div>`;
+            } else if (percent > 0.35) {
+              str+=`<div class="monitoring-sline degraded"></div>`;
+            } else {
+              str+=`<div class="monitoring-sline down"></div>`;
+            }
+          }
+        }
+        $("#monitor-uptime-container").html(str);
+        
+
+        let uptime_daily = "";
+        for (let i =0; i < 90; i++) {
+          const value = monitor.daily_timeline[i];
+          if (value === null) {
+            uptime_daily+=`<div class="monitoring-sline unknown"></div>`;
+          } else if (value > 0.65) {
+            uptime_daily+=`<div class="monitoring-sline up"></div>`;
+          } else if (value > 0.35) {
+            uptime_daily += `<div class="monitoring-sline degraded"></div>`;
+          } else {
+            uptime_daily += `<div class="monitoring-sline down"></div>`;
+          }
+        }
+        $("#monitor-duptime-container").html(uptime_daily);
+
 
       } else {
         // redirect bcs no monitor id or no deployment id
         window.location.href = "/dashboard.html";
       }
-
     } else if (params.has("projectInfo")) {
       // individual project info page
       const project_id = params.get("projectId");
@@ -994,8 +1162,7 @@ $(document).ready(function () {
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
       $("#serror-overview-content").hide();
-              $("#smonitor-content").hide();
-
+      $("#smonitor-content").hide();
 
       const deployment_id = params.get("deploymentId");
       const project = projects.find((p) =>
@@ -2702,7 +2869,16 @@ $(document).ready(function () {
               });
 
               // onclick -> open page with monitor details - TODO
-
+              $("#monitor-" + monitor.id).click(function () {
+                window.location.href =
+                  "./dashboard.html?projectId=" +
+                  project.id +
+                  "&deploymentId=" +
+                  deployment.id +
+                  "&monitorId=" +
+                  monitor.id +
+                  "&monitorInfo";
+              });
               // populate response time chart -> scatter chart -> scrap chart bcs it dosen't fit
               // let response_data = [];
               // for (let j =0; j < monitor.response_times.length; j++) {
@@ -2951,7 +3127,7 @@ $(document).ready(function () {
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
       $("#serror-overview-content").show();
-              $("#smonitor-content").hide();
+      $("#smonitor-content").hide();
 
       const event_id = params.get("eventId");
 
@@ -3310,8 +3486,7 @@ $(document).ready(function () {
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
       $("#serror-overview-content").hide();
-              $("#smonitor-content").hide();
-
+      $("#smonitor-content").hide();
 
       $("#settings-fname").text(user.first_name);
       $("#settings-lname").text(user.last_name);
@@ -3507,8 +3682,7 @@ $(document).ready(function () {
       $("#sdeployment-performance-content-2").hide();
       $("#sdeployment-uptime-content").hide();
       $("#sdeployment-settings-content").hide();
-              $("#smonitor-content").hide();
-
+      $("#smonitor-content").hide();
 
       // populate dashboard
 

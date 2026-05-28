@@ -1484,6 +1484,10 @@ pre[class*="language-"] {
   margin-bottom: 2px;
 }
 
+.sdeployment-monitor:hover {
+  background-color: rgb(238, 238, 238);
+}
+
 .monitor-indicator {
   width: 15px;
   height: 15px;
@@ -1557,10 +1561,31 @@ pre[class*="language-"] {
   gap: 6px;
 }
 
-#monitor-response-chart {
-  height: 40px; 
-}
+
 
 .monitor-rchart-container {
   height: 50px;
+}
+
+#monitor-uptime-container, #monitor-duptime-container {
+  display:flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#monitor-uptime-container .monitoring-sline, #monitor-duptime-container .monitoring-sline {
+  height: 50px;
+}
+
+#mcontainer-label p {
+  margin-top: 3px;
+}
+
+#smonitor-uptime h2{
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 5px;
+
 }

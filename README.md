@@ -126,8 +126,8 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
          - [x] Performance monitoring page
          - [x] Uptime tracking page
            - [ ] Individual monitor page
-             - [ ] Page UI
-             - [ ] Page functionality
+             - [x] Page UI
+             - [x] Page functionality
          - [ ] Reduce clutter
      - [ ] Restructure how deployments work
        - [ ] Deployment types -> front end or backend
@@ -300,6 +300,7 @@ Big Restructuring Plan
       - response time chart
       - overall uptime history
         - similar to chart on monitors list page 
+        - daily uptime data -> for longer past data
   - Settings tab of deployments
     - Similar to settings format
 # NOTES
