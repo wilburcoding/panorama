@@ -2967,9 +2967,20 @@ $(document).ready(function () {
           $("#mlist-delete").click(function () {});
         } else if (currentTab === "settings") {
           // handle editing deployment details
+          console.log(deployment);
+          $("#sdeployment-settings-dname").text(deployment.name);
+          $("#sdeployment-settings-dstatus").text(deployment.status.charAt(0).toUpperCase() + deployment.status.slice(1));
+          $("#sdeployment-settings-denv").text(deployment.environment.charAt(0).toUpperCase() + deployment.environment.slice(1));
+          $("#sdeployment-settings-dversion").text(deployment.version);
+          $("#sdeployment-settings-dapi-key").text(deployment.api_key);
+          
+          $(".apikey-container2").click(function () {
+            $(this).toggleClass("show");
+          });
+          $("#sdeployment-settings-dtype").text(deployment.type.charAt(0).toUpperCase() + deployment.type.slice(1));
 
           //TODO -> update deplyoment edit modal
-          $("#sdeployment-edit").click(function () {
+          $("#sdeployment-settings-dedit").click(function () {
             // editing deployment details
             openModal({
               title: "Edit Deployment Details",
@@ -3023,14 +3034,22 @@ $(document).ready(function () {
                     { label: "Active", value: "active" },
                     { label: "Inactive", value: "inactive" },
                   ],
+                  value: deployment.status
                 },
                 {
-                  id: "regen",
-                  label: "Regenerate API Key (irreversible!)",
-                  type: "checkbox",
-                },
+                  id: "type",
+                  label: "Deployment Type",
+                  type: "select",
+                  options: [
+                    { label: "Frontend", value: "frontend"},
+                    { label: "Backend", value: "backend"}
+                  ],
+                  value: deployment.type
+                  
+                }
               ],
             }).then((data) => {
+              console.log(data);
               fetch("/api/deployments/" + deployment.id, {
                 method: "PUT",
                 headers: {
@@ -3041,43 +3060,31 @@ $(document).ready(function () {
                   version: data.version,
                   environment: data.environment,
                   status: data.status,
-                  regen: data.regen,
+                  type: data.type
+
                 }),
               })
                 .then((resp) => resp.json())
                 .then((json) => {
-                  // console.log(json);
-                  $("#sdeployment-name").text(json.deployment.name);
-                  $("#sdeployment-version").text(json.deployment.version);
-                  $("#sdeployment-environment").text(
-                    json.deployment.environment.charAt(0).toUpperCase() +
-                      json.deployment.environment.slice(1),
-                  );
-                  $("#sdeployment-environment-div").removeClass("production");
-                  $("#sdeployment-environment-div").removeClass("staging");
-                  $("#sdeployment-environment-div").removeClass("development");
-                  $("#sdeployment-environment-div").addClass(
-                    json.deployment.environment,
-                  );
+                  if (json.success) {
+                    const new_deployment = json.deployment;
+                    $("#sdeployment-settings-dname").text(new_deployment.name);
+                    $("#sdeployment-settings-dstatus").text(new_deployment.status.charAt(0).toUpperCase() + new_deployment.status.slice(1));
+                    $("#sdeployment-settings-denv").text(new_deployment.environment.charAt(0).toUpperCase() + new_deployment.environment.slice(1));
+                    $("#sdeployment-settings-dversion").text(new_deployment.version);
+                    $("#sdeployment-settings-dtype").text(new_deployment.type.charAt(0).toUpperCase() + new_deployment.type.slice(1));
+                    $("#sdeployment-settings-dapi-key").text(new_deployment.api_key);
+                    $(".apikey-container2").removeClass("show");
 
-                  $("#sdeployment-status").text(
-                    json.deployment.status.charAt(0).toUpperCase() +
-                      json.deployment.status.slice(1),
-                  );
-                  $("#sdeployment-status-div").removeClass("active");
-                  $("#sdeployment-status-div").removeClass("inactive");
-                  $("#sdeployment-status-div").addClass(json.deployment.status);
-                  $("#sdeployment-apikey").text(json.deployment.api_key);
-                  $("#sdeployment-type").text(
-                    json.deployment.type.charAt(0).toUpperCase() +
-                      json.deployment.type.slice(1),
-                  );
+                  }
+
                 });
             });
+
           });
 
           // handle deleting deployment
-          $("#sdeployment-delete").click(function () {
+          $("#sdeployment-settings-ddelete").click(function () {
             openModal({
               title: "Delete Deployment",
               fields: [
@@ -3107,6 +3114,36 @@ $(document).ready(function () {
               }
             });
           });
+
+          // TODO: handle reseting API key
+          $("#sdeployment-settings-dreset").click(function() {
+            openModal({
+              title: "Reset API key",
+              fields: [
+                {
+                  id: "confirm",
+                  label: "Confirm you want to reset the API key (this is irreversible)",
+                  type: "checkbox"
+                }
+              ]
+            }).then((data) => {
+              if (data.confirm) {
+                fetch("/api/deployments/" + deployment.id + "/reset_api_key", {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json"
+                  }
+                }).then((resp) => resp.json())
+                  .then((json) => {
+                    console.log(json);
+                    if (json.success) {
+                      $("#sdeployment-settings-dapi-key").text(json.api_key);
+                      $(".apikey-container2").removeClass("show");
+                    }
+                  })
+              }
+            })
+          })
         }
 
         // end deployment info population portion of code

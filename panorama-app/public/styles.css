@@ -801,7 +801,7 @@ select {
   background-color: #fb9494;
 }
 
-.apikey-container {
+.apikey-container, .apikey-container2 {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -810,7 +810,7 @@ select {
   transition-duration: 0.2s;
 }
 
-.apikey-container.show {
+.apikey-container.show, .apikey-container2.show {
   color: black;
   background-color: rgb(237, 237, 237);
 }

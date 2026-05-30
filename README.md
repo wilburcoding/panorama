@@ -125,7 +125,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
          - [x] Errors page for more detailed info
          - [x] Performance monitoring page
          - [x] Uptime tracking page
-           - [ ] Individual monitor page
+           - [x] Individual monitor page
              - [x] Page UI
              - [x] Page functionality
          - [ ] Reduce clutter

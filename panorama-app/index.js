@@ -375,24 +375,29 @@ app.put("/api/projects/:id", express.json(), (req, res) => {
 
 app.put("/api/deployments/:id", express.json(), (req, res) => {
   const { id } = req.params;
-  const { name, version, environment, status, regen } = req.body;
-  let api_key = "";
-  if (regen) {
-    api_key = generateApiKey();
-    db.prepare("UPDATE deployments SET api_key = ? WHERE id = ?").run(
-      api_key,
-      id,
-    );
-    console.log("api key regenerated ");
-  }
+  const { name, version, environment, status, type } = req.body;
   db.prepare(
-    "UPDATE deployments SET name = ?, version = ?, environment = ?, status = ? WHERE id = ?",
-  ).run(name, version, environment, status, id);
+    "UPDATE deployments SET name = ?, version = ?, environment = ?, status = ?, type = ? WHERE id = ?",
+  ).run(name, version, environment, status, type, id);
   const deployment = db
     .prepare("SELECT * FROM deployments WHERE id = ?")
     .get(id);
   res.json({ success: true, deployment: deployment });
 });
+
+app.get("/api/deployments/:id/reset_api_key", (req, res) => {
+  const { id } = req.params;
+  // check if delpoyment exists
+  const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(id);
+  if (!deployment) {
+    res.status(404).json({ success: false, message: "Deployment not found"});
+    return;
+  } 
+  const new_api_key = generateApiKey();
+  db.prepare("UPDATE deployments SET api_key = ? WHERE id = ?").run(new_api_key, id);
+  res.json({ success: true, api_key: new_api_key});
+
+})
 
 app.put("/api/error-events/:id", express.json(), (req, res) => {
   const { id } = req.params;
