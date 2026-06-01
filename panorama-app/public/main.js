@@ -233,9 +233,10 @@ $(document).ready(function () {
             <input type="color" id="modal-item-${field.id}" value="${field.value}">
           `);
         } else if (field.type == "checkbox") {
+          console.log(field.value);
           $("#edit-modal-content").append(`
             <p class="modal-label">${field.label}</p>
-            <div class="checkbox" id="modal-item-${field.id}">
+            <div class="checkbox ${field.value ? "checked" : ""}" id="modal-item-${field.id}">
             <i class="ph ph-check"></i>
             </div>`);
           $("#modal-item-" + field.id).on("click", function () {
@@ -596,7 +597,10 @@ $(document).ready(function () {
 
         // populate monitor info page
         $("#monitor-url").text(monitor.url);
-        $("#monitor-status").text(monitor.active ? "Active" : "Inactive");
+        $("#monitor-status").removeClass("active");
+        $("#monitor-status").removeClass("inactive");
+        $("#monitor-status").addClass(monitor.active ? "active" : "inactive");
+        $("#monitor-status-text").text(monitor.active ? "Active" : "Inactive");
         $("#monitor-parent").text(deployment.name);
         $("#monitor-id").text(monitor.id);
         if (monitor.timestamps.length > 0) {
@@ -756,6 +760,113 @@ $(document).ready(function () {
           }
         }
         $("#monitor-duptime-container").html(uptime_daily);
+
+        // TODO: editing monitor options + deleting monitors
+        $("#monitor-edit").click(function() {
+          console.log(monitor.active);
+          openModal({
+            title: "Edit Monitor",
+            fields: [
+              {
+                id: "name",
+                label: "Monitor Name",
+                type: "text",
+                placeholder: "",
+                value: monitor.name,
+                validate: (value) => {
+                  if (value.length < 2) {
+                    return {
+                      success: false,
+                      message: "Monitor name must be at least 2 characters long"
+                    }
+                  }
+                  return {
+                    success: true,
+                  }
+                }
+              },
+              {
+                id: "url",
+                label: "Monitor URL",
+                type: "text",
+                placeholder: "",
+                value: monitor.url,
+                validate: (value) => {
+                  try {
+                    new URL(value);
+                    return {
+                      success: true,
+                    }
+                  } catch (e) {
+                    return {
+                      success: false,
+                      message: "Please enter a valid URL"
+                    }
+                  }
+                }
+              },
+              {
+                id: "active",
+                label: "Status",
+                type: "checkbox",
+                value: monitor.active
+              }
+            ]
+          }).then((data) => {
+            fetch("/api/deployments/" + deployment.id + "/monitors/" + monitor.id, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                name: data.name,
+                url: data.url,
+                active: data.active
+              })
+            }).then((resp) => resp.json())
+              .then((json) => {
+                console.log(json);
+                if (json.success) {
+                  const updated_deployment = json.deployment;
+                  console.log(updated_deployment);
+                  const updated_meta = JSON.parse(updated_deployment.meta);
+                  const updated_monitor = updated_meta.uptime.monitors.find((m) => m.id == monitor.id);
+                  console.log(updated_monitor);
+                  $("#monitor-url").text(updated_monitor.url);
+                  $("#monitor-name").text(updated_monitor.name);
+                  $("#monitor-status").removeClass("active")
+                  $("#monitor-status").removeClass("inactive");
+                  $("#monitor-status").addClass(updated_monitor.active ? "active" : "inactive");
+                  $("#monitor-status-text").text(updated_monitor.active ? "Active" : "Inactive");
+                }
+              })
+          })
+        })
+
+        $("#monitor-delete").click(function() {
+          openModal({
+            title: "Delete Monitor",
+            fields: [
+              {
+                id: "confirm",
+                label: "Confirm you want to delete this monitor (this is irreversible)",
+                type: "checkbox",
+                value: false,
+              }
+            ]
+          }).then((data) => {
+            if (data.confirm) {
+              fetch("/api/deployments/" + deployment.id + "/monitors/" + monitor.id, {
+                method: "DELETE"
+              }).then((resp) => resp.json())
+                .then((json) => {
+                  if (json.success) {
+                    window.location.href = "/dashboard.html?deploymentId=" + deployment.id + "&deploymentInfo&currentTab=uptime";
+                  }
+                })
+            }
+          })
+        })
 
 
       } else {
@@ -2832,7 +2943,7 @@ $(document).ready(function () {
                   <div class="monitor-indicator ${indicator}"></div>
                   <h3>${monitor.name}</h3>
                   <div class="monitor-status ${monitor.active ? "active" : "inactive"}">
-                    <p>${monitor.active ? "Active" : "Inactive"}</p>
+                    <p class="monitor-status-text">${monitor.active ? "Active" : "Inactive"}</p>
                   </div>
                 </div>
                 <div class="monitor-row" style="gap: 0px">

@@ -588,7 +588,8 @@ app.put("/api/deployments/:deployment_id/monitors/:monitor_id", express.json(), 
   monitor.name = name;
   monitor.url = url;
   monitor.active = active; 
-  const updated_deployment = db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), deployment_id);
-  res.json({ succcess: true, deployment: updated_deployment});
+  db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), deployment_id);
+  const updated_deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(deployment_id);
+  res.json({ success: true, deployment: updated_deployment});
 })
 

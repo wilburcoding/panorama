@@ -1576,8 +1576,14 @@
             <p class="settings-htitle">Version</p>
             <p style="margin-top: 2px" id="sdeployment-settings-dversion">12</p>
             <p class="settings-htitle">API Key</p>
-            <div class="apikey-container2" style="width: fit-content;margin-bottom: 14px">
-              <p style="margin-top: 2px;margin-bottom:2px;" id="sdeployment-settings-dapi-key">
+            <div
+              class="apikey-container2"
+              style="width: fit-content; margin-bottom: 14px"
+            >
+              <p
+                style="margin-top: 2px; margin-bottom: 2px"
+                id="sdeployment-settings-dapi-key"
+              >
                 1
               </p>
             </div>
@@ -1614,6 +1620,15 @@
             class="dashboard-card"
             style="margin-top: 5vh; flex: 1; max-width: 70%"
           >
+            <div class="options-brow">
+              <button class="options-button" id="monitor-edit">
+                <i class="ph ph-pencil-simple"></i>
+              </button>
+              <button class="options-button" id="monitor-delete">
+                <i class="ph ph-trash"></i>
+              </button>
+            </div>
+
             <h1
               style="
                 font-size: 35px;
@@ -1631,8 +1646,8 @@
               </div>
               <div class="sdeployment-info-ritem">
                 <h3>Status</h3>
-                <div class="dproject-status active">
-                  <p id="monitor-status">Active</p>
+                <div class="dproject-status active" id="monitor-status">
+                  <p id="monitor-status-text">Active</p>
                 </div>
               </div>
             </div>
