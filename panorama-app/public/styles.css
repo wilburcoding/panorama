@@ -1525,9 +1525,26 @@ pre[class*="language-"] {
   }
 }
 
+@keyframes pulse_unknown {
+  0% {
+    box-shadow: 0 0 0 0 rgba(191, 191, 191, 0.9);
+    opacity:1;
+  }
+
+  100% {
+    box-shadow: 0 0 0 10px rgba(191, 191, 191, 0);
+    opacity: 1;
+  }
+}
+
 .monitor-indicator.down {
   background-color: rgb(245, 140, 140);
   animation: pulse_down 1.6s infinite ease-in-out;
+}
+
+.monitor-indicator.unknown {
+  background-color: rgb(191, 191, 191);
+  animation: pulse_unknown 1.6s infinite ease-in-out;
 }
 
 .monitor-status {

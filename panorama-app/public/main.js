@@ -588,6 +588,53 @@ $(document).ready(function () {
         if (!deployment) {
           window.location.href = "/dashboard.html";
         }
+        $("#sbp-" + project.id).addClass("active");
+
+        // populate tabs
+        const icons = [
+          "ph-house",
+          "ph-warning",
+          "ph-speedometer",
+          "ph-cloud-check",
+          "ph-gear",
+        ];
+        const tab_names = [
+          "Overview",
+          "Errors",
+          "Performance",
+          "Uptime",
+          "Settings",
+        ];
+        for (let i = 0; i < tab_names.length; i++) {
+          const tabname = tab_names[i];
+          const icon = icons[i];
+          $("#sbp-" + project.id + "-" + deployment.id + "-tabs").append(`
+          <button class="sidebar-project tab" id="sbp-${project.id}-${deployment.id}-${tabname.toLowerCase()}">
+            <i class="ph ${icon}"></i>
+            <p id="sbp-${project.id}-${deployment.id}-tab-${tabname.toLowerCase()}">${tabname}</p>
+          </button>
+            `);
+          $(
+            "#sbp-" +
+              project.id +
+              "-" +
+              deployment.id +
+              "-" +
+              tabname.toLowerCase(),
+          ).click(function () {
+            window.location.href =
+              "/dashboard.html?deploymentId=" +
+              deployment.id +
+              "&deploymentInfo&currentTab=" +
+              tabname.toLowerCase();
+          });
+        }
+
+        $(
+          "#sbp-" + project.id + "-" + deployment.id + "-uptime",
+        ).addClass("active");
+        $("#sbp-" + project.id + "-" + deployment.id).addClass("active");
+
 
         const meta = JSON.parse(deployment.meta);
         const monitor = meta.uptime.monitors.find((m) => m.id == monitor_id);
@@ -596,6 +643,7 @@ $(document).ready(function () {
         }
 
         // populate monitor info page
+        console.log(monitor.active)
         $("#monitor-url").text(monitor.url);
         $("#monitor-status").removeClass("active");
         $("#monitor-status").removeClass("inactive");
@@ -2789,7 +2837,11 @@ $(document).ready(function () {
             const avg = Math.round(
               total_response_time / response_time_datasets[i].length,
             );
-            $("#sdeployment-responsetime-avg").text(avg);
+            if (total_response_time > 0) {
+              $("#sdeployment-responsetime-avg").text(avg + " ms");
+            } else {
+              $("#sdeployment-responsetime-avg").text("N/A");
+            }
             annotations2["line" + i] = {
               type: "line",
               scaleID: "y",
@@ -2936,29 +2988,29 @@ $(document).ready(function () {
 
               $("#sdeployment-mlist").append(`
                 <div class="sdeployment-monitor" id="monitor-${monitor.id}">
-                <div class="monitor-row">
-                  <div style="margin-left: 6px;margin-right:0px;" class="checkbox ${checked_monitors.includes(monitor.id) ? "checked" : ""}" id="mcheckbox-${monitor.id}">
-                    <i class="ph ph-check"></i>
-                  </div>
-                  <div class="monitor-indicator ${indicator}"></div>
-                  <h3>${monitor.name}</h3>
-                  <div class="monitor-status ${monitor.active ? "active" : "inactive"}">
-                    <p class="monitor-status-text">${monitor.active ? "Active" : "Inactive"}</p>
-                  </div>
-                </div>
-                <div class="monitor-row" style="gap: 0px">
-                  <div>
-                    <div class="simple-row">
-                      ${uptime_chart}
+                  <div class="monitor-row">
+                    <div style="margin-left: 6px;margin-right:0px;" class="checkbox ${checked_monitors.includes(monitor.id) ? "checked" : ""}" id="mcheckbox-${monitor.id}">
+                      <i class="ph ph-check"></i>
                     </div>
-                    <div class="simple-row sdeployment-monitoring-label">
-                      <p>1 day ago</p>
-                      <p>Now</p>
+                    <div class="monitor-indicator ${indicator}"></div>
+                    <h3>${monitor.name}</h3>
+                    <div class="monitor-status ${monitor.active ? "active" : "inactive"}">
+                      <p class="monitor-status-text">${monitor.active ? "Active" : "Inactive"}</p>
                     </div>
                   </div>
+                  <div class="monitor-row" style="gap: 0px">
+                    <div>
+                      <div class="simple-row">
+                        ${uptime_chart}
+                      </div>
+                      <div class="simple-row sdeployment-monitoring-label">
+                        <p>1 day ago</p>
+                        <p>Now</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <hr />
+                <hr />
               `);
 
               $("#mcheckbox-" + monitor.id).click(function () {
@@ -2978,6 +3030,7 @@ $(document).ready(function () {
                   checked_monitors.length === 0,
                 );
               });
+
 
               // onclick -> open page with monitor details - TODO
               $("#monitor-" + monitor.id).click(function () {
@@ -3049,7 +3102,105 @@ $(document).ready(function () {
               // responseChart.options.scales.y.ticks.display = false;
               // responseChart.update();
             }
+            // new monitor button or something
+            $("#sdeployment-mlist").append(`
+              <div class="sdeployment-monitor dproject-card" id="monitor-new" style="justify-content: center;padding:20px;">
+                <div class="dproject-info">
+                  <i class="ph ph-plus" style="font-size: 20px;"></i>
+                  <p style="margin-top:5px;margin-bottom:5px;">New Monitor</p>
+                </div>
+              </div>  
+              <hr/>
+            `)
+            $("#monitor-new").click(function() {
+              openModal({
+                title: "Create New Monitor",
+                fields: [
+                  {
+                    id: "name",
+                    label: "Monitor Name",
+                    type: "text",
+                    placeholder: "",
+                    validate: (value) => {
+                      if (value.length < 2) {
+                        return {
+                          success: false,
+                          message: "Monitor name must be at least 2 characters long"
+                        }
+                      }
+                      return {
+                        success: true
+                      }
+                    },
+                    value: "",
+                  },
+                  {
+                    id: "url",
+                    label: "Monitor URL",
+                    type: "text",
+                    placeholder: "",
+                    validate: (value) => {
+                      try {
+                        new URL(value);
+                        return {
+                          success: true
+                        }
+                      } catch (e) {
+                        return {
+                          success: false,
+                          message: "Please enter a valid URL"
+                        }
+                      }
+                    },
+                    value: "",
+                  },
+                  {
+                    id: "interval",
+                    label: "Monitoring Interval",
+                    type: "select",
+                    options: [
+                      { label: "15 minute", value: 15}
+                    ],
+                    value: 15
+                  },
+                  {
+                    id: "active",
+                    label: "Monitor Status",
+                    type: "select",
+                    options: [
+                      { label: "Active", value: true},
+                      { label: "Inactive", value: false},
+                    ],
+                    value: true
+                  }
+                ]
+              }).then((data) => {
+
+                fetch("/api/deployments/" + deployment.id + "/monitors", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    name: data.name,
+                    url: data.url,
+                    active: data.active == "true",
+                  })
+                }).then((resp) => resp.json())
+                  .then((json) => {
+                    if (json.success) {
+                      const updated_deployment = json.deployment;
+                      const updated_meta = JSON.parse(updated_deployment.meta);
+                      const monitor_id = json.monitor_id;
+                      const monitor = updated_meta.uptime.monitors.find((m) => m.id === monitor_id);
+                      window.location.href = "./dashboard.html?projectId=" + project.id + "&deploymentId=" + updated_deployment.id + "&monitorId=" + monitor.id + "&monitorInfo";
+                    }
+                  })
+
+              })
+            })
           }
+
 
           populateMonitoringTable($("#mlist-search").val().toLowerCase());
           $("#mlist-search").on("input", function () {

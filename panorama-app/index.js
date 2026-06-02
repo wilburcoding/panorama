@@ -535,8 +535,9 @@ app.post("/api/deployments/:id/monitors", express.json(), (req, res) => {
     res.status(404).json({success: false, message: "Deployment not found"});
     return;
   }
-
-  const { name, url } = req.body;
+  
+  const { name, url, active } = req.body;
+  
   let meta = JSON.parse(deployment.meta);
   if (!meta.uptime.monitors) {
     meta.uptime.monitors = [];
@@ -546,14 +547,17 @@ app.post("/api/deployments/:id/monitors", express.json(), (req, res) => {
     id: monitor_id,
     name: name,
     url: url,
-    active: false,
+    active: active,
     response_times: [],
     timestamps: [],
     status: "down",
     statuses: [],
+    daily_timeline: [],
   })
-  const updated_deployment = db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), id);
-  res.json({success: true, deployment: updated_deployment});
+  
+  db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), id);
+  const updated_deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(id);
+  res.json({success: true, deployment: updated_deployment, monitor_id: monitor_id});
 })
 
 

@@ -83,7 +83,6 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
          - [x] Deleting project functionality
      - [x] deployment detail page
        - [x] Deployment detail page layout
-         - [ ] logs UI
        - [x] Populate data
        - [x] page functionality
          - [x] Error events sorting functionality
@@ -91,10 +90,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
          - [x] Error list functionality (deleting multiple)
            - [x] Updating multiple items functionality 
          - [x] Deleting project functionality
-         - [ ] logs functionality
-           - [ ] searching logs
-           - [ ] deleting logs
-     - [ ] error event detail page
+     - [x] error event detail page
        - [x] page layout
        - [x] populate data
        - [x] functionality (mainly just deleting)
@@ -129,8 +125,8 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
              - [x] Page UI
              - [x] Page functionality
          - [ ] Reduce clutter
-     - [ ] Restructure how deployments work
-       - [ ] Deployment types -> front end or backend
+     - [x] Restructure how deployments work
+       - [x] Deployment types -> front end or backend
      - [ ] More interactive elements
        - [ ] Interactive deployment creation guide
        - [ ] Interactive account creation guide
