@@ -1190,6 +1190,9 @@ pre[class*="language-"] {
   padding: 10px;
 }
 
+.benchmark-item:hover {
+  background-color: rgb(241, 241, 241);
+}
 .pbenchmark-item1 {
   display: flex;
   flex-direction: column;
@@ -1309,6 +1312,11 @@ pre[class*="language-"] {
   color: rgb(84, 59, 14);
 }
 
+.benchmark-status.unknown {
+  background-color: rgb(191, 191, 191);
+  color: black;
+}
+
 .benchmark-name {
   font-size: 16px;
   line-height: 16px;
@@ -1316,15 +1324,6 @@ pre[class*="language-"] {
 
 .benchmark-speed {
   font-weight: 700;
-}
-
-#benchmarks-list hr {
-  width: 100%;
-  border: none;
-  border-top: dotted 1.6px black;
-  margin-bottom: 0;
-  background-color: transparent;
-  margin-top: 0;
 }
 
 .sdeployment-row {
@@ -1378,7 +1377,7 @@ pre[class*="language-"] {
 #sdeployment-monitoring-list hr,
 #serror-rcontainer hr,
 #serror-rccontainer hr,
-#sdeployment-benchmarks hr {
+#sdeployment-benchmarks-1 hr, #sdeployment-benchmarks-2 hr, #benchmarks-list hr {
   width: 100%;
   border: none;
   border-top: dotted 1.6px black;

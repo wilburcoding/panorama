@@ -537,7 +537,7 @@ app.post("/api/deployments/:id/monitors", express.json(), (req, res) => {
   }
   
   const { name, url, active } = req.body;
-  
+
   let meta = JSON.parse(deployment.meta);
   if (!meta.uptime.monitors) {
     meta.uptime.monitors = [];
@@ -597,3 +597,61 @@ app.put("/api/deployments/:deployment_id/monitors/:monitor_id", express.json(), 
   res.json({ success: true, deployment: updated_deployment});
 })
 
+
+// handle benchmarks -> posting, deleting, editing
+app.post("/api/deployments/:id/benchmarks", express.json(), (req, res) => {
+  const { id } = req.params;
+  const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(id);
+  if (!deployment) {
+    res.status(404).json({ success: false, message: "Deployment not found"});
+    return;
+  }
+  const { name, expected_time } = req.body;
+  let meta = JSON.parse(deployment.meta);
+  meta.performance.benchmarks.push({
+    id: generateID(),
+    name: name,
+    expected_time: parseInt(expected_time),
+    times: [],
+    timestamps: [],
+  });
+  db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), id);
+  const updated_deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(id);
+  res.json({ success: true, deployment: updated_deployment});
+})
+
+app.delete("/api/deployments/:deployment_id/benchmarks/:benchmark_id", (req, res) => {
+  const { deployment_id, benchmark_id }= req.params;
+  const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(deployment_id);
+  if (!deployment) {
+    res.status(404).json({ success: false, message: "Deployment not found"});
+    return;
+  }
+  let meta = JSON.parse(deployment.meta);
+  meta.performance.benchmarks = meta.performance.benchmarks.filter((benchmark) => benchmark.id !== benchmark_id);
+  db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), deployment_id);
+  const updated_deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(deployment_id);
+  res.json({ success: true, deployment:updated_deployment});
+
+})
+
+app.put("/api/deployments/:deployment_id/benchmarks/:benchmark_id", express.json(), (req, res) => {
+  const { deployment_id, benchmark_id } = req.params;
+  const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(deployment_id);
+  if (!deployment) {
+    res.status(404).json({ success: false, message: "Deployment not found"});
+    return;
+  }
+  let meta = JSON.parse(deployment.meta);
+  const benchmark = meta.performance.benchmarks.find((benchmark) => benchmark.id === benchmark_id);
+  if (!benchmark) {
+    res.status(404).json({ success: false, message: "Benchmark not found"});
+    return;
+  }
+  const { name, expected_time } = req.body;
+  benchmark.name = name;
+  benchmark.expected_time = parseInt(expected_time);
+  db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), deployment_id);
+  const updated_deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(deployment_id);
+  res.json({ success: true, deployment: updated_deployment});
+})

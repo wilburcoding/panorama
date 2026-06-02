@@ -187,12 +187,14 @@ export function sample_data() {
             {
               name: "DB Query Performance",
               expected_time: 70,
+              id: "benchmark_1",
               times: benchmark_times_1,
               timestamps: benchmark_timestamps, // last 30 times are recorded
             },
             {
               name: "API Response Time",
               expected_time: 70,
+              id: "benchmark_2",
               times: benchmark_times_2,
               timestamps: benchmark_timestamps,
             },

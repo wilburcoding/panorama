@@ -2440,36 +2440,44 @@ $(document).ready(function () {
           }
           // benchmarks statistics
           const benchmarks = meta.performance.benchmarks;
-          console.log(benchmarks);
+          let benchmarks_container = "#sdeployment-benchmarks-1";
+          if (deployment.type == "frontend") {
+            benchmarks_container = "#sdeployment-benchmarks-2";
+          }
           for (let i = 0; i < benchmarks.length; i++) {
             const benchmark = benchmarks[i];
             let status = "";
-            let duration = benchmark.times[benchmark.times.length - 1];
-            if (
-              (duration - benchmark.expected_time) / benchmark.expected_time >
-              0.5
-            ) {
-              status = "Degraded";
-            } else if (
-              (duration - benchmark.expected_time) / benchmark.expected_time <
-              -0.5
-            ) {
-              status = "Excellent";
-            } else if (
-              (duration - benchmark.expected_time) / benchmark.expected_time >=
-              0.2
-            ) {
-              status = "Slow";
-            } else if (
-              (duration - benchmark.expected_time) / benchmark.expected_time <=
-              0.2
-            ) {
-              status = "Good";
+            if (benchmark.times.length == 0) {
+              status = "Unknown";
+            } else {
+              let duration = benchmark.times[benchmark.times.length - 1];
+              if (
+                (duration - benchmark.expected_time) / benchmark.expected_time >
+                0.5
+              ) {
+                status = "Degraded";
+              } else if (
+                (duration - benchmark.expected_time) / benchmark.expected_time <
+                -0.5
+              ) {
+                status = "Excellent";
+              } else if (
+                (duration - benchmark.expected_time) / benchmark.expected_time >=
+                0.2
+              ) {
+                status = "Slow";
+              } else if (
+                (duration - benchmark.expected_time) / benchmark.expected_time <=
+                0.2
+              ) {
+                status = "Good";
+              }
             }
+ 
 
             // calculate the various stats
             let times_sum = 0;
-            let worst_time = 0;
+            let worst_time = -1;
             let best_time = 9999999;
             let recent_count = 0;
 
@@ -2488,13 +2496,23 @@ $(document).ready(function () {
                 recent_count += 1;
               }
             }
-            const average_time = Math.round(times_sum / benchmark.times.length);
-            let benchmarks_container = "#sdeployment-benchmarks-1";
-            if (deployment.type == "frontend") {
-              benchmarks_container = "#sdeployment-benchmarks-2";
+            let average_time = 0;
+            if (benchmark.times.length > 0) {
+              average_time = Math.round(times_sum / benchmark.times.length);
+            } else {
+              average_time = "N/A";
             }
+
+            if (worst_time == -1) {
+              worst_time = "N/A";
+            }
+
+            if (best_time == 9999999) {
+              best_time = "N/A";
+            }
+          
             $(benchmarks_container).append(`
-                <div class="benchmark-item">
+              <div class="benchmark-item">
                 <div class="pbenchmark-item1">
                   <h3
                     class="benchmark-name"
@@ -2502,11 +2520,14 @@ $(document).ready(function () {
                   >
                     ${benchmark.name}
                   </h3>
-                  <div class="simple-row" style="margin-bottom: 7px">
+                  <div class="simple-row" style="margin-bottom: 0px">
                     <p>Status:</p>
                     <div class="benchmark-status ${status.toLowerCase()}">
                       <p>${status}</p>
                     </div>
+                  </div>
+                  <div class="simple-row" style="margin-bottom: 7px">
+                    <p>ID: <span style="font-weight: 600">${benchmark.id}</span></p>
                   </div>
                   <div
                     class="pbenchmark-item2-subitem"
@@ -2637,6 +2658,65 @@ $(document).ready(function () {
             };
             benchmarkChart.update();
           }
+
+          // new benchmark card
+          $(benchmarks_container).append(`
+            <div class="benchmark-item" id="new-benchmark"style="justify-content: center; align-items: center; padding: 20px;">
+              <div style="display:flex;flex-direction:row; align-items: center; justify-content: center;gap: 10px;">
+                <i class="ph ph-plus" style="font-size: 20px;"></i>
+              <p style="margin-top:5px;margin-bottom:5px;" >New Benchmark</p>
+              </div>
+            </div>
+            <hr/>
+            `)
+
+          $("#new-benchmark").click(function() {
+            openModal({
+              title: "Create New Benchmark",
+              fields: [
+                {
+                  id: "name",
+                  label: "Benchmark Name",
+                  type: "text",
+                  value: "",
+                  placeholder: "",
+                  validation: (value) => {
+                    if (value.length < 2) {
+                      return {
+                        success: false,
+                        message: "Benchmark name must be at least 2 characters long"
+                      }
+                    }
+                    return {
+                      success: true
+                    }
+                  }
+                },
+                {
+                  id: "expected_time",
+                  label: "Expected Time (ms)",
+                  type: "text",
+                  value: "",
+                  placeholder: "",
+                  validation: (value) => {
+                    if (isNaN(Number(str.trim()))) {
+                      return {
+                        success: false,
+                        message: "Expected time must be a real number"
+                      }
+                    }
+                    return {
+                      success: true,
+                    }
+                  }
+                }
+              ]
+            }).then((data) => {
+              console.log(data);
+            })
+
+          })
+
         } else if (currentTab === "uptime") {
           // handle uptime monitoring stats
           const meta = JSON.parse(deployment.meta);
