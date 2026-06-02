@@ -138,7 +138,7 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [ ] Posting performance data (frontend)
        - [ ] Posting performance data (backend)
        - [x] Posting + deleting + editing monitors 
-       - [ ] Posting + deleting + editing benchmarks
+       - [x] Posting + deleting + editing benchmarks
    - [ ] Improved backend monitoring? (record requests data?)
 
 

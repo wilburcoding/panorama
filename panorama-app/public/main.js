@@ -2514,20 +2514,32 @@ $(document).ready(function () {
             $(benchmarks_container).append(`
               <div class="benchmark-item">
                 <div class="pbenchmark-item1">
-                  <h3
-                    class="benchmark-name"
-                    style="margin-bottom: 5px; font-size: 20px"
-                  >
-                    ${benchmark.name}
-                  </h3>
-                  <div class="simple-row" style="margin-bottom: 0px">
-                    <p>Status:</p>
-                    <div class="benchmark-status ${status.toLowerCase()}">
-                      <p>${status}</p>
+                  <div class="simple-row" style="width: 100%;align-items: flex-start">
+                    <div>
+                      <h3
+                        class="benchmark-name"
+                        style="margin-bottom: 5px; font-size: 20px;"
+                      >
+                        ${benchmark.name}
+                      </h3>
+                      <div class="simple-row" style="margin-bottom: 0px; width: fit-content">
+                        <p>Latest Status:</p>
+                        <div class="benchmark-status ${status.toLowerCase()}">
+                          <p>${status}</p>
+                        </div>
+                      </div>
+                      <div class="simple-row" style="margin-bottom: 7px">
+                        <p>ID: <span style="font-weight: 600">${benchmark.id}</span></p>
+                      </div>
                     </div>
-                  </div>
-                  <div class="simple-row" style="margin-bottom: 7px">
-                    <p>ID: <span style="font-weight: 600">${benchmark.id}</span></p>
+                    <div class="options-brow" style="position: relative;padding:0px;">
+                      <button class="options-button" id="benchmark-edit-${benchmark.id}" style="margin-top:0px;">
+                        <i class="ph ph-pencil-simple"></i>
+                      </button>
+                      <button class="options-button" id="benchmark-delete-${benchmark.id}" style="margin-top:0px;">
+                        <i class="ph ph-trash"></i>
+                      </button>
+                    </div>
                   </div>
                   <div
                     class="pbenchmark-item2-subitem"
@@ -2650,6 +2662,21 @@ $(document).ready(function () {
                 },
               };
             }
+            annotations["expected"] = {
+              type: "line",
+              yMin: benchmark.expected_time,
+              yMax:benchmark.expected_time,
+              borderColor: "#aaaaaa",
+              borderWidth:2,
+              borderDash: [7, 4],
+              label: {
+                display: true,
+                content: "Expected Time",
+                position: "start",
+                backgroundColor: "rgba(70, 70, 70, 0.63)",
+                color: "white"
+              }
+            }
             benchmarkChart.options.plugins.annotation = {
               annotations: annotations,
             };
@@ -2657,6 +2684,95 @@ $(document).ready(function () {
               suggestedMax: worst_time * 1.15,
             };
             benchmarkChart.update();
+
+            // handle benchmark editing and deleting
+            $("#benchmark-edit-" + benchmark.id).click(function() {
+              openModal({
+                title: "Edit Benchmark",
+                fields: [
+                  {
+                    id: "name",
+                    label: "Benchmark Name",
+                    type: "text",
+                    value: benchmark.name,
+                    placeholder: "",
+                    validation: (value) => {
+                      if (value.length < 2) {
+                        return {
+                          success: false,
+                          message: "Benchmark name must be at least 2 characters long"
+                        }
+                      }
+                      return {
+                        success: true,
+                      }
+                    }
+                  },
+                  {
+                    id: "expected_time",
+                    label: "Expected Time (ms)",
+                    type: "text",
+                    value: benchmark.expected_time,
+                    placeholder: "",
+                    validation: (value) => {
+                      if (isNaN(Number(str.trim()))) {
+                        return {
+                          success: false,
+                          message: "Expected time must be a real number"
+                        }
+                      }
+                      return {
+                        success: true
+                      }
+                    }
+                  }
+                ]
+              }).then((data) => {
+                console.log(data);
+                fetch("/api/deployments/" + deployment.id + "/benchmarks/" + benchmark.id, {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({
+                    name: data.name,
+                    expected_time: data.expected_time
+                  })
+                }).then((resp) => resp.json())
+                  .then((json) => {
+                    if (json.success) {
+                      window.location.reload();
+                    }
+                  })
+              })
+            })
+
+            $("#benchmark-delete-" + benchmark.id).click(function() {
+              openModal({
+                title: "Delete Benchmark",
+                fields: [
+                  {
+                    id: "confirm",
+                    label: "Confirm you want to delete this benchmark (this action is irreversible)",
+                    type: "checkbox",
+                    value: false,
+                  }
+                ]
+              }).then((data) => {
+                if (data.confirm) {
+                  fetch("/api/deployments/" + deployment.id + "/benchmarks/" + benchmark.id, {
+                    method: "DELETE",
+                    headers: {
+                      "Content-Type": "application/json"
+                    }
+                  }).then((resp) => resp.json())
+                    .then((json) => {
+                      window.location.reload();
+                    })
+
+                }
+              })
+            })
           }
 
           // new benchmark card
@@ -2712,7 +2828,22 @@ $(document).ready(function () {
                 }
               ]
             }).then((data) => {
-              console.log(data);
+              fetch("/api/deployments/" + deployment.id + "/benchmarks", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  name: data.name,
+                  expected_time: data.expected_time  
+                })
+              }).then((resp) => resp.json())
+                .then((json) => {
+                  if (json.success) {
+                    window.location.reload();
+                  }
+                })
+                
             })
 
           })
