@@ -1,5 +1,6 @@
 import express from "express";
 import bcrypt from "bcrypt";
+import cors from "cors"
 
 const saltRounds = 10;
 
@@ -33,6 +34,8 @@ async function checkPassword(password, hash) {
 }
 
 app.use(express.static("public"));
+
+app.use(cors())
 
 app.listen(port, () => {
   console.log(`Panorama app listening at http://localhost:${port}`);
@@ -284,9 +287,32 @@ app.post("/api/deployments", express.json(), (req, res) => {
   const { project_id, name, version, environment, status } = req.body;
   const result = db
     .prepare(
-      "INSERT INTO deployments (project_id, name, version, environment, status, api_key) VALUES (?, ?, ?, ?, ?, ?)",
+      "INSERT INTO deployments (project_id, name, version, environment, status, api_key, meta) VALUES (?, ?, ?, ?, ?, ?, ?)",
     )
-    .run(project_id, name, version, environment, status, generateApiKey());
+    .run(project_id, name, version, environment, status, generateApiKey(), JSON.stringify({
+      performance: {
+        backend_monitoring: {
+          cpu_usage:[],
+          memory_usage: [],
+          timestamps:[],
+        },
+        frontend_monitoring: {
+          lcp: [],
+          inp: [],
+          ttfb: [],
+          fcp: [],
+          timestamps: []
+        },
+        benchmarks: [
+
+        ]
+      },
+      uptime: {
+        monitors: [
+          
+        ]
+      }
+    }));
   const deployment = db
     .prepare("SELECT * FROM deployments WHERE id = ?")
     .get(result.lastInsertRowid);
@@ -655,3 +681,105 @@ app.put("/api/deployments/:deployment_id/benchmarks/:benchmark_id", express.json
   const updated_deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(deployment_id);
   res.json({ success: true, deployment: updated_deployment});
 })
+
+// posting performance metrics -> benchmarks, performance (backend and frontend)
+app.post("/api/deployments/:id/benchmarks", express.json(), (req, res) => {
+  const { id } = req.params;
+  const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(id);
+  if (!deployment) {
+    res.status(404).json({ success: false, message: "Deployment not found"})
+    return;
+  }
+  const { benchmark_id, time } = req.body;
+  let meta = JSON.parse(deployment.meta);
+  const benchmark = meta.performance.benchmarks.find((benchmark) => benchmark.id === benchmark_id);
+  if (!benchmark) {
+    res.status(404).json({ success: false, message: "Benchmark not found"});
+    return;
+  }
+
+  benchmark.times.push(parseInt(time));
+  benchmark.timestamps.push(new Date().toISOString());
+  db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), id);
+  const updated_deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(id);
+  res.json({ success: true, deployment: updated_deployment});
+})
+
+app.post("/api/deployments/:id/performance", express.json(), (req, res) => {
+  const { id} = req.params;
+  const deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(id);
+  if (!deployment) {
+    res.status(404).json({ success: false, message: "Deployment not found"});
+    return;
+  }
+
+
+  let meta = JSON.parse(deployment.meta);
+
+  if (deployment.type == "backend") {
+    const { cpu_usage, memory_usage} = req.body;
+    meta.performance.backend_monitoring.cpu_usage.push(cpu_usage);
+    meta.performance.backend_monitoring.memory_usage.push(memory_usage);
+    meta.performance.backend_monitoring.timestamps.push(new Date().toISOString());
+    if (meta.performance.backend_monitoring.timestamps.length > 300) {
+      meta.performance.backend_monitoring.cpu_usage.shift();
+      meta.performance.backend_monitoring.memory_usage.shift();
+      meta.performance.backend_monitoring.timestamps.shift();
+    }
+  } else {
+    const { lcp, inp, ttfb, fcp } = req.body;
+    console.log(lcp, inp, ttfb, fcp);
+    console.log(meta.performance.frontend_monitoring);
+    meta.performance.frontend_monitoring.lcp.push(lcp);
+    meta.performance.frontend_monitoring.inp.push(inp);
+    meta.performance.frontend_monitoring.ttfb.push(ttfb);
+    meta.performance.frontend_monitoring.fcp.push(fcp);
+    meta.performance.frontend_monitoring.timestamps.push(new Date().toISOString());
+    if (meta.performance.frontend_monitoring.timestamps.length > 300) {
+      meta.performance.frontend_monitoring.lcp.shift();
+      meta.performance.frontend_monitoring.inp.shift();
+      meta.performance.frontend_monitoring.ttfb.shift();
+      meta.performance.frontend_monitoring.fcp.shift();
+    }
+  }
+  db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), id);
+  const updated_deployment = db.prepare("SELECT * FROM deployments WHERE id = ?").get(id);
+  res.json({ success: true, deployment: updated_deployment});
+})
+
+
+// uptime checks
+async function checkUptime() {
+  const deployments = db.prepare("SELECT * FROM deployments").all();
+  for (let deployment of deployments) {
+    let meta = JSON.parse(deployment.meta);
+    const monitors = meta.uptime.monitors;
+    monitors.forEach(async (monitor) => {
+      const start = performance.now();
+      try {
+        const res = await fetch(monitor.url, {
+          signal: AbortSignal.timeout(10000)
+        })
+        const response_time = Math.round(performance.now() - start);
+        let status = res.ok;
+        monitor.statuses.push(status);
+        monitor.response_times.push(response_time);
+        monitor.timestamps.push(new Date().toISOString());
+        if (monitor.statuses.length > 50) {
+          monitor.statuses.shift();
+          monitor.response_times.shift();
+          monitor.timestamps.shift();  
+        }
+      } catch (error) {
+        monitor.statuses.push(false);
+        monitor.response_times.push(null);
+        monitor.timestamps.push(new Date().toISOString());
+      }
+
+    });
+    db.prepare("UPDATE deployments SET meta = ? WHERE id = ?").run(JSON.stringify(meta), deployment.id);
+  }
+  setTimeout(checkUptime, 15 * 60 * 1000); // every 15 minutes
+}
+
+checkUptime();

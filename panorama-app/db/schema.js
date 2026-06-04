@@ -215,7 +215,7 @@ export function sample_data() {
             },
             {
               name: "API",
-              url: "https://api.example.com/endpoint",
+              url: "https://api.example.com/",
               statuses: sample_statuses2,
               daily_timeline: sample_daily2,
               timestamps: timestamps,
@@ -238,7 +238,7 @@ export function sample_data() {
         deployment,
         null,
         JSON.stringify(meta),
-        Math.random() < 0.5 ? "backend" : "frontend", // for now, only types are "backend" and "frontend"
+        Math.random() < 0.01 ? "backend" : "frontend", // for now, only types are "backend" and "frontend"
       );
     }
   }

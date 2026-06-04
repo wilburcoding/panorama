@@ -583,6 +583,15 @@ a {
   margin-left: 0;
 }
 
+.overview-row {
+  box-shadow: 4px 4px 0px #000;
+}
+
+.overview-row:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000;
+}
+
 /* .project-overview-card p {
   font-size: 20px !important;
   line-height: 20px !important;

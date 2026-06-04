@@ -110,13 +110,10 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] Deployment guide
      - [ ] Feature info
  - [ ] Additional features + Bug fixes
-   - [ ] Plugin feature for additional stuff
-     - [ ] unified logging
-     - [ ] cron/uptime monitoring
    - [ ] Restructuring plan
      - [ ] Reorganize UI
        - [x] Sidebar improvements
-       - [ ] Error events has multiple pages for different features (performance)
+       - [x] Error events has multiple pages for different features (performance)
          - [x] Overview pages should include information on everything
          - [x] Errors page for more detailed info
          - [x] Performance monitoring page
@@ -124,9 +121,10 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
            - [x] Individual monitor page
              - [x] Page UI
              - [x] Page functionality
-         - [ ] Reduce clutter
+         - [x] Reduce clutter
      - [x] Restructure how deployments work
        - [x] Deployment types -> front end or backend
+       - [ ] Options to enable/disable features (low priority)
      - [ ] More interactive elements
        - [ ] Interactive deployment creation guide
        - [ ] Interactive account creation guide
@@ -134,11 +132,14 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
      - [ ] New sample data
    - [ ] Reorganize API
      - [ ] Remove unused endpoints
-     - [ ] New endpoints for new types of monitoring
-       - [ ] Posting performance data (frontend)
-       - [ ] Posting performance data (backend)
+     - [x] New endpoints for new types of monitoring
+       - [x] Posting performance data (frontend)
+       - [x] Posting performance data (backend)
        - [x] Posting + deleting + editing monitors 
        - [x] Posting + deleting + editing benchmarks
+     - [x] Uptime monitoring
+   - [ ] Sample projects -> frontend and backend
+   - [x] Frontend SDK to track metrics
    - [ ] Improved backend monitoring? (record requests data?)
 
 

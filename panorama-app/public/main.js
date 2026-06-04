@@ -1409,6 +1409,7 @@ $(document).ready(function () {
         if (currentTab === "overview") {
           // populate basic deployment details (name, version, environment, status, last deployed, created on , parent project, api key)
 
+          
           $("#sdeployment-name").text(deployment.name);
           $("#sdeployment-version").text(deployment.version);
           $("#sdeployment-environment").text(
@@ -1797,6 +1798,124 @@ $(document).ready(function () {
           } else {
             $("#sdeployment-overview-wrtime").text("N/A");
           }
+
+          // links to other tabs from overview
+          $("#sdeployment-cerrors").click(function() {
+            window.location.href="/dashboard.html?deploymentId=" + deployment.id + "&deploymentInfo&currentTab=errors";
+          }) 
+
+          $("#sdeployment-cperformance").click(function() {
+            window.location.href="/dashboard.html?deploymentId=" + deployment.id + "&deploymentInfo&currentTab=performance";
+          })
+
+          $("#sdeployment-cuptime").click(function() {
+            window.location.href="/dashboard.html?deploymentId=" + deployment.id + "&deploymentInfo&currentTab=uptime";
+          })
+
+          $("#sdeployment-settings-edit").click(function() {
+            openModal({
+              title: "Edit Deployment Details",
+              fields: [
+                {
+                  id: "name",
+                  label: "Name",
+                  type: "text",
+                  placeholder: "",
+                  value: deployment.name,
+                  validate: (value) => {
+                    if (value.length < 2) {
+                      return {
+                        success: false,
+                        message: "Deployment name must be at least 2 characters long"
+                      }
+                    }
+                    return {
+                      success: true
+                    }
+                    
+                  }
+                },
+                {
+                  id: "version",
+                  label: "Version",
+                  type: "text",
+                  placeholder: "",
+                  value: deployment.version,
+                  validate: (value) => {
+                    if (value.length < 1) {
+                      return {
+                        success: false,
+                        message: "Version must be provided"
+                      }
+                    }
+                    return {
+                      success: true
+                    }
+                  }
+                },
+                {
+                  id: "environment",
+                  label: "Environment",
+                  type: "select",
+                  options: [
+                    { label: "Production", value: "production"},
+                    { label: "Staging", value: "staging"},
+                    { label: "Development", value: "development"}
+                  ]
+                },
+                {
+                  id: 'status',
+                  label: "Status",
+                  type: 'select',
+                  options: [
+                    { label: "Active", value: "active"},
+                    { label: "Inactive", value: 'inactive'}
+                  ],
+                  value: deployment.status
+                },
+                {
+                  id: "type",
+                  label: "Type",
+                  type: "select",
+                  options: [
+                    { label: "Backend", value: "backend"},
+                    { label: "Frontend", value: "frontend"}
+                  ],
+                  value: deployment.type
+                },
+                
+              ]
+            }).then((data) => {
+              fetch("/api/deployments/" + deployment.id, {
+                method: "PUT",
+                headers: {
+                  "Content-Type" : "application/json"
+                },
+                body: JSON.stringify({
+                  name: data.name,
+                  version: data.version,
+                  environment: data.environment,
+                  status: data.status,
+                  type: data.type
+                })
+              }).then((resp) => resp.json())
+                .then((json) => {
+                  console.log(json);
+                  if (json.success) {
+                    $("#sdeployment-name").text(json.deployment.name);
+                    $("#sdeployment-version").text(json.deployment.version);
+                    $("#sdeployment-environment").text(json.deployment.environment.charAt(0).toUpperCase() + json.deployment.environment.slice(1));
+                    $("#sdeployment-environment-div").removeClass("production staging development").addClass(json.deployment.environment);
+                    $("#sdeployment-status").text(json.deployment.status.charAt(0).toUpperCase() + json.deployment.status.slice(1));
+                    $("#sdeployment-status-div").removeClass("active inactive").addClass(json.deployment.status);
+                    $("#sdeployment-type").text(json.deployment.type.charAt(0).toUpperCase() + json.deployment.type.slice(1));
+
+                    deployment = json.deployment;
+                    project.deployments[project.deployments.findIndex((d) => d.id === deployment.id)] = deployment;
+                  }
+                })
+            })
+          })
 
           // end overview tab popualtion
         } else if (currentTab === "errors") {
@@ -3460,7 +3579,7 @@ $(document).ready(function () {
               fields: [
                 {
                   id: "name",
-                  label: "Deployment Name",
+                  label: "Name",
                   type: "text",
                   placeholder: "",
                   value: deployment.name,
@@ -3475,7 +3594,7 @@ $(document).ready(function () {
                 },
                 {
                   id: "version",
-                  label: "Deployment Version",
+                  label: "Version",
                   type: "text",
                   placeholder: "",
                   value: deployment.version,
@@ -3490,7 +3609,7 @@ $(document).ready(function () {
                 },
                 {
                   id: "environment",
-                  label: "Deployment Environment",
+                  label: "Environment",
                   type: "select",
                   options: [
                     { label: "Production", value: "production" },
@@ -3501,7 +3620,7 @@ $(document).ready(function () {
                 },
                 {
                   id: "status",
-                  label: "Deployment Status",
+                  label: "Status",
                   type: "select",
                   options: [
                     { label: "Active", value: "active" },
@@ -3511,7 +3630,7 @@ $(document).ready(function () {
                 },
                 {
                   id: "type",
-                  label: "Deployment Type",
+                  label: "Type",
                   type: "select",
                   options: [
                     { label: "Frontend", value: "frontend"},

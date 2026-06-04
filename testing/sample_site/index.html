@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Sample Site - Panorama Web</title>
+    </head>
+    <body>
+        <h1>Sample Site</h1>
+        <p>This is a sample site for testing the Panorama Web SDK</p>
+        <script type="module" src="./sdk.js"></script>
+        <script type="module">
+            import { PanoramaWeb } from "./sdk.js";
+            const panorama = new PanoramaWeb();
+            panorama.init({
+                api_key: "sample_api_key_1_1",
+                id: 2
+            });
+
+
+        </script>
+    </body>
+</html>
