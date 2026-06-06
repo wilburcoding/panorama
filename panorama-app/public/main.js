@@ -2305,7 +2305,7 @@ $(document).ready(function () {
           const meta = JSON.parse(deployment.meta);
           if (deployment.type == "backend") {
             // show backend performance monitoring data
-            console.log(deployment);
+            // console.log(deployment);
             const backend_monitoring = meta.performance.backend_monitoring;
             const cpu = backend_monitoring.cpu_usage;
             const memory = backend_monitoring.memory_usage;
@@ -2314,6 +2314,8 @@ $(document).ready(function () {
             let labels = [];
             let cpu_data = [];
             let memory_data = [];
+            let cpu_data_sums = [];
+            let memory_data_sums = [];
             for (let i = 240; i >= 0; i--) {
               const time = new Date(Date.now() - i * 60 * 1000);
               let hours = time.getHours();
@@ -2325,16 +2327,37 @@ $(document).ready(function () {
                 `${hours}:${time.getMinutes().toString().padStart(2, "0")} ${suffix}`,
               );
 
+              cpu_data_sums.push(0);
+              memory_data_sums.push(0);
               cpu_data.push(0);
               memory_data.push(0);
             }
 
-            for (let i = 0; i < 240; i++) {
+
+            for (let i = 0; i < timestamps.length; i++) {
               const time = parseSqlTimestamp(timestamps[i]);
               const now = new Date();
               const minutes_before = (now - time) / 1000 / 60;
-              cpu_data[240 - Math.floor(minutes_before)] = cpu[i];
-              memory_data[240 - Math.floor(minutes_before)] = memory[i];
+              if (minutes_before < 240) {
+                cpu_data_sums[240 - Math.floor(minutes_before)] += cpu[i];
+                memory_data_sums[240 - Math.floor(minutes_before)] += memory[i];
+                cpu_data[240 - Math.floor(minutes_before)] += 1;
+                memory_data[240 - Math.floor(minutes_before)] += 1;
+              }
+            }
+            for (let i = 0; i < 240 ;i++) {
+              if (cpu_data[i] === 0) {
+                cpu_data[i] = null;
+              } else {
+                cpu_data[i] = cpu_data_sums[i] / (cpu_data[i] || 1);
+              }
+
+              if (memory_data[i] === 0) {
+                memory_data[i] = null;
+              } else {
+                memory_data[i] = memory_data_sums[i] / (memory_data[i] || 1);
+              }
+              
             }
 
             const ctx_cpu = document.getElementById("sdeployment-cpu-chart");

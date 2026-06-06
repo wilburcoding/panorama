@@ -138,9 +138,14 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Posting + deleting + editing monitors 
        - [x] Posting + deleting + editing benchmarks
      - [x] Uptime monitoring
-   - [ ] Sample projects -> frontend and backend
-   - [x] Frontend SDK to track metrics
+   - [ ] Sample projects
+     - [ ] Frontend monitoring sample site
+     - [ ] 
+   - [x] Frontend SDK
+     - [x] Web metrics monitoring
+     - [ ] Basically any other feature the default SDKs have
    - [ ] Improved backend monitoring? (record requests data?)
+   - [ ] Major issue: CPU and memory data graphs are kinda logically broken
 
 
 
@@ -314,3 +319,5 @@ Timeline:
 Color for database schema should be in HEX
 
 Chart.js doesn't handle multiple datasets very well for scatter charts. Avoid for now.
+
+I have to be stupid or something....why did I originally plan the web SDK to only have web metrics monitoring???????

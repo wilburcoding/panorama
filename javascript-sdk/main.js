@@ -166,12 +166,15 @@ class PanoramaClient {
         stack_trace: stacktrace,
         environment: this.system,
         breadcrumbs: this.breadcrumbs.slice(),
-        performance_metrics: this.performance_metrics,
       }),
     });
 
     const data = await response.json();
-    console.log(data);
+    if (json.success) {
+      console.log("Posted error event: " + error_title);
+    } else {
+      console.error("Failed to post error event: " + json.message);
+    }
   }
 
   addBreadcrumb({ message, source, type }) {
@@ -224,6 +227,7 @@ class PanoramaClient {
     const start = getCPUUsage();
 
     setInterval(() => {
+      console.log("collecting metrics")
       const end = getCPUUsage();
 
       const idleDiff = end.idle - start.idle;
@@ -259,6 +263,32 @@ class PanoramaClient {
           this.performance_metrics.timestamps.shift();
         }
       }
+
+      // post metrics
+      fetch("http://localhost:3000/api/deployments/" + this.id + "/performance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          cpu_usage: cpuUsage,
+          memory_usage: memoryPercent,
+        })
+      }).then((res) => res.json())
+        .then((json) => {
+          console.log(json);
+          if (!json.success) {
+            console.warn("Failed to post performance metrics: " + json.message);
+          }
+          const updated_meta = JSON.parse(json.deployment.meta);
+          const cpu_usage = updated_meta.performance.backend_monitoring.cpu_usage;
+          console.log(cpu_usage[cpu_usage.length - 1]);
+          const memory_usage = updated_meta.performance.backend_monitoring.memory_usage
+          console.log(memory_usage[memory_usage.length - 1]);
+          // } else {
+          //   console.log("Posted performance metrics");
+          // }
+        })
     }, 30000); // every 30 seconds for now
   }
 }

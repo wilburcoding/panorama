@@ -718,6 +718,11 @@ app.post("/api/deployments/:id/performance", express.json(), (req, res) => {
 
   if (deployment.type == "backend") {
     const { cpu_usage, memory_usage} = req.body;
+    if (cpu_usage === undefined || memory_usage === undefined) {
+      res.status(400).json({ success: false, message: "CPU usage and memory usage required"});
+      return;
+    } 
+    // console.log(cpu_usage, memory_usage);
     meta.performance.backend_monitoring.cpu_usage.push(cpu_usage);
     meta.performance.backend_monitoring.memory_usage.push(memory_usage);
     meta.performance.backend_monitoring.timestamps.push(new Date().toISOString());
@@ -728,8 +733,12 @@ app.post("/api/deployments/:id/performance", express.json(), (req, res) => {
     }
   } else {
     const { lcp, inp, ttfb, fcp } = req.body;
-    console.log(lcp, inp, ttfb, fcp);
-    console.log(meta.performance.frontend_monitoring);
+    if (lcp === undefined || inp === undefined || ttfb === undefined || fcp === undefined) {
+      res.status(400).json({ success: false, message: "LCP, INP, TTFB, and FCP required"});
+      return;
+    }
+    // console.log(lcp, inp, ttfb, fcp);
+    // console.log(meta.performance.frontend_monitoring);
     meta.performance.frontend_monitoring.lcp.push(lcp);
     meta.performance.frontend_monitoring.inp.push(inp);
     meta.performance.frontend_monitoring.ttfb.push(ttfb);
