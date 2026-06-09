@@ -134,10 +134,8 @@ class PanoramaClient:
             "stack_trace": stack_trace_str,
             "environment": self.environment,
             "breadcrumbs": self.breadcrumbs,
-            "performance_metrics": self.performance_metrics
         })
         res = res.json()
-        print(res)
 
     def handle_exception(self, exc_type, exc_value, exc_traceback):
         stack_trace = [s.strip() for s in traceback.format_tb(exc_traceback)]
@@ -164,7 +162,6 @@ class PanoramaClient:
         # create performance monitoring loop
         async def monitor():
             while True:
-                print(self.performance_metrics)
                 if (self.max_metrics > 40):
                     print("Max metrics cannot be greater than 40, setting to 40");
                     self.max_metrics = 40
@@ -179,6 +176,18 @@ class PanoramaClient:
                     psutil.cpu_percent())
                 vm = psutil.virtual_memory()
                 self.performance_metrics["memory"].append(round(vm.percent))
+                if (self.performance_metrics["memory"][-1] > 100):
+                    self.performance_metrics["memory"][-1] = 100
+                if (self.performance_metrics["cpu"][-1] > 100):
+                    self.performance_metrics["cpu"][-1] = 100               
+                res = requests.post("http://localhost:3000/api/deployments/" + str(self.deployment_id) + "/performance", json= {
+                    "cpu_usage": self.performance_metrics["cpu"],
+                    "memory_usage": self.performance_metrics["memory"]
+                })
+                res = res.json()
+                if (res["success"] is False):
+                    print("Failed to post performance metrics: " + res["message"]);
+                
                 
                 
                 await asyncio.sleep(60)

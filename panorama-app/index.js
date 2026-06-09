@@ -719,7 +719,7 @@ app.post("/api/deployments/:id/performance", express.json(), (req, res) => {
   if (deployment.type == "backend") {
     const { cpu_usage, memory_usage} = req.body;
     if (cpu_usage === undefined || memory_usage === undefined) {
-      res.status(400).json({ success: false, message: "CPU usage and memory usage required"});
+      res.status(400).json({ success: false, message: "CPU usage and memory usage required. The deployment type is set to backend."});
       return;
     } 
     // console.log(cpu_usage, memory_usage);
@@ -734,7 +734,7 @@ app.post("/api/deployments/:id/performance", express.json(), (req, res) => {
   } else {
     const { lcp, inp, ttfb, fcp } = req.body;
     if (lcp === undefined || inp === undefined || ttfb === undefined || fcp === undefined) {
-      res.status(400).json({ success: false, message: "LCP, INP, TTFB, and FCP required"});
+      res.status(400).json({ success: false, message: "LCP, INP, TTFB, and FCP required. The deployment type is set to frontend."});
       return;
     }
     // console.log(lcp, inp, ttfb, fcp);

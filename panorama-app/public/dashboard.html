@@ -46,7 +46,10 @@
           </button>
         </div>
         <!-- <button class="project"><div class="project-color" ></div>Project 1</button> -->
-        <button style="margin-top: 19px" id="sidebar-settings">
+        <button style="margin-top: 19px; margin-bottom: 0px" id="sidebar-guide">
+          <i class="ph ph-book-bookmark"></i>Guide
+        </button>
+        <button style="margin-top: 0px" id="sidebar-settings">
           <i class="ph ph-gear"></i>Settings
         </button>
       </div>
@@ -645,7 +648,11 @@
         </div>
         <!-- errors monitoring row -->
         <div class="dashboard-row">
-          <div class="dashboard-card overview-row" id="sdeployment-cerrors" style="flex: 1">
+          <div
+            class="dashboard-card overview-row"
+            id="sdeployment-cerrors"
+            style="flex: 1"
+          >
             <h3
               style="
                 font-size: 30px;
@@ -721,7 +728,11 @@
         </div>
         <!-- performance metrics row -->
         <div class="dashboard-row">
-          <div class="dashboard-card overview-row" id="sdeployment-cperformance" style="flex: 1">
+          <div
+            class="dashboard-card overview-row"
+            id="sdeployment-cperformance"
+            style="flex: 1"
+          >
             <h3
               style="
                 font-size: 30px;
@@ -803,7 +814,11 @@
         </div>
         <!-- uptime row -->
         <div class="dashboard-row">
-          <div class="dashboard-card overview-row" id="sdeployment-cuptime" style="flex: 1">
+          <div
+            class="dashboard-card overview-row"
+            id="sdeployment-cuptime"
+            style="flex: 1"
+          >
             <h3
               style="
                 font-size: 30px;
@@ -1766,6 +1781,151 @@
             >
               Sign Out
             </button>
+          </div>
+        </div>
+      </div>
+      <div id="guide-content" class="mainp-content">
+        <div class="dashboard-row">
+          <div
+            class="dashboard-card guide-section"
+            style="margin-top: 5vh; min-width: 60%"
+          >
+            <h1
+              style="
+                font-size: 35px;
+                color: black;
+                margin-top: 5px;
+                margin-bottom: 10px;
+                line-height: 35px;
+              "
+            >
+              Guide
+            </h1>
+            <p style="margin-bottom: 2px; margin-top: 2px">
+              A comprehensive resource to help you get the most out of our
+              platform. Check out the following resources:
+            </p>
+            <ul style="margin-top: 2px">
+              <li>Introduction to the Dashboard</li>
+              <li>Node.js SDK</li>
+              <li>Python SDK</li>
+              <li>Java SDK</li>
+            </ul>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div class="dashboard-card guide-section" style="min-width: 60%">
+            <h1 style="margin-top: 5px;margin-bottom: 10px;">Introduction to the Dashboard</h1>
+            <p>
+              The dashboard is your central hub for monitoring and managing your
+              projects. This guide will help you navigate the various features
+              and functionalities available.
+            </p>
+            <h2>Dashboard Home</h2>
+            <p>
+              Upon logging in, you will be directed to the main dashboard view
+              where you can immediately see some overall statistics (ex.
+              timeline, error stats) as well as a list of your projects.
+            </p>
+            <h2>Projects Overview</h2>
+            <p>
+              Here, you can view all your projects along with a brief timeline.
+              You can click on a project to view its details and manage its
+              settings.
+            </p>
+            <h2>Project Details</h2>
+            <p>
+              This is the dedicated project page view where you can see detailed
+              information about a specific project (with some statistics), as
+              well as a list of deployments under the project.
+            </p>
+            <h2>Deployment Details</h2>
+            <p>
+              This is the dedicated deployment page view where you can see
+              detailed information about a specific deployment. Within this
+              page, there are rows with an overview of each monitoring feature
+              of the deployment including error tracking, performance metrics,
+              and uptime monitoring data.
+            </p>
+            <h3>Deployment Errors</h3>
+            <p>
+              This page within the specific deployment view allows you to see
+              some statistics related to the errors for the deployment, as well
+              as a list of all error events (with options for filtering)
+            </p>
+            <h3>Deployment Performance</h3>
+            <p>
+              This page within the specific deployment view allows you to track
+              performance metrics for the deployment. The metrics for backend
+              services include CPU and memory usage while frontend metrics
+              include important web performance indicators such as FCP, INP,
+              LCP, and TTFB.
+            </p>
+            <h3>Deployment Uptime</h3>
+            <p>
+              This page within the specific deployment view allows you to track
+              the uptime statistics for the deployment using timelines and
+              charts. Also tracks response times.
+            </p>
+            <h3>Deployment Settings</h3>
+            <p>
+              Edit deployment settings such as its name, status, version,
+              environment, API key, and type
+            </p>
+            <h2>Account Settings</h2>
+            <p>
+              Manage your account information including your name, email, and
+              password.
+            </p>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div class="dashboard-card guide-section" style="min-width: 60%">
+            <h1>Node.js SDK</h1>
+            <p>The Node.js SDK provides a seamless way to integrate your Node.js applications with Panorama, allowing you to monitor and manage your applications effectively.</p>
+            <h2>Installation</h2>
+            <p>You can install the Node.js SDK using npm</p>
+            <pre><code class="language-bash">npm install @panorama/sdk </code></pre>
+            <h2>Initialization</h2>
+            <p>To initialize the SDK, you need to import the SDK, create an instance, and configure it with your API credentials for your deployment. </p>
+            <pre><code class="language-javascript">import PanoramaClient from '@panorama/sdk'; // import SDK
+const client = new PanoramaClient(); // create client instance
+client.init({
+  api_key: "sample_api_key_1_0", // API key for deployment
+  id: 1, // deployment id
+}); // can be done in an async function with await as well</code></pre>
+            <h2>Tracking Errors</h2>
+            <p>Once you have successfully initialized the SDK, the client instance automatically tracks errors for the deployment.</p>
+            <p>You can also manually report errors using the <code>captureError</code> method.</p>
+            <pre><code class="language-javascript">try {
+// some code that may throw an error
+} catch (error) {
+  client.captureError(error);
+}         </code></pre>
+            <h3>Breadcrumb Tracking</h3>
+            <p>You can also track breadcrumbs for more context around errors using the <code>addBreadcrumb</code> method. The method takes in the following parameters:</p>
+            <ul>
+              <li><code>message</code>: A description of the breadcrumb</li>
+              <li><code>source</code>: The source of the breadcrumb (ex. navigation, user, log)</li>
+              <li><code>type</code>: The type of the breadcrumb (info, warning, error, debug)</li>
+            </ul>
+            <pre><code class="language-javascript">client.addBreadcrumb({
+  message: "User clicked on button",
+  source: "user",
+  type: "info"              
+})</code></pre>
+            <h2>Tracking Performance</h2>
+            <p>The SDK also automatically tracks performance metrics for the deployment (CPU and memory usage).</p>
+            <p>Just note that tracked performance metrics are relative to the deployment's environment.</p>
+            <h3>Benchmark Tracking</h3>
+            <p>You can measure the performance of different parts of your application using the benchmarking features. </p>
+            <p>To start benchmarking, you can use the <code>beginBenchmark</code> method.</p>
+            <pre><code class="language-javascript">client.beginBenchmark("benchmark_name");</code></pre>
+            <p>To end the benchmark, you can use the <code>endBenchmark</code> method.</p>
+            <pre><code class="language-javascript">client.endBenchmark("benchmark_name");</code></pre>
+            <h2>Tracking Uptime</h2>
+            <p>Uptime metrics are automatically tracked by the Panorama server, including response times and availability statistics.</p>
+            <p>Note that uptime metrics require a public endpoint to be accessible.</p>
           </div>
         </div>
       </div>

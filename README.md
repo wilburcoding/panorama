@@ -105,10 +105,9 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
    - [ ] Toast messages
    - [x] Modal
      - [x] Modal layout and styling
-     - [ ] Modal functionality
+     - [x] Modal functionality
    - [ ] In site info
-     - [ ] Deployment guide
-     - [ ] Feature info
+     - [ ] Feature guide page
  - [ ] Additional features + Bug fixes
    - [ ] Restructuring plan
      - [ ] Reorganize UI
@@ -138,14 +137,14 @@ Goal: Performance monitoring, error catching, general logging, and statistics co
        - [x] Posting + deleting + editing monitors 
        - [x] Posting + deleting + editing benchmarks
      - [x] Uptime monitoring
-   - [ ] Sample projects
-     - [ ] Frontend monitoring sample site
-     - [ ] 
+   - [x] Sample projects
+     - [x] Frontend monitoring sample site
+     - [x] Backend monitoring samples for both SDKs
    - [x] Frontend SDK
      - [x] Web metrics monitoring
-     - [ ] Basically any other feature the default SDKs have
-   - [ ] Improved backend monitoring? (record requests data?)
-   - [ ] Major issue: CPU and memory data graphs are kinda logically broken
+     - [x] Basically any other feature the default SDKs have
+   <!-- - [ ] Improved backend monitoring? (record requests data?) -->
+   - [ ] Major issue: CPU and memory data graphs are kinda logically broken -> struggling to reproduce will need to investigate furhter
 
 
 
@@ -305,6 +304,13 @@ Big Restructuring Plan
         - daily uptime data -> for longer past data
   - Settings tab of deployments
     - Similar to settings format
+  - Guide
+    - Information to doing well everything
+    - Multiple tabs for different things
+      - Using the dashboard
+      - Node.js SDK
+      - Python SDK
+      - Web SDK
 # NOTES
 
 Used a tiny bit of Claude to work out the database stuff but I think I figured it out

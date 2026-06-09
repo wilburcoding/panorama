@@ -350,6 +350,7 @@ $(document).ready(function () {
       // projects overview -> cards with each project
       $("#sbp-overview").addClass("active");
       $("#dashboard-content").hide();
+      $("#guide-content").hide();
       $("#settings-content").hide();
       $("#sproject-content").hide();
       $("#project-content").show();
@@ -555,6 +556,23 @@ $(document).ready(function () {
             });
         });
       });
+    } else if (params.has("guide")) {
+      $("#dashboard-content").hide();
+      $("#guide-content").show();
+      $("#settings-content").hide();
+      $("#project-content").hide();
+      $("#sproject-content").hide();
+      $("#sdeployment-overview-content").hide();
+      $("#sdeployment-errors-content").hide();
+      $("#sdeployment-performance-content-1").hide();
+      $("#sdeployment-performance-content-2").hide();
+      $("#sdeployment-uptime-content").hide();
+      $("#sdeployment-settings-content").hide();
+      $("#serror-overview-content").hide();
+      $("#smonitor-content").hide();
+
+      $("#sidebar-guide").addClass("active");
+
     } else if (params.has("monitorInfo")) {
       // individual monitor details page - TODO
       const monitor_id = params.get("monitorId");
@@ -563,6 +581,7 @@ $(document).ready(function () {
 
       if (monitor_id && deployment_id && project_id) {
         $("#dashboard-content").hide();
+        $("#guide-content").hide();
         $("#settings-content").hide();
         $("#project-content").hide();
         $("#sproject-content").hide();
@@ -630,11 +649,10 @@ $(document).ready(function () {
           });
         }
 
-        $(
-          "#sbp-" + project.id + "-" + deployment.id + "-uptime",
-        ).addClass("active");
+        $("#sbp-" + project.id + "-" + deployment.id + "-uptime").addClass(
+          "active",
+        );
         $("#sbp-" + project.id + "-" + deployment.id).addClass("active");
-
 
         const meta = JSON.parse(deployment.meta);
         const monitor = meta.uptime.monitors.find((m) => m.id == monitor_id);
@@ -643,7 +661,7 @@ $(document).ready(function () {
         }
 
         // populate monitor info page
-        console.log(monitor.active)
+        console.log(monitor.active);
         $("#monitor-url").text(monitor.url);
         $("#monitor-status").removeClass("active");
         $("#monitor-status").removeClass("inactive");
@@ -698,14 +716,14 @@ $(document).ready(function () {
             unit: "hour",
             displayFormats: {
               hour: "h:mm a",
-            }
+            },
           },
           min: (() => {
             const d = new Date();
             d.setHours(d.getHours() - 72);
             return d;
           })(),
-          max: new Date()
+          max: new Date(),
         };
 
         responseChart.options.scales.x.ticks = {
@@ -723,7 +741,7 @@ $(document).ready(function () {
         };
 
         let response_sum = 0;
-        for (let i =0; i < response_data.length; i++) {
+        for (let i = 0; i < response_data.length; i++) {
           response_sum += response_data[i].y;
         }
         let annotations = {};
@@ -732,7 +750,7 @@ $(document).ready(function () {
         if (avg > 0) {
           annotations["avgline"] = {
             type: "line",
-            scaleID:"y",
+            scaleID: "y",
             value: avg,
             borderColor: "rgb(147, 140, 245)",
             borderWidth: 2,
@@ -745,10 +763,9 @@ $(document).ready(function () {
               color: "#ffffff",
               font: {
                 size: 12,
-              }
-            }
-
-          }
+              },
+            },
+          };
         }
         responseChart.options.plugins.annotation = {
           annotations: annotations,
@@ -758,49 +775,46 @@ $(document).ready(function () {
         // uptime chart -> usling sline
         let uptime_sum = [];
         let uptime_count = [];
-        for (let i =0; i < 72; i++) {
+        for (let i = 0; i < 72; i++) {
           uptime_sum.push(0);
           uptime_count.push(0);
-
         }
-        for (let i =0; i < monitor.statuses.length; i++) {
+        for (let i = 0; i < monitor.statuses.length; i++) {
           const status = monitor.statuses[i];
           const time = parseSqlTimestamp(monitor.timestamps[i]);
-          const hours_before = (new Date() - time) / 1000 / 60/60;
+          const hours_before = (new Date() - time) / 1000 / 60 / 60;
           if (hours_before < 72) {
             if (status) {
               uptime_sum[Math.floor(72 - hours_before)] += 1;
             }
             uptime_count[Math.floor(72 - hours_before)] += 1;
-
           }
         }
 
         let str = "";
         for (let i = 0; i < uptime_sum.length; i++) {
           if (uptime_count[i] === 0) {
-            str+=`<div class="monitoring-sline unknown"></div>`;
+            str += `<div class="monitoring-sline unknown"></div>`;
           } else {
             const percent = uptime_sum[i] / uptime_count[i];
             if (percent > 0.65) {
-              str+=`<div class="monitoring-sline up"></div>`;
+              str += `<div class="monitoring-sline up"></div>`;
             } else if (percent > 0.35) {
-              str+=`<div class="monitoring-sline degraded"></div>`;
+              str += `<div class="monitoring-sline degraded"></div>`;
             } else {
-              str+=`<div class="monitoring-sline down"></div>`;
+              str += `<div class="monitoring-sline down"></div>`;
             }
           }
         }
         $("#monitor-uptime-container").html(str);
-        
 
         let uptime_daily = "";
-        for (let i =0; i < 90; i++) {
+        for (let i = 0; i < 90; i++) {
           const value = monitor.daily_timeline[i];
           if (value === null) {
-            uptime_daily+=`<div class="monitoring-sline unknown"></div>`;
+            uptime_daily += `<div class="monitoring-sline unknown"></div>`;
           } else if (value > 0.65) {
-            uptime_daily+=`<div class="monitoring-sline up"></div>`;
+            uptime_daily += `<div class="monitoring-sline up"></div>`;
           } else if (value > 0.35) {
             uptime_daily += `<div class="monitoring-sline degraded"></div>`;
           } else {
@@ -810,7 +824,7 @@ $(document).ready(function () {
         $("#monitor-duptime-container").html(uptime_daily);
 
         // TODO: editing monitor options + deleting monitors
-        $("#monitor-edit").click(function() {
+        $("#monitor-edit").click(function () {
           console.log(monitor.active);
           openModal({
             title: "Edit Monitor",
@@ -825,13 +839,14 @@ $(document).ready(function () {
                   if (value.length < 2) {
                     return {
                       success: false,
-                      message: "Monitor name must be at least 2 characters long"
-                    }
+                      message:
+                        "Monitor name must be at least 2 characters long",
+                    };
                   }
                   return {
                     success: true,
-                  }
-                }
+                  };
+                },
               },
               {
                 id: "url",
@@ -844,79 +859,95 @@ $(document).ready(function () {
                     new URL(value);
                     return {
                       success: true,
-                    }
+                    };
                   } catch (e) {
                     return {
                       success: false,
-                      message: "Please enter a valid URL"
-                    }
+                      message: "Please enter a valid URL",
+                    };
                   }
-                }
+                },
               },
               {
                 id: "active",
                 label: "Status",
                 type: "checkbox",
-                value: monitor.active
-              }
-            ]
-          }).then((data) => {
-            fetch("/api/deployments/" + deployment.id + "/monitors/" + monitor.id, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json"
+                value: monitor.active,
               },
-              body: JSON.stringify({
-                name: data.name,
-                url: data.url,
-                active: data.active
-              })
-            }).then((resp) => resp.json())
+            ],
+          }).then((data) => {
+            fetch(
+              "/api/deployments/" + deployment.id + "/monitors/" + monitor.id,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  name: data.name,
+                  url: data.url,
+                  active: data.active,
+                }),
+              },
+            )
+              .then((resp) => resp.json())
               .then((json) => {
                 console.log(json);
                 if (json.success) {
                   const updated_deployment = json.deployment;
                   console.log(updated_deployment);
                   const updated_meta = JSON.parse(updated_deployment.meta);
-                  const updated_monitor = updated_meta.uptime.monitors.find((m) => m.id == monitor.id);
+                  const updated_monitor = updated_meta.uptime.monitors.find(
+                    (m) => m.id == monitor.id,
+                  );
                   console.log(updated_monitor);
                   $("#monitor-url").text(updated_monitor.url);
                   $("#monitor-name").text(updated_monitor.name);
-                  $("#monitor-status").removeClass("active")
+                  $("#monitor-status").removeClass("active");
                   $("#monitor-status").removeClass("inactive");
-                  $("#monitor-status").addClass(updated_monitor.active ? "active" : "inactive");
-                  $("#monitor-status-text").text(updated_monitor.active ? "Active" : "Inactive");
+                  $("#monitor-status").addClass(
+                    updated_monitor.active ? "active" : "inactive",
+                  );
+                  $("#monitor-status-text").text(
+                    updated_monitor.active ? "Active" : "Inactive",
+                  );
                 }
-              })
-          })
-        })
+              });
+          });
+        });
 
-        $("#monitor-delete").click(function() {
+        $("#monitor-delete").click(function () {
           openModal({
             title: "Delete Monitor",
             fields: [
               {
                 id: "confirm",
-                label: "Confirm you want to delete this monitor (this is irreversible)",
+                label:
+                  "Confirm you want to delete this monitor (this is irreversible)",
                 type: "checkbox",
                 value: false,
-              }
-            ]
+              },
+            ],
           }).then((data) => {
             if (data.confirm) {
-              fetch("/api/deployments/" + deployment.id + "/monitors/" + monitor.id, {
-                method: "DELETE"
-              }).then((resp) => resp.json())
+              fetch(
+                "/api/deployments/" + deployment.id + "/monitors/" + monitor.id,
+                {
+                  method: "DELETE",
+                },
+              )
+                .then((resp) => resp.json())
                 .then((json) => {
                   if (json.success) {
-                    window.location.href = "/dashboard.html?deploymentId=" + deployment.id + "&deploymentInfo&currentTab=uptime";
+                    window.location.href =
+                      "/dashboard.html?deploymentId=" +
+                      deployment.id +
+                      "&deploymentInfo&currentTab=uptime";
                   }
-                })
+                });
             }
-          })
-        })
-
-
+          });
+        });
       } else {
         // redirect bcs no monitor id or no deployment id
         window.location.href = "/dashboard.html";
@@ -928,6 +959,7 @@ $(document).ready(function () {
         $("#sbp-" + project_id).addClass("active");
         // populate project info page
         $("#dashboard-content").hide();
+        $("#guide-content").hide();
         $("#settings-content").hide();
         $("#project-content").hide();
         $("#sproject-content").show();
@@ -1311,6 +1343,7 @@ $(document).ready(function () {
     } else if (params.has("deploymentInfo")) {
       // individual deployment info page
       $("#dashboard-content").hide();
+      $("#guide-content").hide();
       $("#settings-content").hide();
       $("#sproject-content").hide();
       $("#project-content").hide();
@@ -1409,7 +1442,6 @@ $(document).ready(function () {
         if (currentTab === "overview") {
           // populate basic deployment details (name, version, environment, status, last deployed, created on , parent project, api key)
 
-          
           $("#sdeployment-name").text(deployment.name);
           $("#sdeployment-version").text(deployment.version);
           $("#sdeployment-environment").text(
@@ -1548,6 +1580,8 @@ $(document).ready(function () {
             const timestamps = backend_monitoring.timestamps;
             // populate charts for cpu and memory usage -> group by minute for at max 2 hours
             let labels = [];
+            let cpu_data_sums = [];
+            let memory_data_sums = [];
             let cpu_data = [];
             let memory_data = [];
             for (let i = 120; i >= 0; i--) {
@@ -1563,19 +1597,38 @@ $(document).ready(function () {
 
               cpu_data.push(0);
               memory_data.push(0);
+              memory_data_sums.push(0);
+              cpu_data_sums.push(0);
             }
 
-            for (let i = 0; i < 120; i++) {
-              if (i >= timestamps.length) {
-                break;
-              }
+            for (let i = 0; i < timestamps.length; i++) {
               const time = parseSqlTimestamp(timestamps[i]);
               const now = new Date();
               const minutes_before = (now - time) / 1000 / 60;
-              cpu_data[120 - Math.floor(minutes_before)] = cpu[i];
-              memory_data[120 - Math.floor(minutes_before)] = memory[i];
+              if (minutes_before < 120) {
+                cpu_data_sums[120 - Math.floor(minutes_before)] += cpu[i];
+                memory_data_sums[120 - Math.floor(minutes_before)] += memory[i];
+                cpu_data[120 - Math.floor(minutes_before)] += 1;
+                memory_data[120 - Math.floor(minutes_before)] += 1;
+              }
             }
 
+            for (let i = 0; i < 120; i++) {
+              if (cpu_data[i] > 0) {
+                cpu_data[i] = cpu_data_sums[i] / cpu_data[i];
+              } else {
+                cpu_data[i] = null;
+              }
+
+              if (memory_data[i] > 0) {
+                memory_data[i] = memory_data_sums[i] / memory_data[i];
+              } else {
+                memory_data[i] = null;
+              }
+            }
+
+            console.log(memory_data_sums);
+            console.log(memory_data);
             const ctx_cpu = document.getElementById(
               "sdeployment-overview-cpu-chart",
             );
@@ -1800,19 +1853,28 @@ $(document).ready(function () {
           }
 
           // links to other tabs from overview
-          $("#sdeployment-cerrors").click(function() {
-            window.location.href="/dashboard.html?deploymentId=" + deployment.id + "&deploymentInfo&currentTab=errors";
-          }) 
+          $("#sdeployment-cerrors").click(function () {
+            window.location.href =
+              "/dashboard.html?deploymentId=" +
+              deployment.id +
+              "&deploymentInfo&currentTab=errors";
+          });
 
-          $("#sdeployment-cperformance").click(function() {
-            window.location.href="/dashboard.html?deploymentId=" + deployment.id + "&deploymentInfo&currentTab=performance";
-          })
+          $("#sdeployment-cperformance").click(function () {
+            window.location.href =
+              "/dashboard.html?deploymentId=" +
+              deployment.id +
+              "&deploymentInfo&currentTab=performance";
+          });
 
-          $("#sdeployment-cuptime").click(function() {
-            window.location.href="/dashboard.html?deploymentId=" + deployment.id + "&deploymentInfo&currentTab=uptime";
-          })
+          $("#sdeployment-cuptime").click(function () {
+            window.location.href =
+              "/dashboard.html?deploymentId=" +
+              deployment.id +
+              "&deploymentInfo&currentTab=uptime";
+          });
 
-          $("#sdeployment-settings-edit").click(function() {
+          $("#sdeployment-settings-edit").click(function () {
             openModal({
               title: "Edit Deployment Details",
               fields: [
@@ -1826,14 +1888,14 @@ $(document).ready(function () {
                     if (value.length < 2) {
                       return {
                         success: false,
-                        message: "Deployment name must be at least 2 characters long"
-                      }
+                        message:
+                          "Deployment name must be at least 2 characters long",
+                      };
                     }
                     return {
-                      success: true
-                    }
-                    
-                  }
+                      success: true,
+                    };
+                  },
                 },
                 {
                   id: "version",
@@ -1845,77 +1907,94 @@ $(document).ready(function () {
                     if (value.length < 1) {
                       return {
                         success: false,
-                        message: "Version must be provided"
-                      }
+                        message: "Version must be provided",
+                      };
                     }
                     return {
-                      success: true
-                    }
-                  }
+                      success: true,
+                    };
+                  },
                 },
                 {
                   id: "environment",
                   label: "Environment",
                   type: "select",
                   options: [
-                    { label: "Production", value: "production"},
-                    { label: "Staging", value: "staging"},
-                    { label: "Development", value: "development"}
-                  ]
+                    { label: "Production", value: "production" },
+                    { label: "Staging", value: "staging" },
+                    { label: "Development", value: "development" },
+                  ],
                 },
                 {
-                  id: 'status',
+                  id: "status",
                   label: "Status",
-                  type: 'select',
+                  type: "select",
                   options: [
-                    { label: "Active", value: "active"},
-                    { label: "Inactive", value: 'inactive'}
+                    { label: "Active", value: "active" },
+                    { label: "Inactive", value: "inactive" },
                   ],
-                  value: deployment.status
+                  value: deployment.status,
                 },
                 {
                   id: "type",
                   label: "Type",
                   type: "select",
                   options: [
-                    { label: "Backend", value: "backend"},
-                    { label: "Frontend", value: "frontend"}
+                    { label: "Backend", value: "backend" },
+                    { label: "Frontend", value: "frontend" },
                   ],
-                  value: deployment.type
+                  value: deployment.type,
                 },
-                
-              ]
+              ],
             }).then((data) => {
               fetch("/api/deployments/" + deployment.id, {
                 method: "PUT",
                 headers: {
-                  "Content-Type" : "application/json"
+                  "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                   name: data.name,
                   version: data.version,
                   environment: data.environment,
                   status: data.status,
-                  type: data.type
-                })
-              }).then((resp) => resp.json())
+                  type: data.type,
+                }),
+              })
+                .then((resp) => resp.json())
                 .then((json) => {
                   console.log(json);
                   if (json.success) {
                     $("#sdeployment-name").text(json.deployment.name);
                     $("#sdeployment-version").text(json.deployment.version);
-                    $("#sdeployment-environment").text(json.deployment.environment.charAt(0).toUpperCase() + json.deployment.environment.slice(1));
-                    $("#sdeployment-environment-div").removeClass("production staging development").addClass(json.deployment.environment);
-                    $("#sdeployment-status").text(json.deployment.status.charAt(0).toUpperCase() + json.deployment.status.slice(1));
-                    $("#sdeployment-status-div").removeClass("active inactive").addClass(json.deployment.status);
-                    $("#sdeployment-type").text(json.deployment.type.charAt(0).toUpperCase() + json.deployment.type.slice(1));
+                    $("#sdeployment-environment").text(
+                      json.deployment.environment.charAt(0).toUpperCase() +
+                        json.deployment.environment.slice(1),
+                    );
+                    $("#sdeployment-environment-div")
+                      .removeClass("production staging development")
+                      .addClass(json.deployment.environment);
+                    $("#sdeployment-status").text(
+                      json.deployment.status.charAt(0).toUpperCase() +
+                        json.deployment.status.slice(1),
+                    );
+                    $("#sdeployment-status-div")
+                      .removeClass("active inactive")
+                      .addClass(json.deployment.status);
+                    $("#sdeployment-type").text(
+                      json.deployment.type.charAt(0).toUpperCase() +
+                        json.deployment.type.slice(1),
+                    );
 
                     deployment = json.deployment;
-                    project.deployments[project.deployments.findIndex((d) => d.id === deployment.id)] = deployment;
+                    project.deployments[
+                      project.deployments.findIndex(
+                        (d) => d.id === deployment.id,
+                      )
+                    ] = deployment;
                   }
-                })
-            })
-          })
+                });
+            });
+          });
 
           // end overview tab popualtion
         } else if (currentTab === "errors") {
@@ -2333,7 +2412,6 @@ $(document).ready(function () {
               memory_data.push(0);
             }
 
-
             for (let i = 0; i < timestamps.length; i++) {
               const time = parseSqlTimestamp(timestamps[i]);
               const now = new Date();
@@ -2345,7 +2423,9 @@ $(document).ready(function () {
                 memory_data[240 - Math.floor(minutes_before)] += 1;
               }
             }
-            for (let i = 0; i < 240 ;i++) {
+            // console.log(memory_data);
+            // console.log(memory_data_sums);
+            for (let i = 0; i < 240; i++) {
               if (cpu_data[i] === 0) {
                 cpu_data[i] = null;
               } else {
@@ -2357,7 +2437,6 @@ $(document).ready(function () {
               } else {
                 memory_data[i] = memory_data_sums[i] / (memory_data[i] || 1);
               }
-              
             }
 
             const ctx_cpu = document.getElementById("sdeployment-cpu-chart");
@@ -2386,6 +2465,8 @@ $(document).ready(function () {
               return index % 15 == 7 ? this.getLabelForValue(val) : "";
             };
             cpuChart.update();
+            console.log(memory_data);
+            console.log(memory_data_sums);
 
             const ctx_memory = document.getElementById(
               "sdeployment-memory-chart",
@@ -2604,18 +2685,19 @@ $(document).ready(function () {
               ) {
                 status = "Excellent";
               } else if (
-                (duration - benchmark.expected_time) / benchmark.expected_time >=
+                (duration - benchmark.expected_time) /
+                  benchmark.expected_time >=
                 0.2
               ) {
                 status = "Slow";
               } else if (
-                (duration - benchmark.expected_time) / benchmark.expected_time <=
+                (duration - benchmark.expected_time) /
+                  benchmark.expected_time <=
                 0.2
               ) {
                 status = "Good";
               }
             }
- 
 
             // calculate the various stats
             let times_sum = 0;
@@ -2652,7 +2734,7 @@ $(document).ready(function () {
             if (best_time == 9999999) {
               best_time = "N/A";
             }
-          
+
             $(benchmarks_container).append(`
               <div class="benchmark-item">
                 <div class="pbenchmark-item1">
@@ -2807,18 +2889,18 @@ $(document).ready(function () {
             annotations["expected"] = {
               type: "line",
               yMin: benchmark.expected_time,
-              yMax:benchmark.expected_time,
+              yMax: benchmark.expected_time,
               borderColor: "#aaaaaa",
-              borderWidth:2,
+              borderWidth: 2,
               borderDash: [7, 4],
               label: {
                 display: true,
                 content: "Expected Time",
                 position: "start",
                 backgroundColor: "rgba(70, 70, 70, 0.63)",
-                color: "white"
-              }
-            }
+                color: "white",
+              },
+            };
             benchmarkChart.options.plugins.annotation = {
               annotations: annotations,
             };
@@ -2828,7 +2910,7 @@ $(document).ready(function () {
             benchmarkChart.update();
 
             // handle benchmark editing and deleting
-            $("#benchmark-edit-" + benchmark.id).click(function() {
+            $("#benchmark-edit-" + benchmark.id).click(function () {
               openModal({
                 title: "Edit Benchmark",
                 fields: [
@@ -2842,13 +2924,14 @@ $(document).ready(function () {
                       if (value.length < 2) {
                         return {
                           success: false,
-                          message: "Benchmark name must be at least 2 characters long"
-                        }
+                          message:
+                            "Benchmark name must be at least 2 characters long",
+                        };
                       }
                       return {
                         success: true,
-                      }
-                    }
+                      };
+                    },
                   },
                   {
                     id: "expected_time",
@@ -2860,61 +2943,75 @@ $(document).ready(function () {
                       if (isNaN(Number(str.trim()))) {
                         return {
                           success: false,
-                          message: "Expected time must be a real number"
-                        }
+                          message: "Expected time must be a real number",
+                        };
                       }
                       return {
-                        success: true
-                      }
-                    }
-                  }
-                ]
+                        success: true,
+                      };
+                    },
+                  },
+                ],
               }).then((data) => {
                 console.log(data);
-                fetch("/api/deployments/" + deployment.id + "/benchmarks/" + benchmark.id, {
-                  method: "PUT",
-                  headers: {
-                    "Content-Type": "application/json"
+                fetch(
+                  "/api/deployments/" +
+                    deployment.id +
+                    "/benchmarks/" +
+                    benchmark.id,
+                  {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      name: data.name,
+                      expected_time: data.expected_time,
+                    }),
                   },
-                  body: JSON.stringify({
-                    name: data.name,
-                    expected_time: data.expected_time
-                  })
-                }).then((resp) => resp.json())
+                )
+                  .then((resp) => resp.json())
                   .then((json) => {
                     if (json.success) {
                       window.location.reload();
                     }
-                  })
-              })
-            })
+                  });
+              });
+            });
 
-            $("#benchmark-delete-" + benchmark.id).click(function() {
+            $("#benchmark-delete-" + benchmark.id).click(function () {
               openModal({
                 title: "Delete Benchmark",
                 fields: [
                   {
                     id: "confirm",
-                    label: "Confirm you want to delete this benchmark (this action is irreversible)",
+                    label:
+                      "Confirm you want to delete this benchmark (this action is irreversible)",
                     type: "checkbox",
                     value: false,
-                  }
-                ]
+                  },
+                ],
               }).then((data) => {
                 if (data.confirm) {
-                  fetch("/api/deployments/" + deployment.id + "/benchmarks/" + benchmark.id, {
-                    method: "DELETE",
-                    headers: {
-                      "Content-Type": "application/json"
-                    }
-                  }).then((resp) => resp.json())
+                  fetch(
+                    "/api/deployments/" +
+                      deployment.id +
+                      "/benchmarks/" +
+                      benchmark.id,
+                    {
+                      method: "DELETE",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                    },
+                  )
+                    .then((resp) => resp.json())
                     .then((json) => {
                       window.location.reload();
-                    })
-
+                    });
                 }
-              })
-            })
+              });
+            });
           }
 
           // new benchmark card
@@ -2926,9 +3023,9 @@ $(document).ready(function () {
               </div>
             </div>
             <hr/>
-            `)
+            `);
 
-          $("#new-benchmark").click(function() {
+          $("#new-benchmark").click(function () {
             openModal({
               title: "Create New Benchmark",
               fields: [
@@ -2942,13 +3039,14 @@ $(document).ready(function () {
                     if (value.length < 2) {
                       return {
                         success: false,
-                        message: "Benchmark name must be at least 2 characters long"
-                      }
+                        message:
+                          "Benchmark name must be at least 2 characters long",
+                      };
                     }
                     return {
-                      success: true
-                    }
-                  }
+                      success: true,
+                    };
+                  },
                 },
                 {
                   id: "expected_time",
@@ -2960,15 +3058,15 @@ $(document).ready(function () {
                     if (isNaN(Number(str.trim()))) {
                       return {
                         success: false,
-                        message: "Expected time must be a real number"
-                      }
+                        message: "Expected time must be a real number",
+                      };
                     }
                     return {
                       success: true,
-                    }
-                  }
-                }
-              ]
+                    };
+                  },
+                },
+              ],
             }).then((data) => {
               fetch("/api/deployments/" + deployment.id + "/benchmarks", {
                 method: "POST",
@@ -2977,19 +3075,17 @@ $(document).ready(function () {
                 },
                 body: JSON.stringify({
                   name: data.name,
-                  expected_time: data.expected_time  
-                })
-              }).then((resp) => resp.json())
+                  expected_time: data.expected_time,
+                }),
+              })
+                .then((resp) => resp.json())
                 .then((json) => {
                   if (json.success) {
                     window.location.reload();
                   }
-                })
-                
-            })
-
-          })
-
+                });
+            });
+          });
         } else if (currentTab === "uptime") {
           // handle uptime monitoring stats
           const meta = JSON.parse(deployment.meta);
@@ -3384,7 +3480,6 @@ $(document).ready(function () {
                 );
               });
 
-
               // onclick -> open page with monitor details - TODO
               $("#monitor-" + monitor.id).click(function () {
                 window.location.href =
@@ -3464,8 +3559,8 @@ $(document).ready(function () {
                 </div>
               </div>  
               <hr/>
-            `)
-            $("#monitor-new").click(function() {
+            `);
+            $("#monitor-new").click(function () {
               openModal({
                 title: "Create New Monitor",
                 fields: [
@@ -3478,12 +3573,13 @@ $(document).ready(function () {
                       if (value.length < 2) {
                         return {
                           success: false,
-                          message: "Monitor name must be at least 2 characters long"
-                        }
+                          message:
+                            "Monitor name must be at least 2 characters long",
+                        };
                       }
                       return {
-                        success: true
-                      }
+                        success: true,
+                      };
                     },
                     value: "",
                   },
@@ -3496,13 +3592,13 @@ $(document).ready(function () {
                       try {
                         new URL(value);
                         return {
-                          success: true
-                        }
+                          success: true,
+                        };
                       } catch (e) {
                         return {
                           success: false,
-                          message: "Please enter a valid URL"
-                        }
+                          message: "Please enter a valid URL",
+                        };
                       }
                     },
                     value: "",
@@ -3511,24 +3607,21 @@ $(document).ready(function () {
                     id: "interval",
                     label: "Monitoring Interval",
                     type: "select",
-                    options: [
-                      { label: "15 minute", value: 15}
-                    ],
-                    value: 15
+                    options: [{ label: "15 minute", value: 15 }],
+                    value: 15,
                   },
                   {
                     id: "active",
                     label: "Monitor Status",
                     type: "select",
                     options: [
-                      { label: "Active", value: true},
-                      { label: "Inactive", value: false},
+                      { label: "Active", value: true },
+                      { label: "Inactive", value: false },
                     ],
-                    value: true
-                  }
-                ]
+                    value: true,
+                  },
+                ],
               }).then((data) => {
-
                 fetch("/api/deployments/" + deployment.id + "/monitors", {
                   method: "POST",
                   headers: {
@@ -3538,22 +3631,30 @@ $(document).ready(function () {
                     name: data.name,
                     url: data.url,
                     active: data.active == "true",
-                  })
-                }).then((resp) => resp.json())
+                  }),
+                })
+                  .then((resp) => resp.json())
                   .then((json) => {
                     if (json.success) {
                       const updated_deployment = json.deployment;
                       const updated_meta = JSON.parse(updated_deployment.meta);
                       const monitor_id = json.monitor_id;
-                      const monitor = updated_meta.uptime.monitors.find((m) => m.id === monitor_id);
-                      window.location.href = "./dashboard.html?projectId=" + project.id + "&deploymentId=" + updated_deployment.id + "&monitorId=" + monitor.id + "&monitorInfo";
+                      const monitor = updated_meta.uptime.monitors.find(
+                        (m) => m.id === monitor_id,
+                      );
+                      window.location.href =
+                        "./dashboard.html?projectId=" +
+                        project.id +
+                        "&deploymentId=" +
+                        updated_deployment.id +
+                        "&monitorId=" +
+                        monitor.id +
+                        "&monitorInfo";
                     }
-                  })
-
-              })
-            })
+                  });
+              });
+            });
           }
-
 
           populateMonitoringTable($("#mlist-search").val().toLowerCase());
           $("#mlist-search").on("input", function () {
@@ -3584,15 +3685,23 @@ $(document).ready(function () {
           // handle editing deployment details
           console.log(deployment);
           $("#sdeployment-settings-dname").text(deployment.name);
-          $("#sdeployment-settings-dstatus").text(deployment.status.charAt(0).toUpperCase() + deployment.status.slice(1));
-          $("#sdeployment-settings-denv").text(deployment.environment.charAt(0).toUpperCase() + deployment.environment.slice(1));
+          $("#sdeployment-settings-dstatus").text(
+            deployment.status.charAt(0).toUpperCase() +
+              deployment.status.slice(1),
+          );
+          $("#sdeployment-settings-denv").text(
+            deployment.environment.charAt(0).toUpperCase() +
+              deployment.environment.slice(1),
+          );
           $("#sdeployment-settings-dversion").text(deployment.version);
           $("#sdeployment-settings-dapi-key").text(deployment.api_key);
-          
+
           $(".apikey-container2").click(function () {
             $(this).toggleClass("show");
           });
-          $("#sdeployment-settings-dtype").text(deployment.type.charAt(0).toUpperCase() + deployment.type.slice(1));
+          $("#sdeployment-settings-dtype").text(
+            deployment.type.charAt(0).toUpperCase() + deployment.type.slice(1),
+          );
 
           //TODO -> update deplyoment edit modal
           $("#sdeployment-settings-dedit").click(function () {
@@ -3649,19 +3758,18 @@ $(document).ready(function () {
                     { label: "Active", value: "active" },
                     { label: "Inactive", value: "inactive" },
                   ],
-                  value: deployment.status
+                  value: deployment.status,
                 },
                 {
                   id: "type",
                   label: "Type",
                   type: "select",
                   options: [
-                    { label: "Frontend", value: "frontend"},
-                    { label: "Backend", value: "backend"}
+                    { label: "Frontend", value: "frontend" },
+                    { label: "Backend", value: "backend" },
                   ],
-                  value: deployment.type
-                  
-                }
+                  value: deployment.type,
+                },
               ],
             }).then((data) => {
               console.log(data);
@@ -3675,8 +3783,7 @@ $(document).ready(function () {
                   version: data.version,
                   environment: data.environment,
                   status: data.status,
-                  type: data.type
-
+                  type: data.type,
                 }),
               })
                 .then((resp) => resp.json())
@@ -3684,18 +3791,28 @@ $(document).ready(function () {
                   if (json.success) {
                     const new_deployment = json.deployment;
                     $("#sdeployment-settings-dname").text(new_deployment.name);
-                    $("#sdeployment-settings-dstatus").text(new_deployment.status.charAt(0).toUpperCase() + new_deployment.status.slice(1));
-                    $("#sdeployment-settings-denv").text(new_deployment.environment.charAt(0).toUpperCase() + new_deployment.environment.slice(1));
-                    $("#sdeployment-settings-dversion").text(new_deployment.version);
-                    $("#sdeployment-settings-dtype").text(new_deployment.type.charAt(0).toUpperCase() + new_deployment.type.slice(1));
-                    $("#sdeployment-settings-dapi-key").text(new_deployment.api_key);
+                    $("#sdeployment-settings-dstatus").text(
+                      new_deployment.status.charAt(0).toUpperCase() +
+                        new_deployment.status.slice(1),
+                    );
+                    $("#sdeployment-settings-denv").text(
+                      new_deployment.environment.charAt(0).toUpperCase() +
+                        new_deployment.environment.slice(1),
+                    );
+                    $("#sdeployment-settings-dversion").text(
+                      new_deployment.version,
+                    );
+                    $("#sdeployment-settings-dtype").text(
+                      new_deployment.type.charAt(0).toUpperCase() +
+                        new_deployment.type.slice(1),
+                    );
+                    $("#sdeployment-settings-dapi-key").text(
+                      new_deployment.api_key,
+                    );
                     $(".apikey-container2").removeClass("show");
-
                   }
-
                 });
             });
-
           });
 
           // handle deleting deployment
@@ -3731,34 +3848,36 @@ $(document).ready(function () {
           });
 
           // TODO: handle reseting API key
-          $("#sdeployment-settings-dreset").click(function() {
+          $("#sdeployment-settings-dreset").click(function () {
             openModal({
               title: "Reset API key",
               fields: [
                 {
                   id: "confirm",
-                  label: "Confirm you want to reset the API key (this is irreversible)",
-                  type: "checkbox"
-                }
-              ]
+                  label:
+                    "Confirm you want to reset the API key (this is irreversible)",
+                  type: "checkbox",
+                },
+              ],
             }).then((data) => {
               if (data.confirm) {
                 fetch("/api/deployments/" + deployment.id + "/reset_api_key", {
                   method: "GET",
                   headers: {
-                    "Content-Type": "application/json"
-                  }
-                }).then((resp) => resp.json())
+                    "Content-Type": "application/json",
+                  },
+                })
+                  .then((resp) => resp.json())
                   .then((json) => {
                     console.log(json);
                     if (json.success) {
                       $("#sdeployment-settings-dapi-key").text(json.api_key);
                       $(".apikey-container2").removeClass("show");
                     }
-                  })
+                  });
               }
-            })
-          })
+            });
+          });
         }
 
         // end deployment info population portion of code
@@ -3772,6 +3891,7 @@ $(document).ready(function () {
       $("#project-content").hide();
       $("#sproject-content").hide();
       $("#settings-content").hide();
+      $("#guide-content").hide();
       $("#sdeployment-overview-content").hide();
       $("#sdeployment-errors-content").hide();
       $("#sdeployment-performance-content-1").hide();
@@ -4130,6 +4250,7 @@ $(document).ready(function () {
       $("#dashboard-content").hide();
       $("#project-content").hide();
       $("#sproject-content").hide();
+      $("#guide-content").hide();
       $("#settings-content").show();
       $("#sdeployment-overview-content").hide();
       $("#sdeployment-errors-content").hide();
@@ -4327,6 +4448,7 @@ $(document).ready(function () {
       $("#project-content").hide();
       $("#sproject-content").hide();
       $("#settings-content").hide();
+      $("#guide-content").hide();
       $("#serror-overview-content").hide();
       $("#sdeployment-overview-content").hide();
       $("#sdeployment-errors-content").hide();
@@ -4551,6 +4673,9 @@ $(document).ready(function () {
   $("#sbp-overview").click(function () {
     window.location.href = "/dashboard.html?projectOverview";
   });
+  $("#sidebar-guide").click(function() {
+    window.location.href = "/dashboard.html?guide";
+  })
 
   window.addEventListener("pageshow", function () {
     if (event.persisted) {
