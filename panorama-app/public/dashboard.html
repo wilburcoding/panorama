@@ -1789,6 +1789,7 @@
           <div
             class="dashboard-card guide-section"
             style="margin-top: 5vh; min-width: 60%"
+            id="guide-home"
           >
             <h1
               style="
@@ -1806,16 +1807,18 @@
               platform. Check out the following resources:
             </p>
             <ul style="margin-top: 2px">
-              <li>Introduction to the Dashboard</li>
-              <li>Node.js SDK</li>
-              <li>Python SDK</li>
-              <li>Java SDK</li>
+              <li id="l-intro">Introduction to the Dashboard</li>
+              <li id="l-node">Node.js SDK</li>
+              <li id="l-python">Python SDK</li>
+              <li id="l-web">Web SDK</li>
             </ul>
           </div>
         </div>
-        <div class="dashboard-row">
+        <div class="dashboard-row" id="guide-intro">
           <div class="dashboard-card guide-section" style="min-width: 60%">
-            <h1 style="margin-top: 5px;margin-bottom: 10px;">Introduction to the Dashboard</h1>
+            <h1 style="margin-top: 5px; margin-bottom: 10px">
+              Introduction to the Dashboard
+            </h1>
             <p>
               The dashboard is your central hub for monitoring and managing your
               projects. This guide will help you navigate the various features
@@ -1879,15 +1882,23 @@
             </p>
           </div>
         </div>
-        <div class="dashboard-row">
+        <div class="dashboard-row" id="guide-node">
           <div class="dashboard-card guide-section" style="min-width: 60%">
             <h1>Node.js SDK</h1>
-            <p>The Node.js SDK provides a seamless way to integrate your Node.js applications with Panorama, allowing you to monitor and manage your applications effectively.</p>
+            <p>
+              The Node.js SDK provides a seamless way to integrate your Node.js
+              applications with Panorama, allowing you to monitor and manage
+              your applications effectively.
+            </p>
             <h2>Installation</h2>
             <p>You can install the Node.js SDK using npm</p>
             <pre><code class="language-bash">npm install @panorama/sdk </code></pre>
             <h2>Initialization</h2>
-            <p>To initialize the SDK, you need to import the SDK, create an instance, and configure it with your API credentials for your deployment. </p>
+            <p>
+              To initialize the SDK, you need to import the SDK, create an
+              instance, and configure it with your API credentials for your
+              deployment.
+            </p>
             <pre><code class="language-javascript">import PanoramaClient from '@panorama/sdk'; // import SDK
 const client = new PanoramaClient(); // create client instance
 client.init({
@@ -1895,19 +1906,35 @@ client.init({
   id: 1, // deployment id
 }); // can be done in an async function with await as well</code></pre>
             <h2>Tracking Errors</h2>
-            <p>Once you have successfully initialized the SDK, the client instance automatically tracks errors for the deployment.</p>
-            <p>You can also manually report errors using the <code>captureError</code> method.</p>
+            <p>
+              Once you have successfully initialized the SDK, the client
+              instance automatically tracks errors for the deployment.
+            </p>
+            <p>
+              You can also manually report errors using the
+              <code>captureError</code> method.
+            </p>
             <pre><code class="language-javascript">try {
 // some code that may throw an error
 } catch (error) {
   client.captureError(error);
 }         </code></pre>
             <h3>Breadcrumb Tracking</h3>
-            <p>You can also track breadcrumbs for more context around errors using the <code>addBreadcrumb</code> method. The method takes in the following parameters:</p>
+            <p>
+              You can also track breadcrumbs for more context around errors
+              using the <code>addBreadcrumb</code> method. The method takes in
+              the following parameters:
+            </p>
             <ul>
               <li><code>message</code>: A description of the breadcrumb</li>
-              <li><code>source</code>: The source of the breadcrumb (ex. navigation, user, log)</li>
-              <li><code>type</code>: The type of the breadcrumb (info, warning, error, debug)</li>
+              <li>
+                <code>source</code>: The source of the breadcrumb (ex.
+                navigation, user, log)
+              </li>
+              <li>
+                <code>type</code>: The type of the breadcrumb (info, warning,
+                error, debug)
+              </li>
             </ul>
             <pre><code class="language-javascript">client.addBreadcrumb({
   message: "User clicked on button",
@@ -1915,18 +1942,223 @@ client.init({
   type: "info"              
 })</code></pre>
             <h2>Tracking Performance</h2>
-            <p>The SDK also automatically tracks performance metrics for the deployment (CPU and memory usage).</p>
-            <p>Just note that tracked performance metrics are relative to the deployment's environment.</p>
+            <p>
+              The SDK also automatically tracks performance metrics for the
+              deployment (CPU and memory usage).
+            </p>
+            <p>
+              Note that the Node.js SDK only tracks performance metrics for
+              backend services.
+            </p>
             <h3>Benchmark Tracking</h3>
-            <p>You can measure the performance of different parts of your application using the benchmarking features. </p>
-            <p>To start benchmarking, you can use the <code>beginBenchmark</code> method.</p>
+            <p>
+              You can measure the performance of different parts of your
+              application using the benchmarking features.
+            </p>
+            <p>
+              To start benchmarking, you can use the
+              <code>beginBenchmark</code> method.
+            </p>
             <pre><code class="language-javascript">client.beginBenchmark("benchmark_name");</code></pre>
-            <p>To end the benchmark, you can use the <code>endBenchmark</code> method.</p>
+            <p>
+              To end the benchmark, you can use the
+              <code>endBenchmark</code> method.
+            </p>
             <pre><code class="language-javascript">client.endBenchmark("benchmark_name");</code></pre>
             <h2>Tracking Uptime</h2>
-            <p>Uptime metrics are automatically tracked by the Panorama server, including response times and availability statistics.</p>
-            <p>Note that uptime metrics require a public endpoint to be accessible.</p>
+            <p>
+              Uptime metrics are automatically tracked by the Panorama server,
+              including response times and availability statistics.
+            </p>
+            <p>
+              Note that uptime metrics require a public endpoint to be
+              accessible which can be configured in the deployment uptime
+              settings page.
+            </p>
           </div>
+        </div>
+        <div class="dashboard-row" id="guide-python">
+          <div class="dashboard-card guide-section" style="min-width: 60%">
+            <h1>Python SDK</h1>
+            <p>
+              The Python SDK is a simple library for integrating with the
+              Panorama API for your Python applications, with full support for
+              error tracking, performance metrics, and uptime monitorign.
+            </p>
+            <h2>Installation</h2>
+            <p>You can install the Python SDK using pip:</p>
+            <pre><code class="language-python">pip install panorama-sdk</code></pre>
+            <h2>Initialization</h2>
+            <p>
+              Initialize the SDK by importing the library, creating an instance,
+              and initializing using your API key and deployment ID:
+            </p>
+            <pre><code class="language-python">from panorama_sdk import PanoramaClient
+client = PanoramaClient() # create client instance
+client.init({
+  "id": 1, # deployment ID,
+  "api_key": "sample_api_key_1_0" # API key for deployment
+})</code></pre>
+            <h2>Tracking Errors</h2>
+            <p>
+              Once initialized, the SDK will automatically track errors for the
+              deployment.
+            </p>
+            <p>
+              You can also manually track errors using the
+              <code>capture_error</code> method:
+            </p>
+            <pre><code class="language-python">try:
+  # some code that may throw an error
+except Exception as e:
+  client.capture_error(e)</code></pre>
+            <h3>Breadcrumb Tracking</h3>
+            <p>
+              For additional context around errors, you can track breadcrumbs
+              using the <code>add_breadcrumb</code> method which takes in the
+              following parameters:
+            </p>
+            <ul>
+              <li><code>message</code>: A description of the breadcrumb</li>
+              <li>
+                <code>source</code>: The source of the breadcrumb (ex.
+                navigation, system)
+              </li>
+              <li>
+                <code>type</code>: The type of the breadcrumb (info, warning,
+                debug, error)
+              </li>
+            </ul>
+            <pre><code class="language-python">client.add_breadcrumb({
+  "message": "User clicked on button",
+  "source": "user",
+  "type": "info"
+})</code></pre>
+            <h2>Tracking Performance</h2>
+            <p>
+              The SDK also automatically tracks performance metrics for your
+              application (CPU and memory usage).
+            </p>
+            <p>
+              Note that the Python SDK only tracks performance metrics for
+              backend services.
+            </p>
+            <h3>Benchmarking</h3>
+            <p>
+              You can benchmark different parts of your application using the
+              benchmark features
+            </p>
+            <p>
+              To start benchmarking, use the
+              <code>start_benchmark</code> method:
+            </p>
+            <pre><code class="language-python">client.start_benchmark("benchmark_name")</code></pre>
+            <p>
+              To end the benchmark, use the <code>end_benchmark</code> method:
+            </p>
+            <pre><code class="language-python">client.end_benchmark("benchmark_name")</code></pre>
+            <h2>Tracking Uptime</h2>
+            <p>
+              Uptime monitoring is automatically tracked by the Panorama server
+              for your deployment, including response times and availability
+              statistics.
+            </p>
+            <p>
+              Note that uptime monitoring requires a public endpoint to be
+              available.
+            </p>
+          </div>
+        </div>
+        <div class="dashboard-row" id="guide-web">
+          <div class="dashboard-card guide-section" style="min-width: 60%">
+            <h1>Web SDK</h1>
+            <p>
+              The Web SDK is a JavaScript library for integrating with the
+              Panorama API for your web applications, with full support for
+              error tracking, web performance metrics, and uptime monitoring.
+            </p>
+            <p>
+              Implementation is nearly identical to the Node.js SDK but with
+              some minor differences.
+            </p>
+            <h2>Installation</h2>
+            <p>You can install the Web SDK via npm:</p>
+            <pre><code class="language-bash">npm install @panorama/web-sdk </code></pre>
+            <p>Alternatively, you can use the CDN:</p>
+            <pre><code class="language-html">&lt;script src="https://cdn.jsdelivr.net/npm/@panorama/web-sdk"&gt;&lt;/script&gt;</code></pre>
+            <h2>Initialization</h2>
+            <p>
+              To initialize the Web SDK, import the module, create an instance,
+              and call the <code>init</code> method:
+            </p>
+            <pre><code class="language-javascript">const client = new PanoramaWeb(); // create client instance
+client.init({ // initialize client with deployment details
+  api_key: "sample_api_key_1_0", // API key for deployment
+  id: 1 // deployment id
+})</code></pre>
+            <h2>Tracking Errors</h2>
+            <p>
+              Once initialized, the Web SDK will automatically track errors in
+              your application.
+            </p>
+            <p>
+              You can also manually capture errors using the
+              <code>captureError</code> method:
+            </p>
+            <pre><code class="language-javascript">try {
+  // some code here that may throw an error
+} catch (error) {
+  client.captureError(error);
+}</code></pre>
+            <h3>Breadcrumb Tracking</h3>
+            <p>
+              For additional context around errors, you can use the
+              <code>addBreadcrumb</code> method to add breadcrumbs:
+            </p>
+            <ul>
+              <li><code>message</code>: A description of the breadcrumb</li>
+              <li>
+                <code>source</code>: The source of the breadcrumb (ex. user,
+                system)
+              </li>
+              <li>
+                <code>type</code>: The type of the breadcrumb (ex. info,
+                warning, error)
+              </li>
+            </ul>
+            <pre><code class="language-javascript">client.addBreadcrumb({
+  message: "User clicked on button",
+  source: "user",
+  type: "info",
+})</code></pre>
+            <h2>Performance Monitoring</h2>
+            <p>The Web SDK automatically tracks web performance metrics in your application:</p>
+            <ul>
+              <li><code>FCP</code>: First Contentful Paint</li>
+              <li><code>LCP</code>: Largest Contentful Paint</li>
+              <li><code>INP</code>: Interaction to Next Paint</li>
+              <li><code>TTFB</code>: Time to First Byte</li>
+            </ul>
+            <h3>Benchmarking</h3>
+            <p>
+              You can benchmark different parts of your application using the
+              benchmark features.
+            </p>
+            <p>
+              To start benchmarking, use the <code>beginBenchmark</code> method:
+            </p>
+            <pre><code class="language-javascript">client.beginBenchmark("benchmark_name")</code></pre>
+            <p>
+              To end benchmarking, use the <code>endBenchmark</code> method:
+            </p>
+            <pre><code class="language-javascript">client.endBenchmark("benchmark_name")</code></pre>
+            <h2>Uptime Monitoring</h2>
+            <p>The Panorama server monitors your application's uptime and availability which you can configure in the dashboard.</p>
+            <p>Note that uptime monitoring requires a public endpoint to be accessible.</p>
+          </div>
+        </div>
+        <div class="scroll-up">
+          <i class="ph ph-caret-up"></i>
         </div>
       </div>
       <div id="edit-modal-container">

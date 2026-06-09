@@ -572,7 +572,41 @@ $(document).ready(function () {
       $("#smonitor-content").hide();
 
       $("#sidebar-guide").addClass("active");
+      $("#l-intro").click(function () {
+        // console.log("clicked intro");
+        // $("html, body").animate({
+        //   scrollTop: $("#guide-intro").offset().top
+        // }, 1000);
+        document
+          .getElementById("guide-intro")
+          ?.scrollIntoView({ behavior: "smooth" });
+        // window.location.href = "/dashboard.html?guide#guide-intro";
+      });
+      $("#l-node").click(function () {
+        document
+          .getElementById("guide-node")
+          ?.scrollIntoView({ behavior: "smooth" });
 
+        // window.location.href = "/dashboard.html?guide#guide-node";
+      });
+      $("#l-python").click(function () {
+        document
+          .getElementById("guide-python")
+          ?.scrollIntoView({ behavior: "smooth" });
+
+        // window.location.href = "/dashboard.html?guide#guide-python";
+      });
+      $("#l-web").click(function () {
+        document
+          .getElementById("guide-web")
+          ?.scrollIntoView({ behavior: "smooth" });
+        // window.location.href = "/dashboard.html?guide#guide-web";
+      });
+
+      $(".scroll-up").click(function() {
+        console.log("clicked scroll up");
+        document.getElementById("guide-home").scrollIntoView({ behavior: "smooth"});
+      })
     } else if (params.has("monitorInfo")) {
       // individual monitor details page - TODO
       const monitor_id = params.get("monitorId");
@@ -4673,9 +4707,9 @@ $(document).ready(function () {
   $("#sbp-overview").click(function () {
     window.location.href = "/dashboard.html?projectOverview";
   });
-  $("#sidebar-guide").click(function() {
+  $("#sidebar-guide").click(function () {
     window.location.href = "/dashboard.html?guide";
-  })
+  });
 
   window.addEventListener("pageshow", function () {
     if (event.persisted) {

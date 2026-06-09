@@ -1640,3 +1640,25 @@ pre[class*="language-"] {
   font-size: 20px;
   font-weight: 700;
 }
+
+.scroll-up {
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: solid 1.5px black;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 35px;
+  color: black;
+  box-shadow: 2px 2px 0px #000;
+}
+
+.scroll-up:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px 0px #000;
+}

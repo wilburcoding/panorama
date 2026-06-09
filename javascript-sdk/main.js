@@ -178,6 +178,10 @@ class PanoramaClient {
   }
 
   addBreadcrumb({ message, source, type }) {
+    if (!this.initialized) {
+      console.warn("Client has not been initialized yet");
+      return;
+    }
     // add to queue and post with new error events
     this.breadcrumbs.push({
       message: message, // some text descrpition

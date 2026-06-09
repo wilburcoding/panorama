@@ -275,7 +275,6 @@ export class PanoramaWeb {
         stack_trace: stacktrace,
         environment: this.system,
         breadcrumbs: this.breadcrumbs.slice(),
-        performance_metrics: this.performance_metrics,
       }),
     });
     const json = await response.json();
@@ -283,6 +282,22 @@ export class PanoramaWeb {
       console.log("Posted error event: " + error_title);
     } else {
       console.error("Failed to post error event: " + json.message);
+    }
+  }
+
+  addBreadcrumb({ message, source, type }) {
+    if (!this.initialized) {
+      console.warn("Client has not been initialized yet");
+      return;
+    }
+    this.breadcrumbs.push({
+      message: message,
+      source: source,
+      type: type,
+      timestamp: Date.now().toISOString()
+    })
+    if (this.breadcrumbs.length > this.max_breadcrumbs) {
+      this.breadcrumbs.shift();
     }
   }
 }
