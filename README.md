@@ -2,14 +2,18 @@
 Goal: Performance monitoring, error catching, general logging, and statistics collecting across projects
 Features
  - Interactive and detailed dashboard 
- - Super simple usage with Web, Node.js, or Python SDKs
+ - Super easy usage with Web, Node.js, or Python SDKs
    - Error tracking
    - Performance metrics
    - Uptime monitoring
  - Fun Neobrutalist theme
 
 # Usage
-The actual server + dashboard site can be found within the `panorama-app` folder. For that, you can install necesary packages using `npm install` and run the server using `node index.js`. The site will be available at `localhost:3000`
+The actual server + dashboard site can be found within the `panorama-app` folder. For that, you can install necesary packages using `npm install` and run the server using `node index.js`. The site will be available at `localhost:3000` or you can use the public demo URL. SDK setup requires an API URl depending on your setup.
+
+Note: You can use the `/sample_data` of the dashboard (ex. `localhost:3000/sample_data`) to populate the database with the sample data. 
+
+
 
 SDKs can be found in their respective folders, `javascript-sdk`, `python-sdk`, and `web-sdk`. Example usages of all of these can be found within the `testing` folder. 
  - `sample_site` is an example usage of the web SDK. Run with `vite` to test it out. 
