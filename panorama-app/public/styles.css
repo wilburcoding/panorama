@@ -237,6 +237,12 @@ a {
   align-items: flex-start;
   justify-content: flex-start;
   overflow-y: scroll;
+  scrollbar-width: none;
+
+}
+
+#sidebar::webkit-scrollbar {
+  display:none;
 }
 
 #sidebar #stitle {

@@ -11,7 +11,7 @@ Features
 # Usage
 The actual server + dashboard site can be found within the `panorama-app` folder. For that, you can install necesary packages using `npm install` and run the server using `node index.js`. The site will be available at `localhost:3000` or you can use the public demo URL. SDK setup requires an API URl depending on your setup.
 
-Note: You can use the `/sample_data` of the dashboard (ex. `localhost:3000/sample_data`) to populate the database with the sample data. 
+Note: You can use the `/sample_data` of the dashboard (ex. `localhost:3000/sample_data`) to populate the database with the sample data. The username for the sample user created by this is `john@example.com` and the password is `12345678`
 
 
 
