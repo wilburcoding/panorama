@@ -8,7 +8,8 @@ print("Successfully imported PanoramaClient")
 client = python_sdk.PanoramaClient()
 client.init({
     "id": 1,
-    "api_key": "sample_api_key_1_0"
+    "api_key": "sample_api_key_1_0",
+    "api_url": "http://localhost:3000"
 })
 
 @app.route("/")

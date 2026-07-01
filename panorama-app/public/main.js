@@ -1599,15 +1599,15 @@ $(document).ready(function () {
             const formatted_time = formatTime(event.timestamp);
             $("#sdeployment-rerror-container").append(`
               <div class="sdeployment-rerror-card">
-                <h1>Something</h1>
-                <h2>5 minutes ago</h2>
+                <h1>${event.title}</h1>
+                <h2>${formatted_time}</h2>
               </div>
               <hr/> 
               `);
           }
 
           const meta = JSON.parse(deployment.meta);
-          if (meta) {
+          if (meta && meta.performance && meta.performance.backend_monitoring) {
             const backend_monitoring = meta.performance.backend_monitoring;
             const cpu = backend_monitoring.cpu_usage;
             const memory = backend_monitoring.memory_usage;
@@ -2198,10 +2198,11 @@ $(document).ready(function () {
                   <div class="checkbox ${checked_errors.includes(event.id) ? "checked" : ""}" id="checkbox-${event.id}" >
                     <i class="ph ph-check"></i>
                   </div>
-                  <h1>${event.title}</h1>
-                  <div class="dproject-status ${event.status}">
-                    <p>${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</p>
-                  </div>
+                  <h1>${event.title}
+                    <span class="dproject-status ${event.status}" style="display: inline-block; vertical-align: middle; margin-left: 8px; margin-bottom: 2px;">
+                      <span style="font-size: 14px; font-weight: 500; color: black; line-height: 14px;">${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span>
+                    </span>
+                  </h1>
                 </div>
                 <div class="sdeployment-info">
                   <div class="sdeployment-info-item">
@@ -4000,6 +4001,7 @@ $(document).ready(function () {
         for (let i = updates.length - 1; i >= 0; i--) {
           const update = updates[i];
           const update_time = parseSqlTimestamp(update.timestamp);
+          console.log(update);
           $("#error-update-content").append(`
             <div class="error-update">
               <div class="error-update-row">
@@ -4029,9 +4031,12 @@ $(document).ready(function () {
         const breadcrumbs = meta.breadcrumbs || [];
         for (let i = 0; i < breadcrumbs.length; i++) {
           const breadcrumb = breadcrumbs[i];
+          let b_time = breadcrumb.timestamp ? parseSqlTimestamp(breadcrumb.timestamp) : new Date();
+          let hours = b_time.getHours() % 12 || 12;
+          let suffix = b_time.getHours() >= 12 ? "PM" : "AM";
           $("#breadcrumbs-list").append(`
             <div class="breadcrumb-item">
-              <p class="breadcrumbs-timestamp">2/5/2026 5:25 PM</p>
+              <p class="breadcrumbs-timestamp">${b_time.getMonth()+1}/${b_time.getDate()}/${b_time.getFullYear()} ${hours}:${b_time.getMinutes().toString().padStart(2, "0")} ${suffix}</p>
               <div class="breadcrumb-tag source">
                 <p>${breadcrumb.source.charAt(0).toUpperCase() + breadcrumb.source.slice(1)}</p>
               </div>

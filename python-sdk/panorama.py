@@ -28,6 +28,8 @@ class PanoramaClient:
         "benchmarks": {},
     }
 
+    api_url = None
+
     def __init__(self):
         pass
 
@@ -35,6 +37,17 @@ class PanoramaClient:
         if (self.initialized):
             print("PanoramaClient is already initialized.")
             return
+        
+        config_api_url = config.get("api_url")
+        if (config_api_url is None):
+            print("Configuration must include an api_url.")
+            return
+        
+        if config_api_url.endswith("/"):
+            config_api_url = config_api_url[:-1]
+        
+        self.api_url = config_api_url
+
         config_id = config.get("id")
         if (config_id is None):
             print("Configuration must include a deployment ID.")
@@ -44,7 +57,7 @@ class PanoramaClient:
         if (config_api_key is None):
             print("Configuration must include an API key.")
             return
-        res = requests.post("http://localhost:3000/api/deployments/" + str(config_id) + "/connect", json={
+        res = requests.post(self.api_url + "/api/deployments/" + str(config_id) + "/connect", json={
             "id": config_id,
             "api_key": config_api_key,
         })
@@ -128,7 +141,7 @@ class PanoramaClient:
             "stack_trace": stack_trace_str,
             "timestamp": datetime.now().isoformat()
         })
-        res = requests.post("http://localhost:3000/api/deployments/" + str(self.deployment_id) + "/errors", json={
+        res = requests.post(self.api_url + "/api/deployments/" + str(self.deployment_id) + "/errors", json={
             "deployment_id": self.deployment_id,
             "title": error_title,
             "stack_trace": stack_trace_str,
@@ -180,7 +193,7 @@ class PanoramaClient:
                     self.performance_metrics["memory"][-1] = 100
                 if (self.performance_metrics["cpu"][-1] > 100):
                     self.performance_metrics["cpu"][-1] = 100               
-                res = requests.post("http://localhost:3000/api/deployments/" + str(self.deployment_id) + "/performance", json= {
+                res = requests.post(self.api_url + "/api/deployments/" + str(self.deployment_id) + "/performance", json= {
                     "cpu_usage": self.performance_metrics["cpu"],
                     "memory_usage": self.performance_metrics["memory"]
                 })

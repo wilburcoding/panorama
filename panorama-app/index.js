@@ -162,6 +162,13 @@ app.delete("/api/users/:id", (req, res) => {
   res.json({ success: true });
 });
 
+app.get("/sample_data", (req, res) => {
+  reset();
+  migrate();
+  sample_data();
+  res.json({ success: true, message: "Database reset and sample data added"})
+});
+
 app.get("/api/projects/:id", (req, res) => {
   const { id } = req.params;
   const { session_id } = req.query;

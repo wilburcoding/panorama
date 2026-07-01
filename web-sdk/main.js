@@ -24,14 +24,23 @@ export class PanoramaWeb {
   past_errors = [];
   system = "";
 
+  api_url = null;
+
   constructor() {}
 
-  async init({ api_key, id }) {
+  async init({ api_key, id, api_url }) {
     if (this.initialized) {
       console.warn("PanoramaWeb client is already initialized");
       return;
     }
-    await fetch("http://localhost:3000/api/deployments/" + id + "/connect", {
+    if (!api_url) {
+      console.error("PanoramaWeb client initialization failed: api_url is required");
+      return;
+    }
+    if (api_url.endsWith("/")) {
+      api_url = api_url.slice(0, -1);
+    }
+    await fetch(api_url + "/api/deployments/" + id + "/connect", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,6 +56,7 @@ export class PanoramaWeb {
           console.log("Connected to Panorama backend");
           this.api_key = api_key;
           this.id = id;
+          this.api_url = api_url;
           this.initialized = true;
           this.environment = response.deployment.environment;
           this.version = response.deployment.version;
@@ -118,7 +128,7 @@ export class PanoramaWeb {
       // check if everything is calculated
       console.log("Posting performance metrics: " + this.metrics);
       fetch(
-        "http://localhost:3000/api/deployments/" + this.id + "/performance",
+        this.api_url + "/api/deployments/" + this.id + "/performance",
         {
           method: "POST",
           headers: {
@@ -154,7 +164,7 @@ export class PanoramaWeb {
       if (this.queue.length > 0) {
         const item = this.queue.shift();
         const response = await fetch(
-          "http://localhost:3000/api/deployments/" + this.id + "/benchmarks",
+          this.api_url + "/api/deployments/" + this.id + "/benchmarks",
           {
             method: "POST",
             headers: {
@@ -264,7 +274,7 @@ export class PanoramaWeb {
       timestamp: Date.now(),
     });
 
-    const response = await fetch("http://localhost:3000/api/error-events", {
+    const response = await fetch(this.api_url + "/api/error-events", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

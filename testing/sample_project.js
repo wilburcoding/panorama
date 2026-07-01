@@ -12,6 +12,7 @@ async function main() {
     await client.init({
       api_key: "sample_api_key_1_0",
       id: 1,
+      api_url: "http://localhost:3000",
     });
 
     app.listen(PORT, () => {

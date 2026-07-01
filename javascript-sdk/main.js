@@ -20,15 +20,24 @@ class PanoramaClient {
     benchmarks: {}, // record response times for different processes of functions -> user sets this up
   };
 
+  api_url = null;
+
   constructor() {}
 
-  async init({ api_key, id }) {
+  async init({ api_key, id, api_url }) {
     if (this.initialized) {
       console.warn("PanoramaClient is already initialized");
       return;
     }
+    if (!api_url) {
+      console.error("PanoramaClient initialization failed: api_url is required");
+      return;
+    }
+    if (api_url.endsWith("/")) {
+      api_url = api_url.slice(0, -1);
+    }
 
-    await fetch("http://localhost:3000/api/deployments/" + id + "/connect", {
+    await fetch(api_url + "/api/deployments/" + id + "/connect", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -44,6 +53,7 @@ class PanoramaClient {
           console.log("Connected to Panorama backend");
           this.api_key = api_key;
           this.id = id;
+          this.api_url = api_url;
           this.initialized = true;
           this.environment = response.deployment.environment;
           this.version = response.deployment.version;
@@ -155,7 +165,7 @@ class PanoramaClient {
       timestamp: Date.now(),
     });
 
-    const response = await fetch("http://localhost:3000/api/error-events", {
+    const response = await fetch(this.api_url + "/api/error-events", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -269,7 +279,7 @@ class PanoramaClient {
       }
 
       // post metrics
-      fetch("http://localhost:3000/api/deployments/" + this.id + "/performance", {
+      fetch(this.api_url + "/api/deployments/" + this.id + "/performance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

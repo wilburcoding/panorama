@@ -61,268 +61,298 @@ export function reset() {
   console.log("Database reset");
 }
 
+function generateTimestamps(count, intervalMs) {
+    let timestamps = [];
+    for (let k = count; k > 0; k--) {
+        timestamps.push(new Date(Date.now() - intervalMs * k).toISOString());
+    }
+    return timestamps;
+}
+
 export function sample_data() {
-  // create sample user
   const HASHED_PASSWORD = bcrypt.hashSync("12345678", 10);
   db.prepare(
     "INSERT into users (email, first_name, last_name, password_hash) values (?, ?, ?, ?)",
   ).run("john@example.com", "John", "Doe", HASHED_PASSWORD);
-  const user = db
-    .prepare("SELECT * FROM users WHERE email = ?")
-    .get("john@example.com");
+  const user = db.prepare("SELECT * FROM users WHERE email = ?").get("john@example.com");
   const user_id = user.id;
 
-  // create sample projects
-  db.prepare(
-    "INSERT into projects (name, user_id, description, color) values (?, ?, ?, ?)",
-  ).run("Sample Project 1", user_id, "Panorama testing project #1", "#5cff87");
-  db.prepare(
-    "INSERT into projects (name, user_id, description, color) values (?, ?, ?, ?)",
-  ).run("Sample Project 2", user_id, "Panorama testing project #2", "#4d7ef0");
-  db.prepare(
-    "INSERT into projects (name, user_id, description, color) values (?, ?, ?, ?)",
-  ).run("Sample Project 3", user_id, "Panorama testing project #3", "#5d7cc3");
+  const projects = [
+    { name: "E-Commerce Web App", desc: "Customer-facing storefront", color: "#5cff87" },
+    { name: "Payment Gateway API", desc: "Core API for transactions", color: "#4d7ef0" },
+    { name: "Internal Admin Dashboard", desc: "Backoffice management portal", color: "#e05cff" }
+  ];
 
-  //create sample deployments for each project
+  for (const p of projects) {
+    db.prepare("INSERT into projects (name, user_id, description, color) values (?, ?, ?, ?)").run(p.name, user_id, p.desc, p.color);
+  }
 
-  for (let i = 1; i <= 2; i++) {
-    const project = db
-      .prepare("SELECT * FROM projects WHERE name = ?")
-      .get("Sample Project " + i);
-    const project_id = project.id;
-    for (let j = 0; j < 2; j++) {
-      const version = "v1.0.0";
-      const environment = j % 2 === 0 ? "production" : "development";
-      const status = "active";
-      const api_key = "sample_api_key_" + i + "_" + j;
-      const deployment = "Deployment " + (j + 1 + (i - 1) * 2);
-      let sample_cpu = [];
-      let sample_memory = [];
-      let sample_timestamps = [];
-      for (let k = 240; k > 0; k--) {
-        sample_cpu.push(Math.floor(Math.random() * 50 + 10));
-        sample_memory.push(Math.floor(Math.random() * 50 + 20));
-        sample_timestamps.push(new Date(Date.now() - 30000 * k).toISOString());
-      }
+  // --- Project 1: E-Commerce Web App (Frontend) ---
+  const proj1 = db.prepare("SELECT * FROM projects WHERE name = ?").get("E-Commerce Web App");
+  const p1_deployments = [
+      { version: "v2.4.1", env: "production", name: "Production Storefront", type: "frontend", api_key: "ecommerce_prod_key" },
+      { version: "v2.5.0-beta", env: "staging", name: "Staging Storefront", type: "frontend", api_key: "ecommerce_staging_key" }
+  ];
 
-      let sample_statuses = [];
-      let sample_statuses2 = [];
-      for (let k = 0; k < 300; k++) {
-        sample_statuses.push(Math.random() > 0.05);
-        sample_statuses2.push(Math.random() > 0.3);
-      }
-      let sample_response_times = [];
-      let sample_response_times2 = [];
-      for (let k = 0; k < 300; k++) {
-        sample_response_times.push(Math.floor(Math.random() * 100 + 10));
-        sample_response_times2.push(Math.floor(Math.random() * 150 + 20));
-      }
+  for (const d of p1_deployments) {
+      let web_vitals_timestamps = generateTimestamps(40, 60000 * 15);
+      let isProd = d.env === "production";
+      
+      let sample_lcp = web_vitals_timestamps.map(() => Math.floor(Math.random() * (isProd ? 1500 : 2500) + 500));
+      let sample_inp = web_vitals_timestamps.map(() => Math.floor(Math.random() * (isProd ? 100 : 300) + 50));
+      let sample_fcp = web_vitals_timestamps.map(() => Math.floor(Math.random() * (isProd ? 800 : 1500) + 300));
+      let sample_ttfb = web_vitals_timestamps.map(() => Math.floor(Math.random() * (isProd ? 200 : 500) + 100));
 
-      let timestamps = []; // uptime monitoring -> assuming 10 minute intervals, max 300 records (50 hours of data)
-      for (let k = 300; k > 0; k--) {
-        timestamps.push(
-          new Date(Date.now() - 60 * 1000 * 10 * k).toISOString(),
-        );
-      }
-
-      let benchmark_timestamps = [];
-      for (let k = 0; k < 30; k++) {
-        benchmark_timestamps.push(
-          new Date(Date.now() - 60000 * 30 * k).toISOString(),
-        ); // 30x at 30 minute intervals
-      }
-
-      let benchmark_times_1 = [];
-      let benchmark_times_2 = [];
-      let benchmark_times_3 = [];
-      let benchmark_times_4 = [];
-      for (let k = 0; k < 30; k++) {
-        benchmark_times_1.push(Math.floor(Math.random() * 100 + 10)); // random times between 10 ms and 110 ms
-        benchmark_times_2.push(Math.floor(Math.random() * 100 + 10)); // random times between 10 ms and 110 ms
-        benchmark_times_3.push(Math.floor(Math.random() * 80 + 10));
-        benchmark_times_4.push(Math.floor(Math.random() * 50 + 20));
-      }
-
-      let sample_stat;
-
-      let sample_lcp = [];
-      let sample_inp = [];
-      let sample_ttfb = [];
-      let sample_fcp = [];
-      let web_vitals_timestamps = [];
-      for (let k = 0; k < 40; k++) {
-        web_vitals_timestamps.push(
-          new Date(Date.now() - 60000 * 15 * k).toISOString(),
-        );
-        // 40x at 15 minute intervals
-      }
-
-      let sample_daily1 = [];
-      let sample_daily2 = [];
-      for (let k = 0; k < 90; k++) {
-        sample_daily1.push(Math.random());
-        sample_daily2.push(Math.random());
-      }
-      for (let k = 0; k < 40; k++) {
-        sample_lcp.push(Math.floor(Math.random() * 2000 + 500));
-        sample_inp.push(Math.floor(Math.random() * 300 + 50));
-        sample_fcp.push(Math.floor(Math.random() * 2000 + 300));
-        sample_ttfb.push(Math.floor(Math.random() * 500 + 100));
-      }
+      let monitor_timestamps = generateTimestamps(300, 60000 * 10);
+      let monitor_daily = Array.from({length: 90}, () => (Math.random() > 0.02 ? 1 : 0));
+      
       const meta = {
-        performance: {
-          backend_monitoring: {
-            cpu_usage: sample_cpu,
-            memory_usage: sample_memory,
-            timestamps: sample_timestamps,
+          performance: {
+              frontend_monitoring: {
+                  lcp: sample_lcp, inp: sample_inp, ttfb: sample_ttfb, fcp: sample_fcp, timestamps: web_vitals_timestamps
+              }
           },
-          frontend_monitoring: {
-            lcp: sample_lcp,
-            inp: sample_inp, // measures last 40 measurements of INP/LCP
-            ttfb: sample_ttfb,
-            fcp: sample_fcp,
-            timestamps: web_vitals_timestamps,
-          },
-          benchmarks: [
-            {
-              name: "DB Query Performance",
-              expected_time: 70,
-              id: "benchmark_1",
-              times: benchmark_times_1,
-              timestamps: benchmark_timestamps, // last 30 times are recorded
-            },
-            {
-              name: "API Response Time",
-              expected_time: 70,
-              id: "benchmark_2",
-              times: benchmark_times_2,
-              timestamps: benchmark_timestamps,
-            },
-          ],
-        },
-        uptime: {
-          monitors: [
-            {
-              name: "Homepage",
-              url: "https://www.example.com",
-              statuses: sample_statuses,
-              daily_timeline: sample_daily1, // also record statuses from the last 90 days
-              status: "up", // current status -> separate from the last recorded status
-              timestamps: timestamps,
-              active: true,
-              id: "monitor_1",
-              response_times: sample_response_times,
-            },
-            {
-              name: "API",
-              url: "https://api.example.com/",
-              statuses: sample_statuses2,
-              daily_timeline: sample_daily2,
-              timestamps: timestamps,
-              status: "down",
-              active: true,
-              id: "monitor_2",
-              response_times: sample_response_times2,
-            },
-          ],
-        },
+          uptime: {
+              monitors: [
+                  {
+                      id: `mon_1_${d.env}`, name: "Storefront Homepage", url: `https://${isProd ? 'www' : 'staging'}.shop.example.com`,
+                      statuses: Array.from({length: 300}, () => Math.random() > 0.01), daily_timeline: monitor_daily,
+                      status: "up", timestamps: monitor_timestamps, active: true,
+                      response_times: Array.from({length: 300}, () => Math.floor(Math.random() * 150 + 50))
+                  },
+                  {
+                      id: `mon_2_${d.env}`, name: "Checkout API", url: `https://${isProd ? 'api' : 'api-staging'}.shop.example.com/checkout`,
+                      statuses: Array.from({length: 300}, () => Math.random() > 0.05), daily_timeline: Array.from({length: 90}, () => (Math.random() > 0.05 ? 1 : 0)),
+                      status: isProd ? "up" : "down", timestamps: monitor_timestamps, active: true,
+                      response_times: Array.from({length: 300}, () => Math.floor(Math.random() * 300 + 100))
+                  }
+              ]
+          }
       };
-      db.prepare(
+
+      const result = db.prepare(
         "INSERT into deployments (project_id, version, environment, status, api_key, name, last_deployed, meta, type) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      ).run(
-        project_id,
-        version,
-        environment,
-        status,
-        api_key,
-        deployment,
-        null,
-        JSON.stringify(meta),
-        Math.random() < 0.01 ? "backend" : "frontend", // for now, only types are "backend" and "frontend"
-      );
-    }
+      ).run(proj1.id, d.version, d.env, "active", d.api_key, d.name, null, JSON.stringify(meta), d.type);
+
+      for (let j = 0; j < 5; j++) {
+          const title = j % 2 === 0 ? "TypeError: Cannot read properties of undefined (reading 'price')" : "ReferenceError: Stripe is not defined";
+          const status = j === 0 ? "resolved" : "unresolved";
+          const stack_trace = `Error: ${title}\n    at Checkout.render (checkout.js:45:12)\n    at React.render (react-dom.js:122:5)\n    at Object.init (index.js:10:15)`;
+          
+          let perf_timestamps = generateTimestamps(20, 30000);
+          let perf_cpu = perf_timestamps.map(() => Math.floor(Math.random() * 50 + 10));
+          let perf_memory = perf_timestamps.map(() => Math.floor(Math.random() * 50 + 20));
+
+          let breadcrumb_timestamps = generateTimestamps(15, 2000);
+          const errorMeta = {
+              performance: {
+                  cpu: perf_cpu,
+                  memory: perf_memory,
+                  timestamps: perf_timestamps,
+                  benchmarks: {
+                      "React Render": { duration: 240, expected_duration: 150 },
+                      "Fetch Products API": { duration: 420, expected_duration: 300 }
+                  }
+              },
+              breadcrumbs: [
+                  { message: "User navigated to /", type: "info", source: "navigation", timestamp: breadcrumb_timestamps[0] },
+                  { message: "Loaded 15 products", type: "info", source: "ui", timestamp: breadcrumb_timestamps[1] },
+                  { message: "User scrolled down", type: "debug", source: "ui", timestamp: breadcrumb_timestamps[2] },
+                  { message: "User navigated to /category/electronics", type: "info", source: "navigation", timestamp: breadcrumb_timestamps[3] },
+                  { message: "Failed to load image resource for product id 102", type: "warning", source: "network", timestamp: breadcrumb_timestamps[4] },
+                  { message: "User navigated to /products/123", type: "info", source: "navigation", timestamp: breadcrumb_timestamps[5] },
+                  { message: "Added item to cart", type: "info", source: "ui", timestamp: breadcrumb_timestamps[6] },
+                  { message: "User navigated to /products/124", type: "info", source: "navigation", timestamp: breadcrumb_timestamps[7] },
+                  { message: "Added item to cart", type: "info", source: "ui", timestamp: breadcrumb_timestamps[8] },
+                  { message: "User navigated to /cart", type: "info", source: "navigation", timestamp: breadcrumb_timestamps[9] },
+                  { message: "Removed item 123 from cart", type: "info", source: "ui", timestamp: breadcrumb_timestamps[10] },
+                  { message: "User navigated to /checkout", type: "info", source: "navigation", timestamp: breadcrumb_timestamps[11] },
+                  { message: "Started Stripe initialization", type: "debug", source: "log", timestamp: breadcrumb_timestamps[12] },
+                  { message: "Failed to load resource: the server responded with a status of 400", type: "error", source: "network", timestamp: breadcrumb_timestamps[13] },
+                  { message: "Checkout render failed", type: "error", source: "log", timestamp: breadcrumb_timestamps[14] }
+              ]
+          };
+          const updates = j === 1 ? [
+              { email: "john@example.com", message: "Stripe SDK failed to load due to adblocker. Looking for a workaround.", status: "unresolved", timestamp: new Date(Date.now() - 3600000).toISOString() },
+              { email: "john@example.com", message: "Added a fallback UI when Stripe fails to load.", status: "resolved", timestamp: new Date(Date.now() - 1800000).toISOString() }
+          ] : [];
+          
+          db.prepare("INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp, similar_count, meta, updates) values (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            .run(result.lastInsertRowid, title, status, stack_trace, "Chrome 114, Windows 11", new Date(Date.now() - Math.random() * 86400000).toISOString(), Math.floor(Math.random() * 150) + 10, JSON.stringify(errorMeta), JSON.stringify(updates));
+      }
   }
-  console.log("Sample data created");
 
-  // TODO: Create sample error events data
+  // --- Project 2: Payment Gateway API (Backend) ---
+  const proj2 = db.prepare("SELECT * FROM projects WHERE name = ?").get("Payment Gateway API");
+  const p2_deployments = [
+      { version: "v1.2.0", env: "production", name: "Main API Cluster", type: "backend", api_key: "pay_api_prod" }
+  ];
 
-  for (let i = 0; i < 4; i++) {
-    console.log(i);
-    const deployment = db
-      .prepare("SELECT * FROM deployments WHERE id = ?")
-      .get(i + 1);
-    const deployment_id = deployment.id;
-    console.log("Deployment ID: " + deployment_id);
-    for (let j = 0; j < Math.floor(Math.random() * 8 + 2); j++) {
-      console.log("Error event created for deployment " + deployment_id);
-      // random error events for each deployment
-      const title = "Sample Error " + (j + 1);
-      const status = j % 2 === 0 ? "unresolved" : "resolved";
-      const stack_trace = `
-Error: Sample error track message
-at Object.<anonymous> (/app/index.js:10:15)
-at Module._compile (internal/modules/cjs/loader.js:999:19)
-at Module._extensions..js (internal/modules/cjs/loader.js:1027:10)
-at Module.load (internal/modules/cjs/loader.js:863:32)
-at Function.Module._load (internal/modules/cjs/loader.js:708:14)
-at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:60:12)
-      `;
-      const environment = "Windows 10, Node.js v14.17.0";
-      const timestamp = new Date(Date.now());
-      let sample_timestamps = [];
-      for (let k = 0; k < 20; k++) {
-        sample_timestamps.push(
-          new Date(Date.now() - 30000 * (7 - k)).toISOString(),
-        );
-      }
-      let sample_cpu = [];
-      for (let k = 0; k < 20; k++) {
-        sample_cpu.push(Math.floor(Math.random() * 50 + 10));
-      }
-      let sample_memory = [];
-      for (let k = 0; k < 20; k++) {
-        sample_memory.push(Math.floor(Math.random() * 50 + 20));
-      }
+  for (const d of p2_deployments) {
+      let sample_timestamps = generateTimestamps(240, 30000); 
+      let sample_cpu = sample_timestamps.map((_, i) => i % 60 === 0 ? Math.floor(Math.random() * 20 + 70) : Math.floor(Math.random() * 20 + 10)); 
+      let sample_memory = sample_timestamps.map((_, i) => Math.min(100, 40 + (i * 0.1) + Math.random() * 5)); 
 
+      let benchmark_timestamps = generateTimestamps(30, 60000 * 30);
+      let monitor_timestamps = generateTimestamps(300, 60000 * 10);
+      
       const meta = {
-        breadcrumbs: [
-          {
-            message: "Some message here",
-            type: "info",
-            source: "log",
+          performance: {
+              backend_monitoring: { cpu_usage: sample_cpu, memory_usage: sample_memory, timestamps: sample_timestamps },
+              benchmarks: [
+                  { name: "Process Transaction", expected_time: 250, id: "bm_pay_1", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 100 + 200)), timestamps: benchmark_timestamps },
+                  { name: "DB Query: Fetch User", expected_time: 50, id: "bm_pay_2", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 40 + 20)), timestamps: benchmark_timestamps },
+                  { name: "Hash Password", expected_time: 80, id: "bm_pay_3", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 20 + 70)), timestamps: benchmark_timestamps },
+                  { name: "API Request to Stripe", expected_time: 300, id: "bm_pay_4", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 150 + 200)), timestamps: benchmark_timestamps },
+                  { name: "Generate Invoice PDF", expected_time: 500, id: "bm_pay_5", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 200 + 400)), timestamps: benchmark_timestamps }
+              ]
           },
-          {
-            message: "Some message here",
-            type: "error",
-            source: "log",
-          },
-          {
-            message: "Some message here",
-            type: "warning",
-            source: "log",
-          },
-          {
-            message: "Some message here",
-            type: "debug",
-            source: "log",
-          },
-        ],
+          uptime: {
+              monitors: [
+                  {
+                      id: "mon_api_prod", name: "Transaction Endpoint", url: "https://api.payments.example.com/v1/charge",
+                      statuses: Array.from({length: 300}, () => Math.random() > 0.005), daily_timeline: Array.from({length: 90}, () => 1),
+                      status: "up", timestamps: monitor_timestamps, active: true,
+                      response_times: Array.from({length: 300}, () => Math.floor(Math.random() * 50 + 200))
+                  }
+              ]
+          }
       };
-      timestamp.setHours(
-        timestamp.getHours() - j * 2 - Math.floor(Math.random() * 5),
-      );
-      db.prepare(
-        "INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp, similar_count, meta) values (?, ?, ?, ?, ?, ?, ?, ?)",
-      ).run(
-        deployment_id,
-        title,
-        status,
-        stack_trace,
-        environment,
-        timestamp.toISOString(),
-        Math.floor(Math.random() * 5),
-        JSON.stringify(meta),
-      );
-    }
+
+      const result = db.prepare("INSERT into deployments (project_id, version, environment, status, api_key, name, last_deployed, meta, type) values (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(proj2.id, d.version, d.env, "active", d.api_key, d.name, null, JSON.stringify(meta), d.type);
+
+      for (let j = 0; j < 3; j++) {
+          const title = j === 0 ? "TimeoutError: Database query timeout" : "AuthError: Invalid API token provided";
+          const status = j === 0 ? "unresolved" : "resolved";
+          const stack_trace = `Error: ${title}\n    at Database.query (db.js:105:22)\n    at UserService.fetch (user.js:44:12)\n    at handleRequest (server.js:80:15)`;
+          let perf_timestamps = generateTimestamps(20, 30000);
+          let perf_cpu = perf_timestamps.map(() => Math.floor(Math.random() * 50 + 40));
+          let perf_memory = perf_timestamps.map(() => Math.floor(Math.random() * 30 + 60));
+
+          let breadcrumb_timestamps = generateTimestamps(15, 200);
+          const errorMeta = {
+              performance: {
+                  cpu: perf_cpu,
+                  memory: perf_memory,
+                  timestamps: perf_timestamps,
+                  benchmarks: {
+                      "DB Query: Fetch User": { duration: 3000, expected_duration: 50 },
+                      "Token Validation": { duration: 12, expected_duration: 15 }
+                  }
+              },
+              breadcrumbs: [
+                  { message: "Server started", type: "info", source: "system", timestamp: breadcrumb_timestamps[0] },
+                  { message: "Incoming GET /health", type: "debug", source: "http", timestamp: breadcrumb_timestamps[1] },
+                  { message: "Incoming POST /v1/charge", type: "info", source: "http", timestamp: breadcrumb_timestamps[2] },
+                  { message: "Validating payload format", type: "debug", source: "log", timestamp: breadcrumb_timestamps[3] },
+                  { message: "Payload valid", type: "debug", source: "log", timestamp: breadcrumb_timestamps[4] },
+                  { message: "Authenticating token", type: "info", source: "auth", timestamp: breadcrumb_timestamps[5] },
+                  { message: "Token valid for user 5512", type: "info", source: "auth", timestamp: breadcrumb_timestamps[6] },
+                  { message: "Initiating DB Transaction", type: "info", source: "db", timestamp: breadcrumb_timestamps[7] },
+                  { message: "DB query taking longer than expected (3000ms)", type: "warning", source: "db", timestamp: breadcrumb_timestamps[8] },
+                  { message: "Attempting reconnect to DB pool", type: "warning", source: "db", timestamp: breadcrumb_timestamps[9] },
+                  { message: "Reconnect failed", type: "error", source: "db", timestamp: breadcrumb_timestamps[10] },
+                  { message: "Connection pool exhausted", type: "error", source: "db", timestamp: breadcrumb_timestamps[11] },
+                  { message: "Aborting HTTP response", type: "error", source: "http", timestamp: breadcrumb_timestamps[12] },
+                  { message: "Returning 503 Service Unavailable", type: "info", source: "http", timestamp: breadcrumb_timestamps[13] },
+                  { message: "Request duration: 5231ms", type: "debug", source: "http", timestamp: breadcrumb_timestamps[14] }
+              ]
+          };
+          const updates = j === 0 ? [
+              { email: "john@example.com", message: "Getting alerts about this. Investigating the DB load.", status: "unresolved", timestamp: new Date(Date.now() - 7200000).toISOString() },
+              { email: "john@example.com", message: "Looks like a missing index on the transactions table.", status: "unresolved", timestamp: new Date(Date.now() - 3600000).toISOString() },
+              { email: "john@example.com", message: "Index added. Monitoring for recurrence.", status: "resolved", timestamp: new Date(Date.now() - 1800000).toISOString() }
+          ] : [];
+          
+          db.prepare("INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp, similar_count, meta, updates) values (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            .run(result.lastInsertRowid, title, status, stack_trace, "Node.js v18.16.0, Ubuntu 22.04", new Date(Date.now() - Math.random() * 86400000).toISOString(), Math.floor(Math.random() * 500) + 100, JSON.stringify(errorMeta), JSON.stringify(updates));
+      }
   }
+
+  // --- Project 3: Internal Admin Dashboard (Mixed) ---
+  const proj3 = db.prepare("SELECT * FROM projects WHERE name = ?").get("Internal Admin Dashboard");
+  const p3_deployments = [
+      { version: "v1.0.5", env: "production", name: "Admin Dashboard UI", type: "frontend", api_key: "admin_ui_key" },
+      { version: "v1.0.5", env: "production", name: "Admin API", type: "backend", api_key: "admin_api_key" }
+  ];
+  
+  for (const d of p3_deployments) {
+      const isBackend = d.type === "backend";
+      let meta = { performance: {}, uptime: { monitors: [] } };
+      
+      if (isBackend) {
+          let sample_timestamps = generateTimestamps(240, 30000); 
+          let sample_cpu = sample_timestamps.map(() => Math.floor(Math.random() * 10 + 5)); 
+          let sample_memory = sample_timestamps.map(() => Math.floor(Math.random() * 10 + 20));
+          let benchmark_timestamps = generateTimestamps(30, 60000 * 30);
+          
+          meta.performance.backend_monitoring = { cpu_usage: sample_cpu, memory_usage: sample_memory, timestamps: sample_timestamps };
+          meta.performance.benchmarks = [
+              { name: "Generate Monthly Report", expected_time: 5000, id: "bm_admin_1", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 1000 + 4500)), timestamps: benchmark_timestamps },
+              { name: "Fetch All Users", expected_time: 1500, id: "bm_admin_2", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 300 + 1200)), timestamps: benchmark_timestamps },
+              { name: "Export CSV Data", expected_time: 3000, id: "bm_admin_3", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 500 + 2500)), timestamps: benchmark_timestamps },
+              { name: "Cache Clear Job", expected_time: 200, id: "bm_admin_4", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 50 + 150)), timestamps: benchmark_timestamps }
+          ];
+      } else {
+          let web_vitals_timestamps = generateTimestamps(40, 60000 * 15);
+          meta.performance.frontend_monitoring = {
+              lcp: web_vitals_timestamps.map(() => Math.floor(Math.random() * 500 + 200)), 
+              inp: web_vitals_timestamps.map(() => Math.floor(Math.random() * 50 + 20)),
+              ttfb: web_vitals_timestamps.map(() => Math.floor(Math.random() * 100 + 50)),
+              fcp: web_vitals_timestamps.map(() => Math.floor(Math.random() * 300 + 100)),
+              timestamps: web_vitals_timestamps
+          };
+      }
+
+      const result = db.prepare("INSERT into deployments (project_id, version, environment, status, api_key, name, last_deployed, meta, type) values (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(proj3.id, d.version, d.env, "active", d.api_key, d.name, null, JSON.stringify(meta), d.type);
+
+      const title = isBackend ? "UnhandledPromiseRejection: Report generation failed" : "Error: Chart.js failed to render";
+      const stack_trace = `Error: ${title}\n    at module.exports (main.js:1:1)`;
+      
+      let perf_timestamps = generateTimestamps(20, 30000);
+      let perf_cpu = perf_timestamps.map(() => Math.floor(Math.random() * 50 + 10));
+      let perf_memory = perf_timestamps.map(() => Math.floor(Math.random() * 50 + 20));
+
+      let breadcrumb_timestamps = generateTimestamps(15, 5000);
+      const errorMeta = { 
+          performance: {
+              cpu: perf_cpu,
+              memory: perf_memory,
+              timestamps: perf_timestamps,
+              benchmarks: isBackend ? {
+                  "Generate Monthly Report": { duration: 8200, expected_duration: 5000 },
+                  "Fetch All Users": { duration: 1800, expected_duration: 1500 }
+              } : {
+                  "Chart.js Initialization": { duration: 450, expected_duration: 200 }
+              }
+          },
+          breadcrumbs: [
+              { message: "Admin authenticated", type: "info", source: "auth", timestamp: breadcrumb_timestamps[0] },
+              { message: "Requested admin data view", type: "info", source: "ui", timestamp: breadcrumb_timestamps[1] },
+              { message: "Data fetched from cache", type: "debug", source: "cache", timestamp: breadcrumb_timestamps[2] },
+              { message: "Clicked 'Generate Report'", type: "info", source: "ui", timestamp: breadcrumb_timestamps[3] },
+              { message: "Report generation started", type: "info", source: "worker", timestamp: breadcrumb_timestamps[4] },
+              { message: "Processing row 1/1000", type: "debug", source: "worker", timestamp: breadcrumb_timestamps[5] },
+              { message: "Processing row 500/1000", type: "debug", source: "worker", timestamp: breadcrumb_timestamps[6] },
+              { message: "Memory usage approaching limits", type: "warning", source: "system", timestamp: breadcrumb_timestamps[7] },
+              { message: "Processing row 999/1000", type: "debug", source: "worker", timestamp: breadcrumb_timestamps[8] },
+              { message: "File write initiated", type: "info", source: "fs", timestamp: breadcrumb_timestamps[9] },
+              { message: "Disk full error", type: "error", source: "fs", timestamp: breadcrumb_timestamps[10] },
+              { message: "Failing gracefully", type: "info", source: "worker", timestamp: breadcrumb_timestamps[11] },
+              { message: "Report generation failed", type: "error", source: "worker", timestamp: breadcrumb_timestamps[12] },
+              { message: "Rendering error state UI", type: "info", source: "ui", timestamp: breadcrumb_timestamps[13] },
+              { message: "Exception during render", type: "error", source: "ui", timestamp: breadcrumb_timestamps[14] }
+          ] 
+      };
+      
+      const updates = [
+          { email: "john@example.com", message: "Getting reports from the ops team about this.", status: "unresolved", timestamp: new Date(Date.now() - 3600000).toISOString() },
+          { email: "john@example.com", message: "It's an out-of-disk-space issue on the ephemeral storage. Clearing up old logs.", status: "resolved", timestamp: new Date(Date.now() - 1800000).toISOString() }
+      ];
+      
+      db.prepare("INSERT into error_events (deployment_id, title, status, stack_trace, environment, timestamp, similar_count, meta, updates) values (?, ?, ?, ?, ?, ?, ?, ?, ?)")
+          .run(result.lastInsertRowid, title, "resolved", stack_trace, isBackend ? "Node.js v20" : "Firefox 115", new Date().toISOString(), Math.floor(Math.random() * 5), JSON.stringify(errorMeta), JSON.stringify(updates));
+  }
+
+  console.log("Sample data created");
 }

@@ -341,3 +341,5 @@ Color for database schema should be in HEX
 Chart.js doesn't handle multiple datasets very well for scatter charts. Avoid for now.
 
 I have to be stupid or something....why did I originally plan the web SDK to only have web metrics monitoring???????
+
+Used Gemini to put in some better sample data + visual debugging. Fun little antigraity test
