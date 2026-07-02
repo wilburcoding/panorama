@@ -603,10 +603,12 @@ $(document).ready(function () {
         // window.location.href = "/dashboard.html?guide#guide-web";
       });
 
-      $(".scroll-up").click(function() {
+      $(".scroll-up").click(function () {
         console.log("clicked scroll up");
-        document.getElementById("guide-home").scrollIntoView({ behavior: "smooth"});
-      })
+        document
+          .getElementById("guide-home")
+          .scrollIntoView({ behavior: "smooth" });
+      });
     } else if (params.has("monitorInfo")) {
       // individual monitor details page - TODO
       const monitor_id = params.get("monitorId");
@@ -1607,7 +1609,12 @@ $(document).ready(function () {
           }
 
           const meta = JSON.parse(deployment.meta);
+          console.log("performance overview page");
+          console.log(meta.performance);
+
           if (meta && meta.performance && meta.performance.backend_monitoring) {
+            $("#sdeployment-overview-performance-enabled-2").hide();
+            $("#sdeployment-overview-performance-enabled-1").show();
             const backend_monitoring = meta.performance.backend_monitoring;
             const cpu = backend_monitoring.cpu_usage;
             const memory = backend_monitoring.memory_usage;
@@ -1723,6 +1730,146 @@ $(document).ready(function () {
               return index % 15 == 1 ? this.getLabelForValue(val) : "";
             };
             memoryChart.update();
+          } else if (
+            meta &&
+            meta.performance &&
+            meta.performance.frontend_monitoring
+          ) {
+            // show frontend monitoring statistics
+            $("#sdeployment-overview-performance-enabled-2").show();
+            $("#sdeployment-overview-performance-enabled-1").hide();
+            console.log("frontend monitoring");
+            let fcp_sum = 0;
+            let fcp_count = 0;
+            let inp_sum = 0;
+            let inp_count = 0;
+            let ttfb_sum = 0;
+            let ttfb_count = 0;
+            let lcp_sum = 0;
+            let lcp_count = 0;
+            const thresholds = {
+              // labels: good, degraded, slow, excellenet
+              ttfb: {
+                Excellent: 500,
+                Good: 800,
+                Slow: 1300,
+                Degraded: 1800,
+              },
+              fcp: {
+                Excellent: 1000,
+                Good: 1900,
+                Slow: 2500,
+                Degraded: 3200,
+              },
+              lcp: {
+                Excellent: 2000,
+                Good: 2800,
+                Slow: 3800,
+                Degraded: 4800,
+              },
+              inp: {
+                Excellent: 150,
+                Good: 270,
+                Slow: 450,
+                Degraded: 600,
+              },
+            };
+            for (
+              let i = 0;
+              i < meta.performance.frontend_monitoring.timestamps.length;
+              i++
+            ) {
+              // damn what this so long
+              const date = parseSqlTimestamp(
+                meta.performance.frontend_monitoring.timestamps[i],
+              );
+              const now = new Date();
+              const hours_before = (now - date) / 1000 / 60 / 60;
+              if (hours_before > 24) {
+                continue;
+              }
+
+              if (meta.performance.frontend_monitoring.fcp[i] != null) {
+                fcp_sum += meta.performance.frontend_monitoring.fcp[i];
+                fcp_count += 1;
+              }
+
+              if (meta.performance.frontend_monitoring.inp[i] != null) {
+                inp_sum += meta.performance.frontend_monitoring.inp[i];
+                inp_count += 1;
+              }
+
+              if (meta.performance.frontend_monitoring.ttfb[i] != null) {
+                ttfb_sum += meta.performance.frontend_monitoring.ttfb[i];
+                ttfb_count += 1;
+              }
+
+              if (meta.performance.frontend_monitoring.lcp[i] != null) {
+                lcp_sum += meta.performance.frontend_monitoring.lcp[i];
+                lcp_count += 1;
+              }
+            }
+
+            let ttfb_avg = null;
+            if (ttfb_count > 0) {
+              ttfb_avg = ttfb_sum / ttfb_count;
+            }
+            let fcp_avg = null;
+            if (fcp_count > 0) {
+              fcp_avg = fcp_sum / fcp_count;
+            }
+            let lcp_avg = null;
+            if (lcp_count > 0) {
+              lcp_avg = lcp_sum / lcp_count;
+            }
+            let inp_avg = null;
+            if (inp_count > 0) {
+              inp_avg = inp_sum / inp_count;
+            }
+
+            for (let i = 0; i < Object.keys(thresholds).length; i++) {
+              let value = null;
+              let k = Object.keys(thresholds)[i];
+              if (k === "ttfb") {
+                value = ttfb_avg;
+              }
+              if (k === "fcp") {
+                value = fcp_avg;
+              }
+              if (k === "lcp") {
+                value = lcp_avg;
+              }
+              if (k === "inp") {
+                value = inp_avg;
+              }
+              if (value == null) {
+                $("#" + k + "-value").text("N/A");
+                $("#" + k + "-label-container").removeClass(
+                  "excellent good slow degraded",
+                );
+                $("#" + k + "-label-container").addClass("unknown");
+                $("#" + k + "-label").text("Unknown");
+              } else {
+                console.log(k);
+                $("#" + k + "-value").text(Math.round(value) + " ms");
+                $("#" + k + "-label-container").removeClass(
+                  "excellent good slow degraded unknown",
+                );
+                if (value <= thresholds[k].Excellent) {
+                  $("#" + k + "-label-container").addClass("excellent");
+                  $("#" + k + "-label").text("Excellent");
+                } else if (value <= thresholds[k].Good) {
+                  $("#" + k + "-label-container").addClass("good");
+                  $("#" + k + "-label").text("Good");
+                } else if (value <= thresholds[k].Slow) {
+                  $("#" + k + "-label-container").addClass("slow");
+                  $("#" + k + "-label").text("Slow");
+                } else {
+                  $("#" + k + "-label-container").addClass("degraded");
+                  $("#" + k + "-label").text("Degraded");
+                }
+              }
+            }
           }
 
           // uptime monitoring information
@@ -2905,7 +3052,7 @@ $(document).ready(function () {
             };
             let annotations = {};
             const statuses = ["Excellent", "Good", "Slow", "Degraded"];
-            const multipliers = [0.5, 0.2, -0.2, -0.5];
+            const multipliers = [-0.5, -0.2, 0.2, 0.5];
             const colors = ["#a0b8eb", "#7fd58f", "#f4d03f", "#f5b38c"];
             for (let j = 0; j < statuses.length; j++) {
               const threshold = benchmark.expected_time * (1 + multipliers[j]);
@@ -2930,7 +3077,7 @@ $(document).ready(function () {
               borderDash: [7, 4],
               label: {
                 display: true,
-                content: "Expected Time",
+                content: "Expected Time: " + benchmark.expected_time + " ms ",
                 position: "start",
                 backgroundColor: "rgba(70, 70, 70, 0.63)",
                 color: "white",
@@ -4031,12 +4178,14 @@ $(document).ready(function () {
         const breadcrumbs = meta.breadcrumbs || [];
         for (let i = 0; i < breadcrumbs.length; i++) {
           const breadcrumb = breadcrumbs[i];
-          let b_time = breadcrumb.timestamp ? parseSqlTimestamp(breadcrumb.timestamp) : new Date();
+          let b_time = breadcrumb.timestamp
+            ? parseSqlTimestamp(breadcrumb.timestamp)
+            : new Date();
           let hours = b_time.getHours() % 12 || 12;
           let suffix = b_time.getHours() >= 12 ? "PM" : "AM";
           $("#breadcrumbs-list").append(`
             <div class="breadcrumb-item">
-              <p class="breadcrumbs-timestamp">${b_time.getMonth()+1}/${b_time.getDate()}/${b_time.getFullYear()} ${hours}:${b_time.getMinutes().toString().padStart(2, "0")} ${suffix}</p>
+              <p class="breadcrumbs-timestamp">${b_time.getMonth() + 1}/${b_time.getDate()}/${b_time.getFullYear()} ${hours}:${b_time.getMinutes().toString().padStart(2, "0")} ${suffix}</p>
               <div class="breadcrumb-tag source">
                 <p>${breadcrumb.source.charAt(0).toUpperCase() + breadcrumb.source.slice(1)}</p>
               </div>

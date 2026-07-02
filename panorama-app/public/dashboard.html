@@ -461,7 +461,7 @@
               <div class="error-info-ritem">
                 <h3>Stack Trace</h3>
                 <pre
-                  style="max-width: 90%;min-width: 50%;"
+                  style="max-width: 90%; min-width: 50%"
                 ><code class="language-javascript" id="serror-stacktrace"></code></pre>
               </div>
             </div>
@@ -787,7 +787,81 @@
                 </div>
               </div>
               <!-- frontend tracking -> tbd -->
-              <div id="sdeployment-overview-performance-enabled-2"></div>
+              <div
+                id="sdeployment-overview-performance-enabled-2"
+                style="flex: 1; padding: 0px"
+                class="dashboard-row"
+              >
+                <div class="dashboard-card" style="flex: 1">
+                  <h3
+                    style="
+                      margin-top: 2px;
+                      margin-bottom: 5px;
+                      font-weight: 700;
+                    "
+                  >
+                    Average LCP (24 hours)
+                  </h3>
+                  <h2 id="lcp-value">519 ms</h2>
+                  <div
+                    class="measurement-label excellent"
+                    id="lcp-label-container"
+                  >
+                    <p id="lcp-label">Excellent</p>
+                  </div>
+                </div>
+                <div class="dashboard-card" style="flex: 1">
+                  <h3
+                    style="
+                      margin-top: 2px;
+                      margin-bottom: 5px;
+                      font-weight: 700;
+                    "
+                  >
+                    Average TTFB (24 hours)
+                  </h3>
+                  <h2 id="ttfb-value">519 ms</h2>
+                  <div
+                    class="measurement-label excellent"
+                    id="ttfb-label-container"
+                  >
+                    <p id="ttfb-label">Excellent</p>
+                  </div>
+                </div>
+                <div class="dashboard-card" style="flex: 1">
+                  <h3
+                    style="
+                      margin-top: 2px;
+                      margin-bottom: 5px;
+                      font-weight: 700;
+                    "
+                  >
+                    Average INP (24 hours)
+                  </h3>
+                  <h2 id="inp-value">519 ms</h2>
+                  <div
+                    class="measurement-label excellent"
+                    id="inp-label-container"
+                  >
+                    <p id="inp-label">Excellent</p>
+                  </div>
+                </div>
+                <div class="dashboard-card" style="flex: 1">
+                  <h3
+                    style="
+                      margin-top: 2px;
+                      margin-bottom: 5px;
+                      font-weight: 700;
+                    "
+                  >
+                    Average FCP (24 hours)
+                  </h3>
+                  <h2 id="fcp-value">519 ms</h2>
+                  <div class="measurement-label excellent" id="fcp-label-container">
+                    <p id="fcp-label">Excellent</p>
+                  </div>
+                </div>
+              </div>
               <div
                 id="sdeployment-overview-performance-disabled"
                 style="max-width: 50%; display: none"
@@ -2132,7 +2206,10 @@ client.init({ // initialize client with deployment details
   type: "info",
 })</code></pre>
             <h2>Performance Monitoring</h2>
-            <p>The Web SDK automatically tracks web performance metrics in your application:</p>
+            <p>
+              The Web SDK automatically tracks web performance metrics in your
+              application:
+            </p>
             <ul>
               <li><code>FCP</code>: First Contentful Paint</li>
               <li><code>LCP</code>: Largest Contentful Paint</li>
@@ -2153,8 +2230,14 @@ client.init({ // initialize client with deployment details
             </p>
             <pre><code class="language-javascript">client.endBenchmark("benchmark_name")</code></pre>
             <h2>Uptime Monitoring</h2>
-            <p>The Panorama server monitors your application's uptime and availability which you can configure in the dashboard.</p>
-            <p>Note that uptime monitoring requires a public endpoint to be accessible.</p>
+            <p>
+              The Panorama server monitors your application's uptime and
+              availability which you can configure in the dashboard.
+            </p>
+            <p>
+              Note that uptime monitoring requires a public endpoint to be
+              accessible.
+            </p>
           </div>
         </div>
         <div class="scroll-up">

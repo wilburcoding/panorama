@@ -238,11 +238,10 @@ a {
   justify-content: flex-start;
   overflow-y: scroll;
   scrollbar-width: none;
-
 }
 
 #sidebar::webkit-scrollbar {
-  display:none;
+  display: none;
 }
 
 #sidebar #stitle {
@@ -437,7 +436,8 @@ a {
 #wdeployment-container hr,
 #dashboard-plist hr,
 #sproject-dlist hr,
-#sdeployment-elist hr, #sdeployment-mlist hr {
+#sdeployment-elist hr,
+#sdeployment-mlist hr {
   width: 100%;
   border: none;
   border-top: dotted 1.6px black;
@@ -452,7 +452,8 @@ a {
 
 #dashboard-plist,
 #sproject-dlist,
-#sdeployment-elist, #sdeployment-mlist {
+#sdeployment-elist,
+#sdeployment-mlist {
   flex: 1;
   border-top: solid 2px black;
   overflow-y: scroll;
@@ -824,7 +825,8 @@ select {
   background-color: #fb9494;
 }
 
-.apikey-container, .apikey-container2 {
+.apikey-container,
+.apikey-container2 {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -833,7 +835,8 @@ select {
   transition-duration: 0.2s;
 }
 
-.apikey-container.show, .apikey-container2.show {
+.apikey-container.show,
+.apikey-container2.show {
   color: black;
   background-color: rgb(237, 237, 237);
 }
@@ -977,7 +980,8 @@ textarea {
 }
 
 #elist-delete,
-#elist-update, #mlist-delete {
+#elist-update,
+#mlist-delete {
   margin-top: 0px;
   margin-bottom: 0px;
   padding: 8px;
@@ -989,20 +993,23 @@ textarea {
 }
 
 #elist-delete i,
-#elist-update i, #mlist-delete i {
+#elist-update i,
+#mlist-delete i {
   margin: 0px;
   padding: 0px;
   color: black;
 }
 
 #elist-delete:hover,
-#elist-update:hover, #mlist-delete:hover {
+#elist-update:hover,
+#mlist-delete:hover {
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0px 0px #000000;
 }
 
 #elist-delete:disabled,
-#elist-update:disabled, #mlist-delete:disabled {
+#elist-update:disabled,
+#mlist-delete:disabled {
   opacity: 0.5;
   transform: none;
   pointer-events: none;
@@ -1400,7 +1407,9 @@ pre[class*="language-"] {
 #sdeployment-monitoring-list hr,
 #serror-rcontainer hr,
 #serror-rccontainer hr,
-#sdeployment-benchmarks-1 hr, #sdeployment-benchmarks-2 hr, #benchmarks-list hr {
+#sdeployment-benchmarks-1 hr,
+#sdeployment-benchmarks-2 hr,
+#benchmarks-list hr {
   width: 100%;
   border: none;
   border-top: dotted 1.6px black;
@@ -1550,7 +1559,7 @@ pre[class*="language-"] {
 @keyframes pulse_unknown {
   0% {
     box-shadow: 0 0 0 0 rgba(191, 191, 191, 0.9);
-    opacity:1;
+    opacity: 1;
   }
 
   100% {
@@ -1593,27 +1602,27 @@ pre[class*="language-"] {
 }
 
 .monitor-row {
-  display:flex;
+  display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
 }
 
-
-
 .monitor-rchart-container {
   height: 50px;
 }
 
-#monitor-uptime-container, #monitor-duptime-container {
-  display:flex;
+#monitor-uptime-container,
+#monitor-duptime-container {
+  display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
 }
 
-#monitor-uptime-container .monitoring-sline, #monitor-duptime-container .monitoring-sline {
+#monitor-uptime-container .monitoring-sline,
+#monitor-duptime-container .monitoring-sline {
   height: 50px;
 }
 
@@ -1621,17 +1630,16 @@ pre[class*="language-"] {
   margin-top: 3px;
 }
 
-#smonitor-uptime h2{
+#smonitor-uptime h2 {
   font-size: 18px;
   font-weight: 500;
   margin-top: 5px;
   margin-bottom: 5px;
-
 }
 
 .guide-section p {
   margin-top: 2px;
-  margin-bottom:2px;
+  margin-bottom: 2px;
 }
 
 .guide-section h1 {
@@ -1659,7 +1667,7 @@ pre[class*="language-"] {
   width: 50px;
   height: 50px;
   border-radius: 5px;
-  display:flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   background-color: white;
@@ -1685,9 +1693,9 @@ pre[class*="language-"] {
   margin-right: 8px;
 }
 
-.sdeployment-info-item h1 { 
-  word-wrap: break-word; 
-  word-break: break-word; 
+.sdeployment-info-item h1 {
+  word-wrap: break-word;
+  word-break: break-word;
   flex-shrink: 1;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1697,9 +1705,61 @@ pre[class*="language-"] {
   margin-right: 8px;
 }
 
-.sdeployment-rerror-card h2, .sdeployment-info {
+.sdeployment-rerror-card h2,
+.sdeployment-info {
   flex-shrink: 0;
   text-align: right;
   min-width: fit-content;
 }
 
+#sdeployment-overview-performance-enabled-2 .dashboard-card h2 {
+  font-weight: 700;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  font-size: 40px;
+}
+
+#sdeployment-overview-performance-enabled-2 .dashboard-card h3 {
+  font-weight: 700;
+}
+
+.measurement-label {
+  color: black;
+  padding: 2px;
+  border-radius: 2px;
+  width: fit-content;
+}
+
+.measurement-label p {
+  font-size: 14px;
+  line-height: 14px;
+  margin-left: 2px;
+  margin-right:2px;
+  margin-top:2px;
+  margin-bottom:2px;  
+}
+
+.measurement-label.excellent {
+  background-color: #a0b8eb;
+  color: #0d2965;
+}
+
+.measurement-label.good {
+  background-color: #7fd58f;
+  color: rgb(19, 79, 30);
+}
+
+.measurement-label.slow {
+  background-color: #f5f58c;
+  color: #49490f;
+}
+
+.measurement-label.degraded {
+  background-color: #f5b38c;
+  color: rgb(84, 59, 14);
+}
+
+.measurement-label.unknown {
+  background-color: rgb(191, 191, 191);
+  color: black;
+}
