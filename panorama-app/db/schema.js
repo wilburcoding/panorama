@@ -110,7 +110,12 @@ export function sample_data() {
           performance: {
               frontend_monitoring: {
                   lcp: sample_lcp, inp: sample_inp, ttfb: sample_ttfb, fcp: sample_fcp, timestamps: web_vitals_timestamps
-              }
+              },
+              benchmarks: [
+                  { name: "React Hydration", expected_time: 150, id: "bm_front_1", times: web_vitals_timestamps.map(() => Math.floor(Math.random() * 50 + 120)), timestamps: web_vitals_timestamps },
+                  { name: "CSS Paint", expected_time: 50, id: "bm_front_2", times: web_vitals_timestamps.map(() => Math.floor(Math.random() * 20 + 40)), timestamps: web_vitals_timestamps },
+                  { name: "API Initial Fetch", expected_time: 400, id: "bm_front_3", times: web_vitals_timestamps.map(() => Math.floor(Math.random() * 200 + 300)), timestamps: web_vitals_timestamps }
+              ]
           },
           uptime: {
               monitors: [
@@ -302,6 +307,12 @@ export function sample_data() {
               fcp: web_vitals_timestamps.map(() => Math.floor(Math.random() * 300 + 100)),
               timestamps: web_vitals_timestamps
           };
+          let benchmark_timestamps = generateTimestamps(30, 60000 * 30);
+          meta.performance.benchmarks = [
+              { name: "Initial Paint", expected_time: 100, id: "bm_admin_f1", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 50 + 80)), timestamps: benchmark_timestamps },
+              { name: "Script Execution", expected_time: 250, id: "bm_admin_f2", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 100 + 200)), timestamps: benchmark_timestamps },
+              { name: "Dashboard Render", expected_time: 180, id: "bm_admin_f3", times: benchmark_timestamps.map(() => Math.floor(Math.random() * 60 + 150)), timestamps: benchmark_timestamps }
+          ];
       }
 
       const result = db.prepare("INSERT into deployments (project_id, version, environment, status, api_key, name, last_deployed, meta, type) values (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(proj3.id, d.version, d.env, "active", d.api_key, d.name, null, JSON.stringify(meta), d.type);

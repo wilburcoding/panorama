@@ -2345,11 +2345,10 @@ $(document).ready(function () {
                   <div class="checkbox ${checked_errors.includes(event.id) ? "checked" : ""}" id="checkbox-${event.id}" >
                     <i class="ph ph-check"></i>
                   </div>
-                  <h1>${event.title}
-                    <span class="dproject-status ${event.status}" style="display: inline-block; vertical-align: middle; margin-left: 8px; margin-bottom: 2px;">
-                      <span style="font-size: 14px; font-weight: 500; color: black; line-height: 14px;">${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span>
-                    </span>
-                  </h1>
+                  <h1 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; display: block; margin-right: 2px;">${event.title}</h1>
+                  <div class="dproject-status ${event.status}" style="flex-shrink: 0;margin-left:2px;">
+                    <p>${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</p>
+                  </div>
                 </div>
                 <div class="sdeployment-info">
                   <div class="sdeployment-info-item">
