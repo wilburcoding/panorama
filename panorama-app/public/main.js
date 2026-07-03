@@ -572,6 +572,7 @@ $(document).ready(function () {
       $("#smonitor-content").hide();
 
       $("#sidebar-guide").addClass("active");
+      $("#base-url").text(window.location.origin);
       $("#l-intro").click(function () {
         // console.log("clicked intro");
         // $("html, body").animate({

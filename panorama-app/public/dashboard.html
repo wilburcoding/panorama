@@ -1881,11 +1881,14 @@
               platform. Check out the following resources:
             </p>
             <ul style="margin-top: 2px">
-              <li id="l-intro">Introduction to the Dashboard</li>
-              <li id="l-node">Node.js SDK</li>
-              <li id="l-python">Python SDK</li>
-              <li id="l-web">Web SDK</li>
+              <li id="l-intro" style="text-decoration: underline;">Introduction to the Dashboard</li>
+              <li id="l-node" style="text-decoration: underline;">Node.js SDK</li>
+              <li id="l-python" style="text-decoration: underline;">Python SDK</li>
+              <li id="l-web" style="text-decoration: underline;">Web SDK</li>
             </ul>
+            <p>
+              Note: The <code>API_URL</code> required for the SDKs should be <code id="base-url"></code>
+            </p>
           </div>
         </div>
         <div class="dashboard-row" id="guide-intro">
@@ -1928,7 +1931,9 @@
             <p>
               This page within the specific deployment view allows you to see
               some statistics related to the errors for the deployment, as well
-              as a list of all error events (with options for filtering)
+              as a list of all error events (with options for filtering). 
+              Error events can be marked as either "resolved" or "unresolved".
+              When an error occurs, the dashboard automatically captures and displays the exact system performance metrics (like CPU, Memory, or web metrics) and recent benchmarking data from the moment of the crash.
             </p>
             <h3>Deployment Performance</h3>
             <p>
@@ -1978,6 +1983,7 @@ const client = new PanoramaClient(); // create client instance
 client.init({
   api_key: "sample_api_key_1_0", // API key for deployment
   id: 1, // deployment id
+  api_url: "https://localhost:3000" // root URL for the Panorama API
 }); // can be done in an async function with await as well</code></pre>
             <h2>Tracking Errors</h2>
             <p>
@@ -2071,7 +2077,8 @@ client.init({
 client = PanoramaClient() # create client instance
 client.init({
   "id": 1, # deployment ID,
-  "api_key": "sample_api_key_1_0" # API key for deployment
+  "api_key": "sample_api_key_1_0", # API key for deployment
+  "api_url": "http://localhost:3000" # root URL for the Panorama API
 })</code></pre>
             <h2>Tracking Errors</h2>
             <p>
@@ -2168,7 +2175,8 @@ except Exception as e:
             <pre><code class="language-javascript">const client = new PanoramaWeb(); // create client instance
 client.init({ // initialize client with deployment details
   api_key: "sample_api_key_1_0", // API key for deployment
-  id: 1 // deployment id
+  id: 1, // deployment id
+  api_url: "http://localhost:3000" // root URL for the Panorama API
 })</code></pre>
             <h2>Tracking Errors</h2>
             <p>

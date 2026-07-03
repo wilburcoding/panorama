@@ -1460,10 +1460,19 @@ pre[class*="language-"] {
   background-color: #f5cb8c;
 }
 
+.sdeployment-monitoring-label {
+  flex: 1;
+  min-width: 0;
+  margin-right: 20px;
+}
+
 .sdeployment-monitoring-label p {
   font-size: 15px;
   margin-top: 4px;
   margin-bottom: 0px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .uptime-statistic p {
