@@ -13,6 +13,8 @@ The actual server + dashboard site can be found within the `panorama-app` folder
 
 Note: You can use the `/sample_data` of the dashboard (ex. `localhost:3000/sample_data`) to populate the database with the sample data. The username for the sample user created by this is `john@example.com` and the password is `12345678`
 
+Video demo URL can be found at `https://www.youtube.com/watch?v=jNTFX9cQB0I` 
+
 
 
 SDKs can be found in their respective folders, `javascript-sdk`, `python-sdk`, and `web-sdk`. Example usages of all of these can be found within the `testing` folder. 
